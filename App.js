@@ -12,8 +12,6 @@ import { useTheme } from "@mui/material/styles";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/material/Icon";
 
-
-
 function App() {
 let courses = []
 courses.push("COP3502C- Programming Fundamentals 1");
