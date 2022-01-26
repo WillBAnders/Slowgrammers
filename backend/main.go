@@ -19,19 +19,20 @@ func main() {
 
 	//TODO: Test data initialization script
 	/*
-		db.Create(&Course{Code: "COP 3502", Name: "Programming Fundamentals 1"})
-		db.Create(&Course{Code: "COP 3503", Name: "Programming Fundamentals 2"})
-		db.Create(&Course{Code: "COT 3100", Name: "Applications of Discrete Structures"})
-		db.Create(&Course{Code: "COP 3530", Name: "Data Structures and Algorithms"})
-		db.Create(&Course{Code: "CEN 3031", Name: "Introduction to Computer Organization"})
-		db.Create(&Course{Code: "CDA 3101", Name: "Introduction to Software Engineering"})
-		db.Create(&Course{Code: "CIS 4301", Name: "Information and Database Systems"})
-		db.Create(&Course{Code: "COP 4020", Name: "Programming Language Concepts"})
-		db.Create(&Course{Code: "COP 4600", Name: "Operating Systems"})
-		db.Create(&Course{Code: "CNT 4007", Name: "Computer Network Fundamentals"})
+		db.Create(&Course{Code: "cop-3502", Name: "Programming Fundamentals 1"})
+		db.Create(&Course{Code: "cop-3503", Name: "Programming Fundamentals 2"})
+		db.Create(&Course{Code: "cot-3100", Name: "Applications of Discrete Structures"})
+		db.Create(&Course{Code: "cop-3530", Name: "Data Structures and Algorithms"})
+		db.Create(&Course{Code: "cen-3031", Name: "Introduction to Computer Organization"})
+		db.Create(&Course{Code: "cda-3101", Name: "Introduction to Software Engineering"})
+		db.Create(&Course{Code: "cis-4301", Name: "Information and Database Systems"})
+		db.Create(&Course{Code: "cop-4020", Name: "Programming Language Concepts"})
+		db.Create(&Course{Code: "cop-4600", Name: "Operating Systems"})
+		db.Create(&Course{Code: "cnt-4007", Name: "Computer Network Fundamentals"})
 	*/
 
 	r := gin.Default()
+
 	r.GET("/courses", func(c *gin.Context) {
 		//TODO: Pagination support
 		var courses []Course
@@ -40,5 +41,21 @@ func main() {
 			"courses": courses,
 		})
 	})
+
+	r.GET("/courses/:code", func(c *gin.Context) {
+		code := c.Params.ByName("code")
+		var courses []Course
+		db.Limit(1).Find(&courses, "code = ?", code)
+		if len(courses) == 1 {
+			c.JSON(200, gin.H{
+				"course": courses[0],
+			})
+		} else {
+			c.JSON(404, gin.H{
+				"error": "Course " + code + " not found.",
+			})
+		}
+	})
+
 	r.Run(":8080")
 }
