@@ -1,8 +1,4 @@
-import React, { useEffect } from "react";
-import ReactDOM from "react-dom";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import { TextField } from "@mui/material";
+import React from "react";
 import CoursePage from "./components/CoursePage"
 
 function App() {
