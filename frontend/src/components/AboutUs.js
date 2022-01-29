@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Grid, CardHeader } from '@mui/material'
+import { Card, Grid, CardHeader, Typography } from '@mui/material'
 import AccessibilityIcon from '@mui/icons-material/Accessibility';
 import ComputerIcon from '@mui/icons-material/Computer';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
@@ -8,6 +8,13 @@ import '../styles/LandingPage.css'
 const AboutUs = () => {
     return (
         <div id="aboutus">
+            <Typography
+                className="main-text"
+                sx={{ fontWeight: 525 }}
+                variant="h2"
+            >
+                About Us    
+            </Typography>
             <Grid container spacing={3} 
             alignItems="center"
             justifyContent="center"
@@ -17,7 +24,7 @@ const AboutUs = () => {
                             <ComputerIcon justify="center"/>
                             <CardHeader
                                 title={'Accessible'}
-                                subheader={'TutorsVILLE has tutors that work online and can schedule around you!'}
+                                subheader={'TutorsVILLE has a community of tutors that can work online and have varying schedules! Or you can become a tutor yourself!'}
                                 className="card-title"
                             />
                             
@@ -28,7 +35,7 @@ const AboutUs = () => {
                             <AccessibilityIcon />
                             <CardHeader
                                 title={'Personalized'}
-                                subheader={'TutorsVILLE has personalized tutoring, specific to your classes. Get help on any assignment!'}
+                                subheader={'TutorsVILLE has personalized tutoring, specific to your classes. Get help on any assignment, or join to help tutor in your strongsuit!'}
                                 className="card-title"
                             />  
                             
@@ -39,7 +46,7 @@ const AboutUs = () => {
                         <SupportAgentIcon />
                         <CardHeader
                                 title={'Quick Help'}
-                                subheader={'TutorsVILLE has extremely fast support! Reach out at any time to get help.'}
+                                subheader={'TutorsVILLE has extremely fast support! Reach out to get help on any problem you encounter.'}
                                 className="card-title"
                             />
                             

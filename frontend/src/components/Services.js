@@ -1,11 +1,19 @@
 import React from 'react'
 import { Card, Grid, CardHeader, CardContent, CardMedia, Button, Typography, Box } from '@mui/material'
 import '../styles/LandingPage.css'
+import { Link } from 'react-router-dom'
 
 
 const Services = () => {
     return (
         <div name="Services">
+            <Typography
+                className="main-text"
+                sx={{ fontWeight: 525 }}
+                variant="h2"
+            >
+                Our Services    
+            </Typography>
             <Grid 
                 container 
                 spacing={2} 
@@ -32,9 +40,11 @@ const Services = () => {
                                 </Typography>
                             </CardContent>
                             <Box className="button-size">
-                                <Button variant="contained">
-                                    See Tutors
-                                </Button>
+                                <Link to="/Tutors" style={{ textDecoration: 'none' }}>
+                                    <Button variant="contained">
+                                        See Tutors
+                                    </Button>
+                                </Link>
                             </Box>
                     </Card>
                 </Grid>
@@ -57,9 +67,11 @@ const Services = () => {
                                 </Typography>
                             </CardContent>
                             <Box className="button-size">
-                                <Button variant="contained">
-                                    See Courses
-                                </Button>
+                                <Link to="/CoursePage" style={{ textDecoration: 'none' }}>
+                                    <Button variant="contained">
+                                        See Courses
+                                    </Button>
+                                </Link>
                             </Box>
                     </Card>
                 </Grid>
