@@ -5,7 +5,7 @@ import '../styles/LandingPage.css'
 
 const Services = () => {
     return (
-        <div>
+        <div name="Services">
             <Grid 
                 container 
                 spacing={2} 

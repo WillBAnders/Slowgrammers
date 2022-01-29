@@ -7,7 +7,7 @@ import '../styles/LandingPage.css'
 
 const AboutUs = () => {
     return (
-        <div>
+        <div id="aboutus">
             <Grid container spacing={3} 
             alignItems="center"
             justifyContent="center"

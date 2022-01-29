@@ -4,7 +4,7 @@ import '../styles/LandingPage.css'
 
 export default function Join() {
     return (
-        <div id="home" className="home-div">
+        <div id="join" className="home-div">
             <Grid 
             container 
             spacing={1} 
