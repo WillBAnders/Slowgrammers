@@ -4,6 +4,8 @@ import Button from "@mui/material/Button";
 import Navbar from './Navbar';
 import Home from './Home';
 import AboutUs from './AboutUs'
+import Services from './Services'
+import Join from './Join'
 
 const LandingPage = () => {
     return (
@@ -11,7 +13,8 @@ const LandingPage = () => {
             <Navbar />
             <Home />
             <AboutUs />
-            <Link to="/CoursePage">Go to Course Pages</Link>
+            <Services />
+            <Join />
         </div>
     )
 }

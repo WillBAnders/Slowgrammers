@@ -1,5 +1,5 @@
 import React from 'react'
-import { Stack, Box, Paper, Typography, Card, Grid } from '@mui/material'
+import { Box, Typography, Grid, Button } from '@mui/material'
 import Typewriter from 'typewriter-effect';
 import '../styles/LandingPage.css'
 
@@ -29,6 +29,9 @@ const Home = () => {
                                 }}
                             />
                             </div>
+                            <Button variant="contained">
+                                Get Started
+                            </Button>
                     </Typography>
                 </Grid>
                 <Grid item xs={12} md={7} container justify="center" alignItems="left">
