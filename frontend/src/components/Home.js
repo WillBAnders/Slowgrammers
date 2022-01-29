@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Typography, Grid, Button } from '@mui/material'
+import { Typography, Grid, Button } from '@mui/material'
 import Typewriter from 'typewriter-effect';
 import '../styles/LandingPage.css'
 
