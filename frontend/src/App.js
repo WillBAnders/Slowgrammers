@@ -4,6 +4,7 @@ import CoursePage from "./components/CoursePage"
 import LandingPage from "./components/LandingPage"
 import TutorPage from './components/TutorPage'
 import SignUpPage from "./components/SignUpPage";
+import SignInPage from "./components/SigninPage";
 import Navbar from './components/Navbar';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/Courses" element={<CoursePage/>}/>
           <Route path="/Tutors" element={<TutorPage />} />
           <Route path="/SignUp" element={<SignUpPage/>} />
+          <Route path="/SignIn" element={<SignInPage/>} />
         </Routes>
       </BrowserRouter>
     </div>
