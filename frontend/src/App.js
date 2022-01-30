@@ -4,11 +4,13 @@ import CoursePage from "./components/CoursePage"
 import LandingPage from "./components/LandingPage"
 import TutorPage from './components/TutorPage'
 import SignUpPage from "./components/SignUpPage";
+import Navbar from './components/Navbar';
 
 function App() {
   return(
     <div>
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/" exact element={<LandingPage/>}/>
           <Route path="/Courses" element={<CoursePage/>}/>

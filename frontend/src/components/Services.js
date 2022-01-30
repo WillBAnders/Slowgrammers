@@ -67,7 +67,7 @@ const Services = () => {
                                 </Typography>
                             </CardContent>
                             <Box className="button-size">
-                                <Link to="/CoursePage" style={{ textDecoration: 'none' }}>
+                                <Link to="/Courses" style={{ textDecoration: 'none' }}>
                                     <Button variant="contained">
                                         See Courses
                                     </Button>
