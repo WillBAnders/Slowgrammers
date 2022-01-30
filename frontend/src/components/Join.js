@@ -28,7 +28,7 @@ export default function Join() {
                         className="main-text"
                         variant="h2"
                     >
-                        Join TutsVILLE today! <br/>
+                        Join TutorsVILLE today! <br/>
                         <Link to="/SignUp" style={{ textDecoration: 'none' }}>
                             <Button variant="contained">
                                 Sign Up
