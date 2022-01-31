@@ -3,6 +3,44 @@ import { Stack, CardHeader, CardContent, Rating, Card, Typography, Grid, TextFie
 import tutorsList from '../tests/Tutors'
 
 const TutorPage = () => {
+    function writeOutTutors(tutors, filter){
+        if (filter === undefined) {
+            filter = "";
+        }
+        let tutorList = [];
+        for (let i = 0; i < tutors.length; i++){
+                let title = tutors.at(i).firstName + " " + tutors.at(i).lastName;
+                let courses = tutors.at(i).classCode;
+                let coursesuppercased = courses.map(courses => courses.toUpperCase());
+                let avail = tutors.at(i).availability;
+                let availuppercased = avail.map(avail => avail.toUpperCase());
+                if (title.toUpperCase().includes(filter.toUpperCase()) || coursesuppercased.find(element => element.includes(filter.toUpperCase())) || availuppercased.find(element => element.includes(filter.toUpperCase()))) tutorList.push(
+                <Card key={tutors.at(i).id} >
+                    <CardHeader 
+                        title={title}
+                        subheader={<Rating name="read-only" precision={0.1} size="small" value={tutors.at(i).rating} readOnly />}
+                    />
+                    <CardContent>
+                        <Typography
+                            component="div"
+                            sx={{marginBottom: "10px"}}
+                        >
+                            Classes:
+                            {writeOutClasses(courses)}
+                        </Typography>
+                        <Typography 
+                            sx={{marginBottom: "10px"}}
+                            component="div"
+                        >
+                            Availability:
+                            {writeOutAvailability(avail)}
+                        </Typography>
+                    </CardContent>
+                </Card>
+            );
+        }
+        return tutorList;
+    }
     function writeOutClasses(classes){
         return (
             <Grid
@@ -58,7 +96,10 @@ const TutorPage = () => {
             </Grid>
         )
     }
-
+    const [value, setValue] = React.useState("");
+    const handleChange = e => {
+        setValue(e.target.value);
+    };
     return (
         <div>
             <Box sx={{display:"flex", justifyContent:"center"}}>
@@ -87,7 +128,14 @@ const TutorPage = () => {
                         maxWidth: "750px"
                     }}
                 >
-                    <TextField fullWidth id="tutor-search" label="Search Here" variant="outlined" />
+                    <TextField 
+                        value={value}
+                        fullWidth 
+                        id="tutor-search" 
+                        label="Search Here" 
+                        variant="outlined"
+                        onChange={handleChange} 
+                        />
                 </Paper>
             </Box>
 
@@ -106,32 +154,7 @@ const TutorPage = () => {
                     spacing={1}
                     sx={{ width: "80%"}}
                 >
-                    {tutorsList.map((tutor) =>{
-                        return(
-                            <Card key={tutor.id} >
-                                <CardHeader 
-                                    title={`${tutor.firstName} ${tutor.lastName}`}
-                                    subheader={<Rating name="read-only" precision={0.1} size="small" value={tutor.rating} readOnly />}
-                                />
-                                <CardContent>
-                                    <Typography
-                                        component="div"
-                                        sx={{marginBottom: "10px"}}
-                                    >
-                                        Classes:
-                                        {writeOutClasses(tutor.classCode)}
-                                    </Typography>
-                                    <Typography 
-                                        sx={{marginBottom: "10px"}}
-                                        component="div"
-                                    >
-                                        Availability:
-                                        {writeOutAvailability(tutor.availability)}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        )
-                    })}
+                    {writeOutTutors(tutorsList, value)}
                 </Stack>
             </Grid>
         </div>

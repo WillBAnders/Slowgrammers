@@ -1,7 +1,7 @@
 import React from 'react'
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import { TextField } from "@mui/material";
+import { TextField, Box, Paper, Stack, Button } from "@mui/material";
+import { BrowserRouter, Route, Link } from "react-router-dom";
+import { positions } from '@mui/system';
 
 const CoursePage = () => {
     function loadButtons(courses, filter) {
@@ -15,16 +15,18 @@ const CoursePage = () => {
             link = link.replace(/\s/g, "-");
             if (text.toUpperCase().includes(filter.toUpperCase())) {
                 //Added the key to be equal to i (might have to make unique IDs for each of the courses)
-                buttons.push(
-                    <Button
-                        key = {i}
-                        variant="contained"
-                        text={text}
-                        href={link}
-                    >
-                        {text}
-                    </Button>
-                );
+                    buttons.push(
+                        <Link to={link} style={{ textDecoration: 'none', color: "blue" }}>
+                            <Button
+                                key = {i}
+                                variant="contained"
+                                text={text}
+                                style={{maxWidth: '400px', maxHeight: '100px', minWidth: '400px', minHeight: '100px'}}
+                            >
+                                {text}
+                            </Button>
+                        </Link>
+                    );
             }
         }
         //console.log(buttons.length);
@@ -54,17 +56,55 @@ const CoursePage = () => {
     return (
 
         <div className="Courses">
-            <TextField value={value}
-                id="outlined-basic"
-                label="SearchBar"
-                variant="outlined"
-                name="SearchBar"
-                onChange={handleChange}
-            />
+            <Box 
+                display="flex" 
+                width="100%"
+                alignItems="center"
+                justifyContent="center"
+            >
+                <Paper
+                    elevation={0}
+                    sx={{
+                        width: "400px",
+                        margin: "10px",
+                        maxWidth: "750px"
+                    }}
+                >
+                    <TextField value={value}
+                        fullWidth 
+                        id="outlined-basic"
+                        label="SearchBar"
+                        variant="outlined"
+                        name="SearchBar"
+                        onChange={handleChange}
+                        inputProps={{
+                            "data-testid": "SearchBarin"
+                        }}
+                    />
+            </Paper>
+            </Box>
             {/* Course Buttons */}
-            <Stack direction="column" spacing={{ xs: 1, sm: 2, md: 2.5 }}>
-                {loadButtons(courses, value)}
-            </Stack>
+            <Box 
+                display="flex" 
+                width="100%"
+                alignSelf="right"
+                alignItems="right"
+                justifyContent="right"
+            >
+                <Paper
+                    elevation={0}
+                    sx={{
+                        mr: 10
+                    }}
+                >
+                    <Stack 
+                        direction="column" 
+                        spacing={{ xs: 1, sm: 2, md: 2.5 }}
+                        label="buttonStack">
+                        {loadButtons(courses, value)}
+                    </Stack>
+                </Paper>
+            </Box>
             {/* Window Part */}
         </div>
     )
