@@ -9,7 +9,17 @@ export default function Join() {
         <div id="join" className="home-div">
             <Typography
                 className="main-text"
-                sx={{ fontWeight: 525 }}
+                sx={{ 
+                    fontWeight: 525,
+                    paddingLeft: {
+                        xs: "0px",
+                        md: "30px"
+                    },
+                    paddingTop: {
+                        xs: "30px",
+                        md: "0px"
+                    }
+                }}
                 variant="h2"
             >
                 Get Started    
@@ -19,7 +29,7 @@ export default function Join() {
             spacing={1} 
             alignItems="center"
             justifyContent="center"
-            style={{ minHeight: '100vh' }}>
+            style={{ minHeight: '90vh' }}>
                 <Grid item xs={12} md={7} container justify="center" alignItems="left">
                     <img src="/images/join.png"  height="100%" width="100%" className="main-img" alt="join"/>
                 </Grid>

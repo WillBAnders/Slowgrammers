@@ -109,6 +109,14 @@ const Navbar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
+            <Link to="/SignUp" style={{ textDecoration: 'none', color: 'white'}}>
+              <Button 
+                variant="contained"
+                sx={{ margin: "5px"}}
+              >
+                Sign up
+              </Button>
+            </Link>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="John Doe" src="" />

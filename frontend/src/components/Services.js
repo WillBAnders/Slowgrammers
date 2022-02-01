@@ -9,7 +9,17 @@ const Services = () => {
         <div name="Services">
             <Typography
                 className="main-text"
-                sx={{ fontWeight: 525 }}
+                sx={{ 
+                    fontWeight: 525,
+                    paddingLeft: {
+                        xs: "0px",
+                        md: "30px"
+                    },
+                    paddingTop: {
+                        xs: "30px",
+                        md: "0px"
+                    }
+                 }}
                 variant="h2"
             >
                 Our Services    

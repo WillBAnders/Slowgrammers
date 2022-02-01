@@ -13,6 +13,16 @@ const Home = () => {
                     <Typography
                         className="main-text"
                         variant="h2"
+                        sx={{
+                        paddingLeft: {
+                            xs: "0px",
+                            md: "30px"
+                        },
+                        paddingTop: {
+                            xs: "20px",
+                            md: "0px"
+                        }
+                        }}
                     >
                         Welcome aboard, begin
                             <div className="typew">
