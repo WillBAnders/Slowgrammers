@@ -1,0 +1,19 @@
+package models
+
+type Course struct {
+	ID   uint   `gorm:"primaryKey" json:"-"`
+	Code string `gorm:"unique,not null" json:"code"`
+	Name string `gorm:"not null" json:"name"`
+}
+
+type Tutor struct {
+	ID       uint   `gorm:"primaryKey" json:"-"`
+	Username string `gorm:"unique,not null" json:"username"`
+}
+
+type Tutoring struct {
+	TutorID  uint   `json:"-"`
+	Tutor    Tutor  `gorm:"foreignKey:TutorID" json:"tutor"`
+	CourseID uint   `json:"-"`
+	Course   Course `gorm:"foreignKey:CourseID" json:"course"`
+}

@@ -4,18 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"models"
 )
-
-type Course struct {
-	ID   uint   `gorm:"primaryKey" json:"-"`
-	Code string `gorm:"unique,not null" json:"code"`
-	Name string `gorm:"not null" json:"name"`
-}
 
 func main() {
 	//TODO: Initialization errors
 	db, _ := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
-	_ = db.AutoMigrate(&Course{})
+	_ = db.AutoMigrate(&models.Course{})
 
 	//TODO: Test data initialization script
 	/*
@@ -35,7 +30,7 @@ func main() {
 
 	r.GET("/courses", func(c *gin.Context) {
 		//TODO: Pagination support
-		var courses []Course
+		var courses []models.Course
 		db.Order("code").Find(&courses)
 		c.JSON(200, gin.H{
 			"courses": courses,
@@ -44,7 +39,7 @@ func main() {
 
 	r.GET("/courses/:code", func(c *gin.Context) {
 		code := c.Params.ByName("code")
-		var courses []Course
+		var courses []models.Course
 		db.Limit(1).Find(&courses, "code = ?", code)
 		if len(courses) == 1 {
 			c.JSON(200, gin.H{
