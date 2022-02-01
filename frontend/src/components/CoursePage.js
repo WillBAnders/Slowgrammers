@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextField, Box, Paper, Stack, Button } from "@mui/material";
+import { TextField, Box, Paper, Stack, Button, CardHeader, Card, CardContent } from "@mui/material";
 import { BrowserRouter, Route, Link } from "react-router-dom";
 import { positions } from '@mui/system';
 
@@ -11,20 +11,19 @@ const CoursePage = () => {
         let buttons = [];
         for (let i = 0; i < courses.length; i++) {
             let text = courses.at(i).code + ": " + courses.at(i).name;
-            let link = "/courses/" + courses.at(i).code;
-            link = link.replace(/\s/g, "-");
+            let link = "/Courses/" + courses.at(i).code;
             if (text.toUpperCase().includes(filter.toUpperCase())) {
                 //Added the key to be equal to i (might have to make unique IDs for each of the courses)
                     buttons.push(
                         <Link to={link} style={{ textDecoration: 'none', color: "blue" }}>
-                            <Button
+                            <Card 
                                 key = {i}
-                                variant="contained"
-                                text={text}
-                                style={{maxWidth: '400px', maxHeight: '100px', minWidth: '400px', minHeight: '100px'}}
                             >
-                                {text}
-                            </Button>
+                                <CardHeader
+                                    subheader = {courses.at(i).name}
+                                    title = {courses.at(i).code.toUpperCase()}
+                                />
+                            </Card>
                         </Link>
                     );
             }
@@ -71,8 +70,9 @@ const CoursePage = () => {
                     }}
                 >
                     <TextField value={value}
-                        fullWidth 
-                        id="outlined-basic"
+                        fullWidth
+                        className="SearchBar" 
+                        id="SearchBar"
                         label="SearchBar"
                         variant="outlined"
                         name="SearchBar"
@@ -87,20 +87,20 @@ const CoursePage = () => {
             <Box 
                 display="flex" 
                 width="100%"
-                alignSelf="right"
-                alignItems="right"
-                justifyContent="right"
+                alignSelf="center"
+                alignItems="center"
+                justifyContent="center"
             >
                 <Paper
                     elevation={0}
                     sx={{
-                        mr: 10
+                        width:'28%'
                     }}
                 >
                     <Stack 
                         direction="column" 
                         spacing={{ xs: 1, sm: 2, md: 2.5 }}
-                        label="buttonStack">
+                        data-testid="buttonStack">
                         {loadButtons(courses, value)}
                     </Stack>
                 </Paper>
