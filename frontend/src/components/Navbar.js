@@ -12,6 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import { Link as ScrollLink } from 'react-scroll'
 
 const pages = ['About Us', 'Services', 'Contact Us'];
 const settings = ['Profile', 'Finance', 'Logout'];
@@ -81,7 +82,9 @@ const Navbar = () => {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <ScrollLink activeClass="active" to={page} spy={true} smooth={true} duration={500}>
                     <Typography textAlign="right">{page}</Typography>
+                  </ScrollLink>
                 </MenuItem>
               ))}
             </Menu>
@@ -97,15 +100,23 @@ const Navbar = () => {
             </Link>
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
+              {pages.map((page) => (
+                <ScrollLink 
+                  key={page}
+                  activeClass="active" 
+                  to={page} 
+                  spy={true} 
+                  smooth={true} 
+                  duration={500}>
+                    <Button
+                      key={page}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: 'white', display: 'block' }}
+                    >
+                      {page}
+                    </Button>
+                </ScrollLink>
+              ))}
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 const Services = () => {
     return (
-        <div name="Services">
+        <div id="Services">
             <Typography
                 className="main-text"
                 sx={{ 

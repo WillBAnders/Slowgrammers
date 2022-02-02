@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 export default function Join() {
     return (
-        <div id="join" className="home-div">
+        <div id="Join" className="home-div">
             <Typography
                 className="main-text"
                 sx={{ 
