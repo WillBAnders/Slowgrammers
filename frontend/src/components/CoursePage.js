@@ -1,7 +1,7 @@
 import React from 'react'
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import { TextField } from "@mui/material";
+import { TextField, Box, Paper, Stack, Button, CardHeader, Card, CardContent } from "@mui/material";
+import { BrowserRouter, Route, Link } from "react-router-dom";
+import { positions } from '@mui/system';
 
 const CoursePage = () => {
     function loadButtons(courses, filter) {
@@ -11,20 +11,21 @@ const CoursePage = () => {
         let buttons = [];
         for (let i = 0; i < courses.length; i++) {
             let text = courses.at(i).code + ": " + courses.at(i).name;
-            let link = "/courses/" + courses.at(i).code;
-            link = link.replace(/\s/g, "-");
+            let link = "/Courses/" + courses.at(i).code;
             if (text.toUpperCase().includes(filter.toUpperCase())) {
                 //Added the key to be equal to i (might have to make unique IDs for each of the courses)
-                buttons.push(
-                    <Button
-                        key = {i}
-                        variant="contained"
-                        text={text}
-                        href={link}
-                    >
-                        {text}
-                    </Button>
-                );
+                    buttons.push(
+                        <Link to={link} style={{ textDecoration: 'none', color: "blue" }}>
+                            <Card 
+                                key = {i}
+                            >
+                                <CardHeader
+                                    subheader = {courses.at(i).name}
+                                    title = {courses.at(i).code.toUpperCase()}
+                                />
+                            </Card>
+                        </Link>
+                    );
             }
         }
         //console.log(buttons.length);
@@ -54,17 +55,56 @@ const CoursePage = () => {
     return (
 
         <div className="Courses">
-            <TextField value={value}
-                id="outlined-basic"
-                label="SearchBar"
-                variant="outlined"
-                name="SearchBar"
-                onChange={handleChange}
-            />
+            <Box 
+                display="flex" 
+                width="100%"
+                alignItems="center"
+                justifyContent="center"
+            >
+                <Paper
+                    elevation={0}
+                    sx={{
+                        width: "400px",
+                        margin: "10px",
+                        maxWidth: "750px"
+                    }}
+                >
+                    <TextField value={value}
+                        fullWidth
+                        className="SearchBar" 
+                        id="SearchBar"
+                        label="SearchBar"
+                        variant="outlined"
+                        name="SearchBar"
+                        onChange={handleChange}
+                        inputProps={{
+                            "data-testid": "SearchBarin"
+                        }}
+                    />
+            </Paper>
+            </Box>
             {/* Course Buttons */}
-            <Stack direction="column" spacing={{ xs: 1, sm: 2, md: 2.5 }}>
-                {loadButtons(courses, value)}
-            </Stack>
+            <Box 
+                display="flex" 
+                width="100%"
+                alignSelf="center"
+                alignItems="center"
+                justifyContent="center"
+            >
+                <Paper
+                    elevation={0}
+                    sx={{
+                        width:'28%'
+                    }}
+                >
+                    <Stack 
+                        direction="column" 
+                        spacing={{ xs: 1, sm: 2, md: 2.5 }}
+                        data-testid="buttonStack">
+                        {loadButtons(courses, value)}
+                    </Stack>
+                </Paper>
+            </Box>
             {/* Window Part */}
         </div>
     )
