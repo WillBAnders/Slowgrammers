@@ -37,6 +37,7 @@ const Navbar = () => {
   };
 
   return (
+    <div className='navbarr'>
     <AppBar position="absolute">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -159,6 +160,7 @@ const Navbar = () => {
         </Toolbar>
       </Container>
     </AppBar>
+    </div>
   );
 };
 export default Navbar;

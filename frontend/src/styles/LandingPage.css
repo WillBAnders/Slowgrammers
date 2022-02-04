@@ -46,3 +46,7 @@
 .navbar > .active {
     border-bottom: 1px white ;
 }
+
+.navbarr{
+    padding-bottom: 70px;
+}
