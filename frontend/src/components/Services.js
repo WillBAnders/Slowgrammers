@@ -6,10 +6,20 @@ import { Link } from 'react-router-dom'
 
 const Services = () => {
     return (
-        <div name="Services">
+        <div id="Services">
             <Typography
                 className="main-text"
-                sx={{ fontWeight: 525 }}
+                sx={{ 
+                    fontWeight: 525,
+                    paddingLeft: {
+                        xs: "0px",
+                        md: "30px"
+                    },
+                    paddingTop: {
+                        xs: "30px",
+                        md: "0px"
+                    }
+                 }}
                 variant="h2"
             >
                 Our Services    

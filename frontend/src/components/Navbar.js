@@ -12,6 +12,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import { Link as ScrollLink } from 'react-scroll'
 
 const pages = ['About Us', 'Services', 'Contact Us'];
 const settings = ['Profile', 'Finance', 'Logout'];
@@ -36,7 +37,7 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="sticky">
+    <AppBar position="absolute">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Link to="/" style={{ textDecoration: 'none', color: 'white'}}>
@@ -81,7 +82,9 @@ const Navbar = () => {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <ScrollLink activeClass="active" to={page} spy={true} smooth={true} duration={500}>
                     <Typography textAlign="right">{page}</Typography>
+                  </ScrollLink>
                 </MenuItem>
               ))}
             </Menu>
@@ -97,18 +100,34 @@ const Navbar = () => {
             </Link>
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
+              {pages.map((page) => (
+                <ScrollLink 
+                  key={page}
+                  activeClass="active" 
+                  to={page} 
+                  spy={true} 
+                  smooth={true} 
+                  duration={500}>
+                    <Button
+                      key={page}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: 'white', display: 'block' }}
+                    >
+                      {page}
+                    </Button>
+                </ScrollLink>
+              ))}
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
+            <Link to="/SignUp" style={{ textDecoration: 'none', color: 'white'}}>
+              <Button 
+                variant="contained"
+                sx={{ margin: "5px"}}
+              >
+                Sign up
+              </Button>
+            </Link>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="John Doe" src="" />
