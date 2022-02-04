@@ -94,7 +94,7 @@ const CoursePage = () => {
                 <Paper
                     elevation={0}
                     sx={{
-                        width:'28%'
+                        width: { xs: '95%',  md:'28%' }
                     }}
                 >
                     <Stack 
