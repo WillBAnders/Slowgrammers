@@ -9,9 +9,15 @@ var DB *gorm.DB
 
 func InitDatabase(dsn string) {
 	//TODO: Error handling
-	//TODO: Fix relative path use (relative from cmd/<cmd>)
 	DB, _ = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
-	_ = DB.AutoMigrate(&Course{}, &Tutor{}, &Tutoring{})
+	_ = DB.AutoMigrate(&User{}, &Course{}, &Tutor{}, &Tutoring{})
+}
+
+//TODO: Merge with Tutor (depends on information stored)
+type User struct {
+	ID       uint   `gorm:"primaryKey" json:"-"`
+	Username string `gorm:"unique,not null" json:"username"`
+	Password string `gorm:"not null" json:"-"`
 }
 
 type Course struct {
