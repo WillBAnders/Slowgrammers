@@ -2,6 +2,7 @@ package src
 
 import (
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var Router *gin.Engine
@@ -12,6 +13,8 @@ func InitRouter() {
 	Router.GET("/courses/:code", getCoursesCode)
 	Router.GET("/tutors", getTutors)
 	Router.GET("/tutors/:username", getTutorsUsername)
+	Router.POST("/signup", postSignup)
+	Router.POST("/signin", postSignin)
 }
 
 func getCourses(c *gin.Context) {
@@ -76,4 +79,66 @@ func getTutorsUsername(c *gin.Context) {
 			"error": "Tutor " + username + " not found.",
 		})
 	}
+}
+
+type AuthBody struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func postSignup(c *gin.Context) {
+	//TODO: Error on unknown fields
+	var body AuthBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{
+			"error": "Invalid request: " + err.Error() + ".",
+		})
+		return
+	}
+
+	//TODO: Validate username/password
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", body.Username)
+	if len(users) != 0 {
+		c.JSON(401, gin.H{
+			"error": "User " + body.Username + " already exists.",
+		})
+		return
+	}
+
+	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
+	DB.Create(&User{Username: body.Username, Password: string(hash)})
+
+	c.JSON(200, gin.H{})
+}
+
+func postSignin(c *gin.Context) {
+	//TODO: Error on unknown fields
+	var body AuthBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{
+			"error": "Invalid request: " + err.Error() + ".",
+		})
+		return
+	}
+
+	//TODO: Validate username/password
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", body.Username)
+	if len(users) != 1 {
+		c.JSON(401, gin.H{
+			"error": "User " + body.Username + " not found.",
+		})
+		return
+	}
+
+	if bcrypt.CompareHashAndPassword([]byte(users[0].Password), []byte(body.Password)) != nil {
+		c.JSON(401, gin.H{
+			"error": "Invalid password.",
+		})
+	}
+
+	c.JSON(200, gin.H{})
 }
