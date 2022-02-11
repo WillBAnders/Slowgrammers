@@ -30,8 +30,8 @@ func getCoursesCode(c *gin.Context) {
 	if len(courses) == 1 {
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
-		DB.Preload("Tutor").Find(&tutorings, "course_id = ?", courses[0].ID)
-		var tutors []Tutor
+		DB.Joins("Tutor").Order("Tutor__username").Find(&tutorings, "course_id = ?", courses[0].ID)
+		tutors := []Tutor{}
 		for _, tutoring := range tutorings {
 			tutors = append(tutors, tutoring.Tutor)
 		}
@@ -62,8 +62,8 @@ func getTutorsUsername(c *gin.Context) {
 	if len(tutors) == 1 {
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
-		DB.Preload("Course").Find(&tutorings, "tutor_id = ?", tutors[0].ID)
-		var courses []Course
+		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].ID)
+		courses := []Course{}
 		for _, tutoring := range tutorings {
 			courses = append(courses, tutoring.Course)
 		}
