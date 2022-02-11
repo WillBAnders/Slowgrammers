@@ -14,6 +14,14 @@ func InitRouter() {
 	Router.GET("/tutors/:username", getTutorsUsername)
 }
 
+// Handler for /courses. Returns all courses ordered by code.
+//
+// Response Schema: {
+//   courses: []Course {
+//     code: String
+//     name: String
+//   }
+// }
 func getCourses(c *gin.Context) {
 	//TODO: Pagination support
 	var courses []Course
@@ -23,6 +31,22 @@ func getCourses(c *gin.Context) {
 	})
 }
 
+// Handler for /courses/:code. Returns the course identified by :code along
+// with all tutors ordered by username. If the course :code is not defined,
+// returns a 404 with an error message.
+//
+// Response Schema: {
+//   course: Course {
+//     code: String
+//     name: String
+//   }
+//   tutors: []Tutor {
+//     username: String
+//   }
+// }
+// Error Schema: {
+//   error: String
+// }
 func getCoursesCode(c *gin.Context) {
 	code := c.Params.ByName("code")
 	var courses []Course
@@ -46,6 +70,13 @@ func getCoursesCode(c *gin.Context) {
 	}
 }
 
+// Handler for /tutors. Returns all tutors ordered by username.
+//
+// Response Schema: {
+//   tutors: []Tutor {
+//     username: String
+//   }
+// }
 func getTutors(c *gin.Context) {
 	//TODO: Pagination support
 	var tutors []Tutor
@@ -55,6 +86,22 @@ func getTutors(c *gin.Context) {
 	})
 }
 
+// Handler for /tutors/:username. Returns the tutor identified by :username
+// along with all courses tutored ordered by code. If the tutor :username is
+// not defined, returns a 404 with an error message.
+//
+// Response Schema: {
+//   tutor: Tutor {
+//     username: String
+//   }
+//   courses: []Course {
+//     code: String
+//     name: String
+//   }
+// }
+// Error Schema: {
+//   error: String
+// }
 func getTutorsUsername(c *gin.Context) {
 	username := c.Params.ByName("username")
 	var tutors []Tutor
