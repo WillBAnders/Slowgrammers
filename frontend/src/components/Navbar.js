@@ -15,9 +15,9 @@ import MenuItem from '@mui/material/MenuItem';
 import { Link as ScrollLink } from 'react-scroll'
 
 const pages = ['About Us', 'Services', 'Contact Us'];
-const settings = ['Profile', 'Finance', 'Logout'];
+//const settings = ['Profile', 'Finance', 'Logout'];
 
-const Navbar = () => {
+const Navbar = ({ name, setName }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -35,6 +35,75 @@ const Navbar = () => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const signout = () =>{
+    setName(false)
+    handleCloseUserMenu()
+  }
+
+let buttons;
+if(name){
+  buttons = (
+    <Box sx={{ flexGrow: 0 }}>
+    <Tooltip title="Open settings">
+      <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+        <Avatar alt="John Doe" src="" />
+      </IconButton>
+    </Tooltip>
+    <Menu
+      sx={{ mt: '45px' }}
+      id="menu-appbar"
+      anchorEl={anchorElUser}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={Boolean(anchorElUser)}
+      onClose={handleCloseUserMenu}
+    >
+      <MenuItem onClick={handleCloseUserMenu}>
+        <Typography textAlign="center">Profile</Typography>
+      </MenuItem>
+      <MenuItem onClick={handleCloseUserMenu}>
+        <Typography textAlign="center">Finance</Typography>
+      </MenuItem>
+      <MenuItem onClick={signout}>
+        <Typography textAlign="center">Logout</Typography>
+      </MenuItem>
+    </Menu>
+  </Box>
+  )
+
+}else{
+  buttons = (
+    <Box sx={{ flexGrow: 0 }}>
+    <Link to="/SignUp" style={{ textDecoration: 'none', color: 'white'}}>
+      <Button 
+        variant="contained"
+        color="secondary"
+        sx={{ margin: "5px"}}
+      >
+        Sign Up
+      </Button>
+    </Link>
+    <Link to="/SignIn" style={{ textDecoration: 'none', color: 'white'}}>
+      <Button 
+        variant="contained"
+        color="secondary"
+        sx={{ margin: "5px"}}
+      >
+        Sign In
+      </Button>
+    </Link>
+  </Box>
+  )
+}
+
 
   return (
     <div className='navbarr'>
@@ -119,44 +188,7 @@ const Navbar = () => {
                 </ScrollLink>
               ))}
           </Box>
-
-          <Box sx={{ flexGrow: 0 }}>
-            <Link to="/SignUp" style={{ textDecoration: 'none', color: 'white'}}>
-              <Button 
-                variant="contained"
-                sx={{ margin: "5px"}}
-              >
-                Sign up
-              </Button>
-            </Link>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="John Doe" src="" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+          {buttons}
         </Toolbar>
       </Container>
     </AppBar>
