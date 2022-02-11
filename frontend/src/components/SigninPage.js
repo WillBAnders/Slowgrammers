@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,21 +10,42 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 
 const theme = createTheme();
 
-export default function SigninPage() {
-  const handleSubmit = (event) => {
+export default function SigninPage({ setName }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [navigate, setNavigate] = useState(false);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    
+    console.log(username + password)
+
+    const res = await fetch('/signin', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({
+            username,
+            password
+        })
     });
+    
+    setNavigate(true);
+    //const content = await res.json();  
+
+    if(res.status === 200){
+      console.log(res)
+      setName(true)
+    }
   };
 
+  if (navigate) {
+    return <Navigate to="/"/>;
+  }
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
@@ -61,21 +83,19 @@ export default function SigninPage() {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                label="Username"
+                autoComplete="username"
                 autoFocus
+                onChange={(e) => {setUsername(e.target.value)}}
               />
               <TextField
                 margin="normal"
                 required
                 fullWidth
-                name="password"
                 label="Password"
                 type="password"
-                id="password"
                 autoComplete="current-password"
+                onChange={(e) => {setPassword(e.target.value)}}
               />
               <Button
                 type="submit"
