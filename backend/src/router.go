@@ -157,7 +157,17 @@ func postSignup(c *gin.Context) {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	DB.Create(&User{Username: body.Username, Password: string(hash)})
 
-	c.JSON(200, gin.H{})
+	token, err := CreateJWT(body.Username)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to create JWT.",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		token: token,
+	})
 }
 
 func postSignin(c *gin.Context) {
@@ -187,5 +197,15 @@ func postSignin(c *gin.Context) {
 		})
 	}
 
-	c.JSON(200, gin.H{})
+	token, err := CreateJWT(body.Username)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to create JWT.",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		token: token,
+	})
 }
