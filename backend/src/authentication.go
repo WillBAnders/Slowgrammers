@@ -13,14 +13,14 @@ type Claims struct {
 }
 
 func CreateJWT(username string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, &Claims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
 		&jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(24 * time.Hour).Unix(),
 			Issuer:    "Server",
 		},
 		username,
 	})
-	return token.SignedString(secret)
+	return token.SignedString([]byte(secret))
 }
 
 func ParseJWT(tokenString string) (*Claims, error) {

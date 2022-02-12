@@ -129,8 +129,8 @@ func getTutorsUsername(c *gin.Context) {
 }
 
 type AuthBody struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 func postSignup(c *gin.Context) {
@@ -160,13 +160,13 @@ func postSignup(c *gin.Context) {
 	token, err := CreateJWT(body.Username)
 	if err != nil {
 		c.JSON(500, gin.H{
-			"error": "Unable to create JWT.",
+			"error": "Unable to create JWT: " + err.Error() + ".",
 		})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		token: token,
+		"token": token,
 	})
 }
 
@@ -206,6 +206,6 @@ func postSignin(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		token: token,
+		"token": token,
 	})
 }
