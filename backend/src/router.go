@@ -133,6 +133,23 @@ type AuthBody struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// Handler for /signup. Takes a username and password and creates a new user
+// account, returning a JWT. Errors if:
+//
+//  - The body has missing/unknown fields (400)
+//  - The username already exists (401)
+//  - A server issue prevents creating a JWT (500)
+//
+// Body Schema: {
+//   username: String
+//   password: String
+// }
+// Response Schema: {
+//   token: JWT
+// }
+// Error Schema: {
+//   error: String
+// }
 func postSignup(c *gin.Context) {
 	//TODO: Error on unknown fields
 	var body AuthBody
@@ -170,6 +187,24 @@ func postSignup(c *gin.Context) {
 	})
 }
 
+// Handler for /signin. Takes a username and password and logs in an existing
+// user account, returning a JWT. Errors if:
+//
+//  - The body has missing/unknown fields (400)
+//  - The username does not exist (401)
+//  - The password is invalid (401)
+//  - A server issue prevents creating a JWT (500)
+//
+// Body Schema: {
+//   username: String
+//   password: String
+// }
+// Response Schema: {
+//   token: JWT
+// }
+// Error Schema: {
+//   error: String
+// }
 func postSignin(c *gin.Context) {
 	//TODO: Error on unknown fields
 	var body AuthBody
