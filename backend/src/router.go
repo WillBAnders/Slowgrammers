@@ -12,6 +12,7 @@ func InitRouter() {
 	Router.GET("/courses/:code", getCoursesCode)
 	Router.GET("/tutors", getTutors)
 	Router.GET("/tutors/:username", getTutorsUsername)
+	Router.GET("/users/:username", getUsersUsername)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -124,3 +125,30 @@ func getTutorsUsername(c *gin.Context) {
 		})
 	}
 }
+
+// Handler for /users/:username. Returns the user identified by :username
+// If the tutor :username is not defined, returns a 404 with an error message.
+//
+// Response Schema: {
+//   user: User {
+//     username: String
+//   }
+// }
+// Error Schema: {
+//   error: String
+// }
+func getUsersUsername(c *gin.Context) {
+	username := c.Params.ByName("username")
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", username)
+	if len(users) == 1 {
+		c.JSON(200, gin.H{
+			"user":   users[0],
+		})
+	} else {
+		c.JSON(404, gin.H{
+			"error": "User " + username + " not found.",
+		})
+	}
+}
+

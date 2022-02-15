@@ -11,7 +11,7 @@ func InitDatabase(dsn string) {
 	//TODO: Error handling
 	//TODO: Fix relative path use (relative from cmd/<cmd>)
 	DB, _ = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
-	_ = DB.AutoMigrate(&Course{}, &Tutor{}, &Tutoring{})
+	_ = DB.AutoMigrate(&Course{}, &Tutor{}, &Tutoring{}, &User{})
 }
 
 type Course struct {
@@ -30,4 +30,10 @@ type Tutoring struct {
 	Tutor    Tutor  `gorm:"foreignKey:TutorID" json:"tutor"`
 	CourseID uint   `json:"-"`
 	Course   Course `gorm:"foreignKey:CourseID" json:"course"`
+}
+
+type User struct {
+	ID       uint   `gorm:"primaryKey" json:"-"`
+	Username string `gorm:"unique,not null" json:"username"`
+	//TODO: Add other attributes
 }

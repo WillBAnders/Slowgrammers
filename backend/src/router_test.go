@@ -294,3 +294,76 @@ func request(method string, path string) *httptest.ResponseRecorder {
 	Router.ServeHTTP(w, req)
 	return w
 }
+//still working on this, having trouble getting others to compile
+/*
+func (suite *RouterSuite) TestGetUserUsername() {
+	user := Tutor{ID: 1, Username: "Username"}
+
+	test := func(tutorings []Tutoring, expected string) func() {
+		return manualSetupTest(func() {
+			DB.Create(&tutor)
+			DB.Create(tutorings)
+			w := request("GET", "/tutors/"+tutor.Username)
+			suite.Equal(200, w.Code)
+			suite.JSONEq(expected, w.Body.String())
+		})
+	}
+
+	suite.Run("Empty Courses", test(
+		[]Tutoring{},
+		`{
+			"tutor": {"username": "Username"},
+			"courses": []
+		}`,
+	))
+
+	suite.Run("Single Tutor", test(
+		[]Tutoring{
+			{Course: Course{Code: "code", Name: "Name"}, Tutor: tutor},
+		},
+		`{
+			"tutor": {"username": "Username"},
+			"courses": [
+				{"code": "code", "name": "Name"}
+			]
+		}`,
+	))
+
+	suite.Run("Multiple Tutors", test(
+		[]Tutoring{
+			{Course: Course{Code: "1", Name: "First"}, Tutor: tutor},
+			{Course: Course{Code: "2", Name: "Second"}, Tutor: tutor},
+			{Course: Course{Code: "3", Name: "Third"}, Tutor: tutor},
+		},
+		`{
+			"tutor": {"username": "Username"},
+			"courses": [
+				{"code": "1", "name": "First"},
+				{"code": "2", "name": "Second"},
+				{"code": "3", "name": "Third"}
+			]
+		}`,
+	))
+
+	suite.Run("Courses Order", test(
+		[]Tutoring{
+			{Course: Course{Code: "3", Name: "Third"}, Tutor: tutor},
+			{Course: Course{Code: "2", Name: "Second"}, Tutor: tutor},
+			{Course: Course{Code: "1", Name: "First"}, Tutor: tutor},
+		},
+		`{
+			"tutor": {"username": "Username"},
+			"courses": [
+				{"code": "1", "name": "First"},
+				{"code": "2", "name": "Second"},
+				{"code": "3", "name": "Third"}
+			]
+		}`,
+	))
+
+	suite.Run("Undefined Username", manualSetupTest(func() {
+		w := request("GET", "/tutors/undefined")
+		suite.Equal(404, w.Code)
+	}))
+}
+*/
