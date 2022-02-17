@@ -3,22 +3,61 @@ import { Stack, CardHeader, CardContent, Rating, Card, Typography, Grid, TextFie
 import tutorsList from '../tests/Tutors'
 
 const TutorPage = () => {
-    function writeOutTutors(tutors, filter){
+    const [tutors, setTutors] = React.useState([]);
+    //Effect callbacks are synchronous to prevent race conditions. So we need to put the async function inside
+    React.useEffect(() => {
+        async function fetchTutors(){
+            const data = await fetch("/tutors").then(r => r.json());
+            setTutors(data.tutors);
+        }
+        fetchTutors();
+    }, []);
+
+    function getTutorInfo(tutorArray){
+        //[
+        // {
+        //     "courses": [
+        //         {
+        //             "code": "cop-3502",
+        //             "name": "Programming Fundamentals 1"
+        //         }
+        //     ],
+        //     "tutor": {
+        //         "username": "Alice"
+        //     }
+        // }
+        //]
+        var tutorsInfo = [];
+
+        async function fetchTutorInfo(name){
+            const data = await fetch(`/tutors/${name}`).then(r => r.json());
+            tutorsInfo.push(data)
+        }
+
+        tutorArray.forEach(tutor => {
+            fetchTutorInfo(tutor.username)
+        });
+
+        console.log(tutorsInfo)
+        return tutorsInfo
+    }
+
+    function writeOutTutors(_tutors, filter){
         if (filter === undefined) {
             filter = "";
         }
         let tutorList = [];
-        for (let i = 0; i < tutors.length; i++){
-                let title = tutors.at(i).firstName + " " + tutors.at(i).lastName;
-                let courses = tutors.at(i).classCode;
+        for (let i = 0; i < _tutors.length; i++){
+                let title = _tutors.at(i).firstName + " " + _tutors.at(i).lastName;
+                let courses = _tutors.at(i).classCode;
                 let coursesuppercased = courses.map(courses => courses.toUpperCase());
-                let avail = tutors.at(i).availability;
+                let avail = _tutors.at(i).availability;
                 let availuppercased = avail.map(avail => avail.toUpperCase());
                 if (title.toUpperCase().includes(filter.toUpperCase()) || coursesuppercased.find(element => element.includes(filter.toUpperCase())) || availuppercased.find(element => element.includes(filter.toUpperCase()))) tutorList.push(
-                <Card key={tutors.at(i).id} >
+                <Card key={_tutors.at(i).id} >
                     <CardHeader 
                         title={title}
-                        subheader={<Rating name="read-only" precision={0.1} size="small" value={tutors.at(i).rating} readOnly />}
+                        subheader={<Rating name="read-only" precision={0.1} size="small" value={_tutors.at(i).rating} readOnly />}
                     />
                     <CardContent>
                         <Typography
@@ -160,5 +199,7 @@ const TutorPage = () => {
         </div>
     )
 }
+
+// {writeOutTutors(getTutorInfo(tutors), value)}
 
 export default TutorPage
