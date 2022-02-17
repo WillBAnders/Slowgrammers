@@ -200,6 +200,10 @@ const TutorPage = () => {
     )
 }
 
-// {writeOutTutors(getTutorInfo(tutors), value)}
+// to get the full list of tutors and the information:
+//    getTutorInfo(tutors)
+
+//what should be getting called in the page (~line 196)
+//    {writeOutTutors(getTutorInfo(tutors), value)}
 
 export default TutorPage
