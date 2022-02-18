@@ -94,11 +94,14 @@ func getTutors(c *gin.Context) {
 // Response Schema: {
 //   tutor: Tutor {
 //     username: String
+//	   rating: Float
+//     availability: []String
 //   }
 //   courses: []Course {
 //     code: String
 //     name: String
 //   }
+//   availability: []String {}
 // }
 // Error Schema: {
 //   error: String
@@ -111,13 +114,20 @@ func getTutorsUsername(c *gin.Context) {
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
 		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].ID)
+		var availability []Availability
+		DB.Joins("Availability").Select("day").Find(&availability, "tutor_id = ?", tutors[0].ID)
 		courses := []Course{}
 		for _, tutoring := range tutorings {
 			courses = append(courses, tutoring.Course)
+		}	
+		availabilityList := []string{} //make([]string, 5)
+		for _, openings := range availability {
+			availabilityList = append(availabilityList, openings.Day)
 		}
 		c.JSON(200, gin.H{
 			"tutor":   tutors[0],
 			"courses": courses,
+			"availability": availabilityList,
 		})
 	} else {
 		c.JSON(404, gin.H{
