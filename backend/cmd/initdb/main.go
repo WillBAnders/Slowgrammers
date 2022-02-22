@@ -6,7 +6,7 @@ import (
 
 func main() {
 	//TODO: Error handling
-	src.InitDatabase("../server/database.db")
+	src.InitDatabase("database.db")
 
 	courses := []src.Course{
 		{Code: "cop-3502", Name: "Programming Fundamentals 1"},
