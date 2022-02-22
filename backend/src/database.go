@@ -40,7 +40,9 @@ type Tutoring struct {
 }
 
 type User struct {
-	ID       uint   `gorm:"primaryKey" json:"-"`
-	Username string `gorm:"unique,not null" json:"username"`
+	ID       uint    `gorm:"primaryKey" json:"-"`
+	Username string  `gorm:"unique,not null" json:"username"`
+	FirstName string `gorm:"unique,not null" json:"firstname"`
+	LastName string  `gorm:"unique,not null" json:"lastname"`
 	//TODO: Add other attributes
 }

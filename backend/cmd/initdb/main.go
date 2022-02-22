@@ -49,10 +49,10 @@ func main() {
 	src.DB.Create(tutoring)
 	
 	users := []src.User{
-		{Username: "Eve"},
-		{Username: "Fred"},
-		{Username: "Greta"},
-		{Username: "Henry"},
+		{Username: "Eve", FirstName: "Evangeline", LastName: "Mae"},
+		{Username: "Fred", FirstName: "Fred", LastName: "Flinstone"},
+		{Username: "Greta", FirstName: "Greta", LastName: "Glade"},
+		{Username: "Henry", FirstName: "Henry", LastName: "Hue"},
 	}
 	src.DB.Create(users)
 }
