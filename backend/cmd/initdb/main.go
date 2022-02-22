@@ -6,7 +6,7 @@ import (
 
 func main() {
 	//TODO: Error handling
-	src.InitDatabase("database.db")
+	src.InitDatabase("../server/database.db")
 
 	courses := []src.Course{
 		{Code: "cop-3502", Name: "Programming Fundamentals 1"},
@@ -23,12 +23,22 @@ func main() {
 	src.DB.Create(courses)
 
 	tutors := []src.Tutor{
-		{Username: "Alice"},
-		{Username: "Bob"},
-		{Username: "Clair"},
-		{Username: "David"},
+		{Username: "Alice", Rating: 5.0},
+		{Username: "Bob", Rating: 4.5},
+		{Username: "Clair", Rating: 2.0},
+		{Username: "David", Rating: 0.0},
 	}
 	src.DB.Create(tutors)
+	
+	availability := []src.Availability{
+		{Tutor: tutors[0], Day: "Monday"},
+		{Tutor: tutors[1], Day: "Tuesday"},
+		{Tutor: tutors[1], Day: "Wendsday"},
+		{Tutor: tutors[2], Day: "Monday"},
+		{Tutor: tutors[2], Day: "Thursday"},
+		{Tutor: tutors[3], Day: "Friday"},
+	}
+	src.DB.Create(availability)
 
 	tutoring := []src.Tutoring{
 		{Tutor: tutors[0], Course: courses[0]},
@@ -37,4 +47,12 @@ func main() {
 		{Tutor: tutors[2], Course: courses[2]},
 	}
 	src.DB.Create(tutoring)
+	
+	users := []src.User{
+		{Username: "Eve"},
+		{Username: "Fred"},
+		{Username: "Greta"},
+		{Username: "Henry"},
+	}
+	src.DB.Create(users)
 }

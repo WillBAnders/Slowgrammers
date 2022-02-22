@@ -12,6 +12,7 @@ func InitRouter() {
 	Router.GET("/courses/:code", getCoursesCode)
 	Router.GET("/tutors", getTutors)
 	Router.GET("/tutors/:username", getTutorsUsername)
+	Router.GET("/users/:username", getUsersUsername)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -93,11 +94,14 @@ func getTutors(c *gin.Context) {
 // Response Schema: {
 //   tutor: Tutor {
 //     username: String
+//	   rating: Float
+//     availability: []String
 //   }
 //   courses: []Course {
 //     code: String
 //     name: String
 //   }
+//   availability: []String {}
 // }
 // Error Schema: {
 //   error: String
@@ -110,13 +114,20 @@ func getTutorsUsername(c *gin.Context) {
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
 		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].ID)
+		var availability []Availability
+		DB.Joins("Availability").Select("day").Find(&availability, "tutor_id = ?", tutors[0].ID)
 		courses := []Course{}
 		for _, tutoring := range tutorings {
 			courses = append(courses, tutoring.Course)
+		}	
+		availabilityList := []string{} //make([]string, 5)
+		for _, openings := range availability {
+			availabilityList = append(availabilityList, openings.Day)
 		}
 		c.JSON(200, gin.H{
 			"tutor":   tutors[0],
 			"courses": courses,
+			"availability": availabilityList,
 		})
 	} else {
 		c.JSON(404, gin.H{
@@ -124,3 +135,30 @@ func getTutorsUsername(c *gin.Context) {
 		})
 	}
 }
+
+// Handler for /users/:username. Returns the user identified by :username
+// If the tutor :username is not defined, returns a 404 with an error message.
+//
+// Response Schema: {
+//   user: User {
+//     username: String
+//   }
+// }
+// Error Schema: {
+//   error: String
+// }
+func getUsersUsername(c *gin.Context) {
+	username := c.Params.ByName("username")
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", username)
+	if len(users) == 1 {
+		c.JSON(200, gin.H{
+			"user":   users[0],
+		})
+	} else {
+		c.JSON(404, gin.H{
+			"error": "User " + username + " not found.",
+		})
+	}
+}
+
