@@ -23,13 +23,13 @@ func main() {
 	src.DB.Create(courses)
 
 	tutors := []src.Tutor{
-		{Username: "Alice", Rating: 5.0},
-		{Username: "Bob", Rating: 4.5},
-		{Username: "Clair", Rating: 2.0},
-		{Username: "David", Rating: 0.0},
+		{Username: "Alice", FirstName: "Alice", LastName: "Schnieder", Rating: 5.0},
+		{Username: "Bob", FirstName: "Bob", LastName: "Goldsmith", Rating: 4.5},
+		{Username: "Clair", FirstName: "Clair", LastName: "Langy", Rating: 2.0},
+		{Username: "David", FirstName: "David", LastName: "Mobley", Rating: 0.0},
 	}
 	src.DB.Create(tutors)
-	
+
 	availability := []src.Availability{
 		{Tutor: tutors[0], Day: "Monday"},
 		{Tutor: tutors[1], Day: "Tuesday"},
@@ -47,7 +47,7 @@ func main() {
 		{Tutor: tutors[2], Course: courses[2]},
 	}
 	src.DB.Create(tutoring)
-	
+
 	users := []src.User{
 		{Username: "Eve", FirstName: "Evangeline", LastName: "Mae"},
 		{Username: "Fred", FirstName: "Fred", LastName: "Flinstone"},
