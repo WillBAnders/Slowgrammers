@@ -9,12 +9,7 @@ var DB *gorm.DB
 
 func InitDatabase(dsn string) {
 	//TODO: Error handling
-<<<<<<< HEAD
-	//TODO: Fix relative path use (relative from cmd/<cmd>)
-	DB, _ = gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
-=======
 	DB, _ = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
->>>>>>> 34095bcc8b060e94d5afa8e21e81382a4ddebb5f
 	_ = DB.AutoMigrate(&User{}, &Course{}, &Tutor{}, &Tutoring{})
 }
 

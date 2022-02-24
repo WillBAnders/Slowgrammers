@@ -129,12 +129,6 @@ func getTutorsUsername(c *gin.Context) {
 }
 
 type AuthBody struct {
-<<<<<<< HEAD
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-=======
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
@@ -156,7 +150,6 @@ type AuthBody struct {
 // Error Schema: {
 //   error: String
 // }
->>>>>>> 34095bcc8b060e94d5afa8e21e81382a4ddebb5f
 func postSignup(c *gin.Context) {
 	//TODO: Error on unknown fields
 	var body AuthBody
@@ -181,11 +174,6 @@ func postSignup(c *gin.Context) {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	DB.Create(&User{Username: body.Username, Password: string(hash)})
 
-<<<<<<< HEAD
-	c.JSON(200, gin.H{})
-}
-
-=======
 	token, err := CreateJWT(body.Username)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -217,7 +205,6 @@ func postSignup(c *gin.Context) {
 // Error Schema: {
 //   error: String
 // }
->>>>>>> 34095bcc8b060e94d5afa8e21e81382a4ddebb5f
 func postSignin(c *gin.Context) {
 	//TODO: Error on unknown fields
 	var body AuthBody
@@ -245,9 +232,6 @@ func postSignin(c *gin.Context) {
 		})
 	}
 
-<<<<<<< HEAD
-	c.JSON(200, gin.H{})
-=======
 	token, err := CreateJWT(body.Username)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -259,5 +243,4 @@ func postSignin(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"token": token,
 	})
->>>>>>> 34095bcc8b060e94d5afa8e21e81382a4ddebb5f
 }
