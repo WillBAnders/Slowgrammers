@@ -17,6 +17,14 @@ func InitRouter() {
 	Router.POST("/signin", postSignin)
 }
 
+// Handler for /courses. Returns all courses ordered by code.
+//
+// Response Schema: {
+//   courses: []Course {
+//     code: String
+//     name: String
+//   }
+// }
 func getCourses(c *gin.Context) {
 	//TODO: Pagination support
 	var courses []Course
@@ -26,6 +34,22 @@ func getCourses(c *gin.Context) {
 	})
 }
 
+// Handler for /courses/:code. Returns the course identified by :code along
+// with all tutors ordered by username. If the course :code is not defined,
+// returns a 404 with an error message.
+//
+// Response Schema: {
+//   course: Course {
+//     code: String
+//     name: String
+//   }
+//   tutors: []Tutor {
+//     username: String
+//   }
+// }
+// Error Schema: {
+//   error: String
+// }
 func getCoursesCode(c *gin.Context) {
 	code := c.Params.ByName("code")
 	var courses []Course
@@ -33,8 +57,8 @@ func getCoursesCode(c *gin.Context) {
 	if len(courses) == 1 {
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
-		DB.Preload("Tutor").Find(&tutorings, "course_id = ?", courses[0].ID)
-		var tutors []Tutor
+		DB.Joins("Tutor").Order("Tutor__username").Find(&tutorings, "course_id = ?", courses[0].ID)
+		tutors := []Tutor{}
 		for _, tutoring := range tutorings {
 			tutors = append(tutors, tutoring.Tutor)
 		}
@@ -49,6 +73,13 @@ func getCoursesCode(c *gin.Context) {
 	}
 }
 
+// Handler for /tutors. Returns all tutors ordered by username.
+//
+// Response Schema: {
+//   tutors: []Tutor {
+//     username: String
+//   }
+// }
 func getTutors(c *gin.Context) {
 	//TODO: Pagination support
 	var tutors []Tutor
@@ -58,6 +89,22 @@ func getTutors(c *gin.Context) {
 	})
 }
 
+// Handler for /tutors/:username. Returns the tutor identified by :username
+// along with all courses tutored ordered by code. If the tutor :username is
+// not defined, returns a 404 with an error message.
+//
+// Response Schema: {
+//   tutor: Tutor {
+//     username: String
+//   }
+//   courses: []Course {
+//     code: String
+//     name: String
+//   }
+// }
+// Error Schema: {
+//   error: String
+// }
 func getTutorsUsername(c *gin.Context) {
 	username := c.Params.ByName("username")
 	var tutors []Tutor
@@ -65,8 +112,8 @@ func getTutorsUsername(c *gin.Context) {
 	if len(tutors) == 1 {
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
-		DB.Preload("Course").Find(&tutorings, "tutor_id = ?", tutors[0].ID)
-		var courses []Course
+		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].ID)
+		courses := []Course{}
 		for _, tutoring := range tutorings {
 			courses = append(courses, tutoring.Course)
 		}
@@ -82,10 +129,34 @@ func getTutorsUsername(c *gin.Context) {
 }
 
 type AuthBody struct {
+<<<<<<< HEAD
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+=======
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+// Handler for /signup. Takes a username and password and creates a new user
+// account, returning a JWT. Errors if:
+//
+//  - The body has missing/unknown fields (400)
+//  - The username already exists (401)
+//  - A server issue prevents creating a JWT (500)
+//
+// Body Schema: {
+//   username: String
+//   password: String
+// }
+// Response Schema: {
+//   token: JWT
+// }
+// Error Schema: {
+//   error: String
+// }
+>>>>>>> 34095bcc8b060e94d5afa8e21e81382a4ddebb5f
 func postSignup(c *gin.Context) {
 	//TODO: Error on unknown fields
 	var body AuthBody
@@ -110,9 +181,43 @@ func postSignup(c *gin.Context) {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	DB.Create(&User{Username: body.Username, Password: string(hash)})
 
+<<<<<<< HEAD
 	c.JSON(200, gin.H{})
 }
 
+=======
+	token, err := CreateJWT(body.Username)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to create JWT: " + err.Error() + ".",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"token": token,
+	})
+}
+
+// Handler for /signin. Takes a username and password and logs in an existing
+// user account, returning a JWT. Errors if:
+//
+//  - The body has missing/unknown fields (400)
+//  - The username does not exist (401)
+//  - The password is invalid (401)
+//  - A server issue prevents creating a JWT (500)
+//
+// Body Schema: {
+//   username: String
+//   password: String
+// }
+// Response Schema: {
+//   token: JWT
+// }
+// Error Schema: {
+//   error: String
+// }
+>>>>>>> 34095bcc8b060e94d5afa8e21e81382a4ddebb5f
 func postSignin(c *gin.Context) {
 	//TODO: Error on unknown fields
 	var body AuthBody
@@ -140,5 +245,19 @@ func postSignin(c *gin.Context) {
 		})
 	}
 
+<<<<<<< HEAD
 	c.JSON(200, gin.H{})
+=======
+	token, err := CreateJWT(body.Username)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to create JWT.",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"token": token,
+	})
+>>>>>>> 34095bcc8b060e94d5afa8e21e81382a4ddebb5f
 }
