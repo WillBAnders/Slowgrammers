@@ -36,162 +36,168 @@ const Navbar = ({ name, setName }) => {
     setAnchorElUser(null);
   };
 
-  const signout = () =>{
-    setName(false)
+  const signout = async () => {
+    await fetch('/signout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    setName(false);
     handleCloseUserMenu()
   }
 
-let buttons;
-if(name){
-  buttons = (
-    <Box sx={{ flexGrow: 0 }}>
-    <Tooltip title="Open settings">
-      <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-        <Avatar alt="John Doe" src="" />
-      </IconButton>
-    </Tooltip>
-    <Menu
-      sx={{ mt: '45px' }}
-      id="menu-appbar"
-      anchorEl={anchorElUser}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={Boolean(anchorElUser)}
-      onClose={handleCloseUserMenu}
-    >
-      <MenuItem onClick={handleCloseUserMenu}>
-        <Typography textAlign="center">Profile</Typography>
-      </MenuItem>
-      <MenuItem onClick={handleCloseUserMenu}>
-        <Typography textAlign="center">Finance</Typography>
-      </MenuItem>
-      <MenuItem onClick={signout}>
-        <Typography textAlign="center">Logout</Typography>
-      </MenuItem>
-    </Menu>
-  </Box>
-  )
+  let buttons;
+  if (name) {
+    buttons = (
+      <Box sx={{ flexGrow: 0 }}>
+        <Tooltip title="Open settings">
+          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+            <Avatar alt="John Doe" src="" />
+          </IconButton>
+        </Tooltip>
+        <Menu
+          sx={{ mt: '45px' }}
+          id="menu-appbar"
+          anchorEl={anchorElUser}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          open={Boolean(anchorElUser)}
+          onClose={handleCloseUserMenu}
+        >
+          <MenuItem onClick={handleCloseUserMenu}>
+            <Typography textAlign="center">Profile</Typography>
+          </MenuItem>
+          <MenuItem onClick={handleCloseUserMenu}>
+            <Typography textAlign="center">Finance</Typography>
+          </MenuItem>
+          <MenuItem onClick={signout}>
+            <Typography textAlign="center">Logout</Typography>
+          </MenuItem>
+        </Menu>
+      </Box>
+    )
 
-}else{
-  buttons = (
-    <Box sx={{ flexGrow: 0 }}>
-    <Link to="/SignUp" style={{ textDecoration: 'none', color: 'white'}}>
-      <Button 
-        variant="contained"
-        color="secondary"
-        sx={{ margin: "5px"}}
-      >
-        Sign Up
+  } else {
+    buttons = (
+      <Box sx={{ flexGrow: 0 }}>
+        <Link to="/SignUp" style={{ textDecoration: 'none', color: 'white' }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ margin: "5px" }}
+          >
+            Sign Up
       </Button>
-    </Link>
-    <Link to="/SignIn" style={{ textDecoration: 'none', color: 'white'}}>
-      <Button 
-        variant="contained"
-        color="secondary"
-        sx={{ margin: "5px"}}
-      >
-        Sign In
+        </Link>
+        <Link to="/SignIn" style={{ textDecoration: 'none', color: 'white' }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ margin: "5px" }}
+          >
+            Sign In
       </Button>
-    </Link>
-  </Box>
-  )
-}
+        </Link>
+      </Box>
+    )
+  }
 
 
   return (
     <div className='navbarr'>
-    <AppBar position="absolute">
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <Link to="/" style={{ textDecoration: 'none', color: 'white'}}>
+      <AppBar position="absolute">
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
+              <Typography
+                variant="h4"
+                noWrap
+                component="div"
+                sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+              >
+                TutorsVILLE
+            </Typography>
+            </Link>
+
+            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="inherit"
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElNav}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+                sx={{
+                  display: { xs: 'block', md: 'none' },
+                }}
+              >
+                {pages.map((page) => (
+                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                    <ScrollLink activeClass="active" to={page} spy={true} smooth={true} duration={500}>
+                      <Typography textAlign="right">{page}</Typography>
+                    </ScrollLink>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
             <Typography
-              variant="h4"
+              variant="h6"
               noWrap
               component="div"
-              sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+              sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
             >
-              TutorsVILLE
-            </Typography>
-          </Link>
-
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: 'block', md: 'none' },
-              }}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <ScrollLink activeClass="active" to={page} spy={true} smooth={true} duration={500}>
-                    <Typography textAlign="right">{page}</Typography>
-                  </ScrollLink>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
-          >
-            <Link to="/" style={{ textDecoration: 'none', color: 'white'}}>
-              TutorsVILLE
+              <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
+                TutorsVILLE
             </Link>
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            </Typography>
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
-                <ScrollLink 
+                <ScrollLink
                   key={page}
-                  activeClass="active" 
-                  to={page} 
-                  spy={true} 
-                  smooth={true} 
+                  activeClass="active"
+                  to={page}
+                  spy={true}
+                  smooth={true}
                   duration={500}>
-                    <Button
-                      key={page}
-                      onClick={handleCloseNavMenu}
-                      sx={{ my: 2, color: 'white', display: 'block' }}
-                    >
-                      {page}
-                    </Button>
+                  <Button
+                    key={page}
+                    onClick={handleCloseNavMenu}
+                    sx={{ my: 2, color: 'white', display: 'block' }}
+                  >
+                    {page}
+                  </Button>
                 </ScrollLink>
               ))}
-          </Box>
-          {buttons}
-        </Toolbar>
-      </Container>
-    </AppBar>
+            </Box>
+            {buttons}
+          </Toolbar>
+        </Container>
+      </AppBar>
     </div>
   );
 };
