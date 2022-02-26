@@ -1,20 +1,30 @@
 package src
 
 import (
+	"fmt"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
 var Router *gin.Engine
+var secret = "secret"
 
 func InitRouter() {
 	Router = gin.Default()
+	Router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowCredentials: true}))
 	Router.GET("/courses", getCourses)
 	Router.GET("/courses/:code", getCoursesCode)
 	Router.GET("/tutors", getTutors)
 	Router.GET("/tutors/:username", getTutorsUsername)
 	Router.POST("/signup", postSignup)
 	Router.POST("/signin", postSignin)
+	Router.POST("/signout", postSignout)
+	Router.GET("/user", getUser)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -173,18 +183,6 @@ func postSignup(c *gin.Context) {
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	DB.Create(&User{Username: body.Username, Password: string(hash)})
-
-	token, err := CreateJWT(body.Username)
-	if err != nil {
-		c.JSON(500, gin.H{
-			"error": "Unable to create JWT: " + err.Error() + ".",
-		})
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"token": token,
-	})
 }
 
 // Handler for /signin. Takes a username and password and logs in an existing
@@ -232,7 +230,8 @@ func postSignin(c *gin.Context) {
 		})
 	}
 
-	token, err := CreateJWT(body.Username)
+	ss, err := CreateJWT(body.Username)
+
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": "Unable to create JWT.",
@@ -240,7 +239,59 @@ func postSignin(c *gin.Context) {
 		return
 	}
 
+	cookie, err := c.Cookie("jwt")
+
+	if err == nil {
+		fmt.Printf("Cookie not able to be setup in signin: %s", cookie)
+		return
+	}
+	c.SetCookie("jwt", ss, 3600*24, "/", "", false, true)
+
 	c.JSON(200, gin.H{
-		"token": token,
+		"token": ss,
 	})
+}
+
+func getUser(c *gin.Context) {
+	cookie, err := c.Cookie("jwt")
+
+	if err != nil {
+		fmt.Printf("cookie not recieved get user\n")
+	}
+	//will have to change the secret in the future
+	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Unable to create JWT.",
+		})
+		return
+	}
+
+	claims := token.Claims.(*jwt.StandardClaims)
+
+	var users []User
+
+	DB.Limit(1).Find(&users, "username = ?", claims.Issuer)
+
+	c.JSON(200, users)
+	return
+}
+
+func postSignout(c *gin.Context) {
+
+	c.SetCookie("jwt", "", -1, "", "", false, true)
+
+	cookie, err := c.Cookie("jwt")
+
+	if err != nil {
+		fmt.Printf("cookie not recieved signout: %s , %s \n", cookie, err)
+	}
+
+	c.JSON(200, gin.H{
+		"message": "success",
+	})
+	return
 }
