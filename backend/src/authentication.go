@@ -1,11 +1,12 @@
 package src
 
 import (
-	"github.com/golang-jwt/jwt"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
-var secret = "secret"
+//var secret = "secret"
 
 type Claims struct {
 	*jwt.StandardClaims
@@ -13,13 +14,15 @@ type Claims struct {
 }
 
 func CreateJWT(username string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
-		&jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(24 * time.Hour).Unix(),
-			Issuer:    "Server",
-		},
-		username,
-	})
+
+	claims := jwt.StandardClaims{
+		Issuer:    username,
+		IssuedAt:  time.Now().Unix(),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
 	return token.SignedString([]byte(secret))
 }
 
