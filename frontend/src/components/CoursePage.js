@@ -71,6 +71,7 @@ const CoursePage = () => {
                 >
                     <TextField value={value}
                         fullWidth
+                        title="SearchBar"
                         className="SearchBar" 
                         id="SearchBar"
                         label="SearchBar"
@@ -78,7 +79,8 @@ const CoursePage = () => {
                         name="SearchBar"
                         onChange={handleChange}
                         inputProps={{
-                            "data-testid": "SearchBarin"
+                            "data-testid": "SearchBarin",
+                            "title": "SearchBarInput"
                         }}
                     />
             </Paper>
@@ -100,7 +102,9 @@ const CoursePage = () => {
                     <Stack 
                         direction="column" 
                         spacing={{ xs: 1, sm: 2, md: 2.5 }}
-                        data-testid="buttonStack">
+                        data-testid="buttonStack"
+                        title="buttonStack"
+                        >
                         {loadButtons(courses, value)}
                     </Stack>
                 </Paper>

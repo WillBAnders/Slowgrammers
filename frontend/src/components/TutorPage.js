@@ -170,10 +170,15 @@ const TutorPage = () => {
                     <TextField 
                         value={value}
                         fullWidth 
+                        title="SearchBar"
                         id="tutor-search" 
                         label="Search Here" 
                         variant="outlined"
                         onChange={handleChange} 
+                        inputProps={{
+                            "data-testid": "SearchBarin",
+                            "title": "SearchBarInput"
+                        }}
                         />
                 </Paper>
             </Box>
@@ -187,6 +192,7 @@ const TutorPage = () => {
                 style={{ minHeight: '100vh', width: "100%"}}
             >
                 <Stack
+                    title = "tutorlist"
                     direction="column"
                     justifyContent="center"
                     alignItems="stretch"
