@@ -24,6 +24,7 @@ type Tutor struct {
 	ID            uint            `gorm:"primaryKey" json:"-"`
 	Username      string          `gorm:"unique,not null" json:"username"`
 	Rating	      float32         `gorm:"not null" json:"rating"`
+	Bio	      	  string          `json:"bio"`
 }
 
 type Availability struct {
@@ -40,9 +41,11 @@ type Tutoring struct {
 }
 
 type User struct {
-	ID       uint    `gorm:"primaryKey" json:"-"`
-	Username string  `gorm:"unique,not null" json:"username"`
-	FirstName string `gorm:"unique,not null" json:"firstname"`
-	LastName string  `gorm:"unique,not null" json:"lastname"`
+	ID        uint    `json:"-"`
+	Username  string  `gorm:"unique,not null" json:"username"`
+	FirstName string  `gorm:"not null" json:"firstname"`
+	LastName  string  `gorm:"not null" json:"lastname"`
+	Email	  string  `gorm:"not null" json:"email"`
+	Phone	  string  `gorm:"not null" json:"phone"`
 	//TODO: Add other attributes
 }

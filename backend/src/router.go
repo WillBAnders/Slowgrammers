@@ -95,7 +95,14 @@ func getTutors(c *gin.Context) {
 //   tutor: Tutor {
 //     username: String
 //	   rating: Float
-//     availability: []String
+//	   bio: String
+//   }
+//   profile: User {
+//     username: String
+//	   firstname: String
+//	   lastname: String
+//	   email: String
+//	   phone: String
 //   }
 //   courses: []Course {
 //     code: String
@@ -116,6 +123,8 @@ func getTutorsUsername(c *gin.Context) {
 		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].ID)
 		var availability []Availability
 		DB.Joins("Availability").Select("day").Find(&availability, "tutor_id = ?", tutors[0].ID)
+		var user []User
+		DB.Where("username = ?", tutors[0].Username).Find(&user)
 		courses := []Course{}
 		for _, tutoring := range tutorings {
 			courses = append(courses, tutoring.Course)
@@ -126,6 +135,7 @@ func getTutorsUsername(c *gin.Context) {
 		}
 		c.JSON(200, gin.H{
 			"tutor":   tutors[0],
+			"profile": user,
 			"courses": courses,
 			"availability": availabilityList,
 		})
