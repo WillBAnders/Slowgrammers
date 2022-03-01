@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,20 +10,35 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 
 const theme = createTheme();
 
 export default function SignupPage() {
-  const handleSubmit = (event) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [navigate, setNavigate] = useState(false);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    
+    console.log(username + password)
+
+    const res = await fetch('/signup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            username,
+            password
+        })
     });
+    setNavigate(true);
+    console.log(res)
   };
+
+  if (navigate) {
+    return <Navigate to="/SignIn"/>;
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -44,46 +60,23 @@ export default function SignupPage() {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
+                  label="Username"
+                  autoComplete="username"
+                  onChange={(e) => {setUsername(e.target.value)}}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
                   label="Password"
                   type="password"
-                  id="password"
                   autoComplete="new-password"
+                  onChange={(e) => {setPassword(e.target.value)}}
                 />
               </Grid>
             </Grid>

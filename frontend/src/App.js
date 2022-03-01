@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useState, useEffect } from "react";
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
 import CoursePage from "./components/CoursePage"
 import LandingPage from "./components/LandingPage"
@@ -9,16 +9,33 @@ import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
 
 function App() {
-  return(
+  const [name, setName] = useState(false);
+
+  useEffect(() => {
+    (
+      async () => {
+        const response = await fetch('/user', {
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        const content = await response.json();
+
+        setName(content[0].username);
+      }
+    )();
+  });
+
+  return (
     <div>
       <BrowserRouter>
-        <Navbar />
+        <Navbar name={name} setName={setName} />
         <Routes>
           <Route path="/" exact element={<LandingPage/>}/>
           <Route path="/courses" element={<CoursePage/>}/>
           <Route path="/tutors" element={<TutorPage />} />
           <Route path="/signUp" element={<SignUpPage/>} />
-          <Route path="/signIn" element={<SignInPage/>} />
+          <Route path="/signIn" element={<SignInPage setName={setName}/>} />
           <Route path="/tutors/:username" element={<ProfilePage/>} />
         </Routes>
       </BrowserRouter>

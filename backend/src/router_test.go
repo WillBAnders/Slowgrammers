@@ -1,7 +1,11 @@
 package src
 
 import (
+	"bytes"
+	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,7 +34,7 @@ func (suite *RouterSuite) TestGetCourses() {
 	test := func(courses []Course, expected string) func() {
 		return manualSetupTest(func() {
 			DB.Create(courses)
-			w := request("GET", "/courses")
+			w := GET("/courses")
 			suite.Equal(200, w.Code)
 			suite.JSONEq(expected, w.Body.String())
 		})
@@ -93,7 +97,7 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		return manualSetupTest(func() {
 			DB.Create(&course)
 			DB.Create(tutorings)
-			w := request("GET", "/courses/"+course.Code)
+			w := GET("/courses/" + course.Code)
 			suite.Equal(200, w.Code)
 			suite.JSONEq(expected, w.Body.String())
 		})
@@ -152,7 +156,7 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 	))
 
 	suite.Run("Undefined Code", manualSetupTest(func() {
-		w := request("GET", "/courses/undefined")
+		w := GET("/courses/undefined")
 		suite.Equal(404, w.Code)
 	}))
 }
@@ -161,7 +165,7 @@ func (suite *RouterSuite) TestGetTutors() {
 	test := func(tutors []Tutor, expected string) func() {
 		return manualSetupTest(func() {
 			DB.Create(tutors)
-			w := request("GET", "/tutors")
+			w := GET("/tutors")
 			suite.Equal(200, w.Code)
 			suite.JSONEq(expected, w.Body.String())
 		})
@@ -224,7 +228,7 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 		return manualSetupTest(func() {
 			DB.Create(&tutor)
 			DB.Create(tutorings)
-			w := request("GET", "/tutors/"+tutor.Username)
+			w := GET("/tutors/" + tutor.Username)
 			suite.Equal(200, w.Code)
 			suite.JSONEq(expected, w.Body.String())
 		})
@@ -283,14 +287,120 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 	))
 
 	suite.Run("Undefined Username", manualSetupTest(func() {
-		w := request("GET", "/tutors/undefined")
+		w := GET("/tutors/undefined")
 		suite.Equal(404, w.Code)
 	}))
 }
 
-func request(method string, path string) *httptest.ResponseRecorder {
+func (suite *RouterSuite) TestSignup() {
+	test := func(username string, password string) *httptest.ResponseRecorder {
+		return POST("/signup", gin.H{
+			"username": username,
+			"password": password,
+		})
+	}
+
+	suite.Run("Success", manualSetupTest(func() {
+		w := test("Username", "Password")
+		suite.Equal(200, w.Code)
+
+		data := gin.H{}
+		_ = json.Unmarshal(w.Body.Bytes(), &data)
+		claims, _ := ParseJWT(data["token"].(string))
+		suite.Equal("Username", claims.Username)
+	}))
+
+	suite.Run("Invalid Request (Missing Field)", manualSetupTest(func() {
+		w := POST("/signup", gin.H{
+			"username": "Username",
+		})
+		suite.Equal(400, w.Code)
+	}))
+
+	/*
+		//TODO: Error on unknown fields
+		suite.Run("Invalid Request (Unknown Field)", manualSetupTest(func() {
+			w := POST("/signup", gin.H{
+				"username": "Username",
+				"password": "Password",
+				"unknown":  "Unknown",
+			})
+			suite.Equal(400, w.Code)
+		}))
+	*/
+
+	suite.Run("Duplicate Username", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&User{Username: "Username", Password: string(hash)})
+
+		w := test("Username", "Password")
+		suite.Equal(401, w.Code)
+	}))
+}
+
+func (suite *RouterSuite) TestSignin() {
+	test := func(username string, password string) *httptest.ResponseRecorder {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&User{Username: "Username", Password: string(hash)})
+
+		return POST("/signin", gin.H{
+			"username": username,
+			"password": password,
+		})
+	}
+
+	suite.Run("Success", manualSetupTest(func() {
+		w := test("Username", "Password")
+		suite.Equal(200, w.Code)
+
+		data := gin.H{}
+		_ = json.Unmarshal(w.Body.Bytes(), &data)
+		claims, _ := ParseJWT(data["token"].(string))
+		suite.Equal("Username", claims.Username)
+	}))
+
+	suite.Run("Invalid Request (Missing Field)", manualSetupTest(func() {
+		w := POST("/signin", gin.H{
+			"username": "Username",
+		})
+		suite.Equal(400, w.Code)
+	}))
+
+	/*
+		//TODO: Error on unknown fields
+		suite.Run("Invalid Request (Unknown Field)", manualSetupTest(func() {
+			w := POST("/signin", gin.H{
+				"username": "Username",
+				"password": "Password",
+				"unknown":  "Unknown",
+			})
+			suite.Equal(400, w.Code)
+		}))
+	*/
+
+	suite.Run("Unknown Username", manualSetupTest(func() {
+		w := test("Unknown", "Password")
+		suite.Equal(401, w.Code)
+	}))
+
+	suite.Run("Invalid Password", manualSetupTest(func() {
+		w := test("Username", "Invalid")
+		suite.Equal(401, w.Code)
+	}))
+}
+
+func GET(path string) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(method, path, nil)
+	req, _ := http.NewRequest("GET", path, nil)
+	Router.ServeHTTP(w, req)
+	return w
+}
+
+func POST(path string, body gin.H) *httptest.ResponseRecorder {
+	w := httptest.NewRecorder()
+	data, _ := json.Marshal(body)
+	req, _ := http.NewRequest("POST", path, bytes.NewBuffer(data))
+	req.Header.Set("Content-Type", "application/json")
 	Router.ServeHTTP(w, req)
 	return w
 }

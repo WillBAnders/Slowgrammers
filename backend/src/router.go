@@ -1,17 +1,30 @@
 package src
 
 import (
+	"fmt"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var Router *gin.Engine
+var secret = "secret"
 
 func InitRouter() {
 	Router = gin.Default()
+	Router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowCredentials: true}))
 	Router.GET("/courses", getCourses)
 	Router.GET("/courses/:code", getCoursesCode)
 	Router.GET("/tutors", getTutors)
 	Router.GET("/tutors/:username", getTutorsUsername)
+	Router.POST("/signup", postSignup)
+	Router.POST("/signin", postSignin)
+	Router.POST("/signout", postSignout)
+	Router.GET("/user", getUser)
 	Router.GET("/users/:username", getUsersUsername)
 }
 
@@ -146,6 +159,170 @@ func getTutorsUsername(c *gin.Context) {
 	}
 }
 
+type AuthBody struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+// Handler for /signup. Takes a username and password and creates a new user
+// account, returning a JWT. Errors if:
+//
+//  - The body has missing/unknown fields (400)
+//  - The username already exists (401)
+//  - A server issue prevents creating a JWT (500)
+//
+// Body Schema: {
+//   username: String
+//   password: String
+// }
+// Response Schema: {
+//   token: JWT
+// }
+// Error Schema: {
+//   error: String
+// }
+func postSignup(c *gin.Context) {
+	//TODO: Error on unknown fields
+	var body AuthBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{
+			"error": "Invalid request: " + err.Error() + ".",
+		})
+		return
+	}
+
+	//TODO: Validate username/password
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", body.Username)
+	if len(users) != 0 {
+		c.JSON(401, gin.H{
+			"error": "User " + body.Username + " already exists.",
+		})
+		return
+	}
+
+	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
+	DB.Create(&User{Username: body.Username, Password: string(hash)})
+}
+
+// Handler for /signin. Takes a username and password and logs in an existing
+// user account, returning a JWT. Errors if:
+//
+//  - The body has missing/unknown fields (400)
+//  - The username does not exist (401)
+//  - The password is invalid (401)
+//  - A server issue prevents creating a JWT (500)
+//
+// Body Schema: {
+//   username: String
+//   password: String
+// }
+// Response Schema: {
+//   token: JWT
+// }
+// Error Schema: {
+//   error: String
+// }
+func postSignin(c *gin.Context) {
+	//TODO: Error on unknown fields
+	var body AuthBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{
+			"error": "Invalid request: " + err.Error() + ".",
+		})
+		return
+	}
+
+	//TODO: Validate username/password
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", body.Username)
+	if len(users) != 1 {
+		c.JSON(401, gin.H{
+			"error": "User " + body.Username + " not found.",
+		})
+		return
+	}
+
+	if bcrypt.CompareHashAndPassword([]byte(users[0].Password), []byte(body.Password)) != nil {
+		c.JSON(401, gin.H{
+			"error": "Invalid password.",
+		})
+	}
+
+	ss, err := CreateJWT(body.Username)
+
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to create JWT.",
+		})
+		return
+	}
+
+	cookie, err := c.Cookie("jwt")
+
+	if err == nil {
+		fmt.Printf("Cookie not able to be setup in signin: %s", cookie)
+		return
+	}
+	c.SetCookie("jwt", ss, 3600*24, "/", "", false, true)
+
+	c.JSON(200, gin.H{
+		"token": ss,
+	})
+}
+
+
+
+//TODO make docs
+func getUser(c *gin.Context) {
+	cookie, err := c.Cookie("jwt")
+
+	if err != nil {
+		fmt.Printf("cookie not recieved get user\n")
+	}
+	//will have to change the secret in the future
+	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Unable to create JWT.",
+		})
+		return
+	}
+
+	claims := token.Claims.(*jwt.StandardClaims)
+
+	var users []User
+
+	DB.Limit(1).Find(&users, "username = ?", claims.Issuer)
+
+	c.JSON(200, users)
+	return
+}
+
+
+
+//TODO make docs
+func postSignout(c *gin.Context) {
+
+	c.SetCookie("jwt", "", -1, "", "", false, true)
+
+	cookie, err := c.Cookie("jwt")
+
+	if err != nil {
+		fmt.Printf("cookie not recieved signout: %s , %s \n", cookie, err)
+	}
+
+	c.JSON(200, gin.H{
+		"message": "success",
+	})
+	return
+}
+
 // Handler for /users/:username. Returns the user identified by :username
 // If the tutor :username is not defined, returns a 404 with an error message.
 //
@@ -171,4 +348,3 @@ func getUsersUsername(c *gin.Context) {
 		})
 	}
 }
-
