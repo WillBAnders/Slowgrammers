@@ -33,7 +33,6 @@ const ProfilePage = () => {
     }, [url]);
     console.log("info: ");
     console.log(info);
-    //console.log(info.tutor);
     if (isLoading) {
         return (
           <div  className="loadingContainer">
@@ -47,119 +46,120 @@ const ProfilePage = () => {
         </div>
         )
       } else {
-    return(
-        <div>
-            <Stack
-                direction="row"
-                spacing={{xs:2, md: 3}}
-                sx={{
-                    ml: {
-                        md: '200px'
+        let fullname = info.profile[0].firstname + " " + info.profile[0].lastname;
+        return(
+            <div>
+                <Stack
+                    direction="row"
+                    spacing={{xs:2, md: 3}}
+                    sx={{
+                        ml: {
+                            md: '200px'
+                        }
+                    }}
+                >
+                <Avatar 
+                    sx={{
+                        mt: {md: '5px'},
+                        bgcolor: blue[500],
+                        width: {xs: 50, md: 100},
+                        height: {xs: 50, md: 100}
+                    }}
+                    alt= {
+                        fullname
                     }
-                }}
-            >
-            <Avatar 
-                sx={{
-                    mt: {md: '5px'},
-                    bgcolor: blue[500],
-                    width: {xs: 50, md: 100},
-                    height: {xs: 50, md: 100}
-                }}
-                alt= {
-                    "Sans Undertale"
-                }
-                src={sans} />
-            <Typography 
-                sx={{
-                    fontSize:{
-                        md:75,
-                        xs:30
-                    }
-                }}
-            >
-                First Name, Last Name
-            </Typography>
-            </Stack>
-            <Stack
-                direction="row"
-                spacing={{xs:15, md: 80}}
-            >
+                    />
+                <Typography 
+                    sx={{
+                        fontSize:{
+                            md:75,
+                            xs:30
+                        }
+                    }}
+                >
+                    {fullname}
+                </Typography>
+                </Stack>
+                <Stack
+                    direction="row"
+                    spacing={{xs:15, md: 80}}
+                >
+                    <Typography
+                        sx={{
+                            ml:{
+                                xs: 8,
+                                md: 40
+                            },
+                            fontSize:{
+                                md:40,
+                                xs:20
+                            }
+                        }}
+                        color="gray"
+                    >
+                        @{info.tutor.username}
+                        
+                    </Typography>
+                    {<Rating 
+                        name="read-only" 
+                        value = {info.tutor.rating}
+                        readOnly
+                    />}
+                </Stack>
                 <Typography
                     sx={{
                         ml:{
                             xs: 8,
-                            md: 40
+                            md: 41
                         },
                         fontSize:{
-                            md:40,
-                            xs:20
+                            md:30,
+                            xs:15
                         }
                     }}
-                    color="gray"
                 >
-                    @{info.tutor.username}
-                    
+                    {info.profile[0].email}
                 </Typography>
-                {<Rating 
-                    name="read-only" 
-                    value = {info.tutor.rating}
-                    readOnly
-                />}
-            </Stack>
-            <Typography
-                sx={{
-                    ml:{
-                        xs: 8,
-                        md: 41
-                    },
-                    fontSize:{
-                        md:30,
-                        xs:15
-                    }
-                }}
-            >
-                sans.undertale@ufl.edu
-            </Typography>
-            <Typography
-                sx={{
-                    ml:{
-                        xs: 8,
-                        md: 41
-                    },
-                    fontSize:{
-                        md:30,
-                        xs:15
-                    }
-                }}
-            >
-                229-655-4245
-            </Typography>
-            <Box
-                sx={{
-                    ml:{
-                        xs: 8,
-                        md: 41
-                    },
-                    width: {xs: 300, md: 700},
-                    height: {xs: 150, md: 300},
-                    backgroundColor: '#dfdfdf'
-                }}
-            >
                 <Typography
-                sx={{
-                    fontSize:{
-                        md:20,
-                        xs:10
-                    }
-                }}
-                style={{wordWrap: "break-word"}}
+                    sx={{
+                        ml:{
+                            xs: 8,
+                            md: 41
+                        },
+                        fontSize:{
+                            md:30,
+                            xs:15
+                        }
+                    }}
                 >
-                    Sample Bio
-                </Typography>    
-            </Box>
-        </div>
+                    {info.profile[0].phone}
+                </Typography>
+                <Box
+                    sx={{
+                        ml:{
+                            xs: 8,
+                            md: 41
+                        },
+                        width: {xs: 300, md: 700},
+                        height: {xs: 150, md: 300},
+                        backgroundColor: '#dfdfdf'
+                    }}
+                >
+                    <Typography
+                    sx={{
+                        fontSize:{
+                            md:20,
+                            xs:10
+                        }
+                    }}
+                    style={{wordWrap: "break-word"}}
+                    >
+                        {info.tutor.bio}
+                    </Typography>    
+                </Box>
+            </div>
 
-    )}
+        )}
 }
 
 export default ProfilePage
