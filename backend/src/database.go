@@ -20,16 +20,16 @@ type Course struct {
 }
 
 type Tutor struct {
-	ID            uint            `gorm:"primaryKey" json:"-"`
-	Username      string          `gorm:"unique,not null" json:"username"`
-	Rating	      float32         `gorm:"not null" json:"rating"`
-	Bio	      	  string          `json:"bio"`
+	ID       uint    `gorm:"primaryKey" json:"-"`
+	Username string  `gorm:"unique,not null" json:"username"`
+	Rating   float32 `gorm:"not null" json:"rating"`
+	Bio      string  `json:"bio"`
 }
 
 type Availability struct {
-	TutorID  uint   `json:"-"`
-	Tutor    Tutor  `gorm:"foreignKey:TutorID" json:"tutor"`
-	Day		 string `gorm:"not null" json:"day"`
+	TutorID uint   `json:"-"`
+	Tutor   Tutor  `gorm:"foreignKey:TutorID" json:"tutor"`
+	Day     string `gorm:"not null" json:"day"`
 }
 
 type Tutoring struct {
@@ -40,11 +40,12 @@ type Tutoring struct {
 }
 
 type User struct {
-	ID        uint    `json:"-"`
-	Username  string  `gorm:"unique,not null" json:"username"`
-	FirstName string  `gorm:"not null" json:"firstname"`
-	LastName  string  `gorm:"not null" json:"lastname"`
-	Email	  string  `gorm:"not null" json:"email"`
-	Phone	  string  `gorm:"not null" json:"phone"`
+	ID        uint   `json:"-"`
+	Username  string `gorm:"unique,not null" json:"username"`
+	Password  string `gorm:"not null" json:"-"`
+	FirstName string `gorm:"not null" json:"firstname"`
+	LastName  string `gorm:"not null" json:"lastname"`
+	Email     string `gorm:"not null" json:"email"`
+	Phone     string `gorm:"not null" json:"phone"`
 	//TODO: Add other attributes
 }

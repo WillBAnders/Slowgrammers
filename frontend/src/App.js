@@ -20,8 +20,9 @@ function App() {
         });
 
         const content = await response.json();
-
-        setName(content[0].username);
+        if (content[0]) {
+          setName(content[0].username);
+        }
       }
     )();
   });
@@ -31,12 +32,12 @@ function App() {
       <BrowserRouter>
         <Navbar name={name} setName={setName} />
         <Routes>
-          <Route path="/" exact element={<LandingPage/>}/>
-          <Route path="/courses" element={<CoursePage/>}/>
+          <Route path="/" exact element={<LandingPage />} />
+          <Route path="/courses" element={<CoursePage />} />
           <Route path="/tutors" element={<TutorPage />} />
-          <Route path="/signUp" element={<SignUpPage/>} />
-          <Route path="/signIn" element={<SignInPage setName={setName}/>} />
-          <Route path="/tutors/:username" element={<ProfilePage/>} />
+          <Route path="/signUp" element={<SignUpPage />} />
+          <Route path="/signIn" element={<SignInPage setName={setName} />} />
+          <Route path="/tutors/:username" element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>
     </div>

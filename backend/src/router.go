@@ -141,15 +141,15 @@ func getTutorsUsername(c *gin.Context) {
 		courses := []Course{}
 		for _, tutoring := range tutorings {
 			courses = append(courses, tutoring.Course)
-		}	
+		}
 		availabilityList := []string{} //make([]string, 5)
 		for _, openings := range availability {
 			availabilityList = append(availabilityList, openings.Day)
 		}
 		c.JSON(200, gin.H{
-			"tutor":   tutors[0],
-			"profile": user,
-			"courses": courses,
+			"tutor":        tutors[0],
+			"profile":      user,
+			"courses":      courses,
 			"availability": availabilityList,
 		})
 	} else {
@@ -273,8 +273,6 @@ func postSignin(c *gin.Context) {
 	})
 }
 
-
-
 //TODO make docs
 func getUser(c *gin.Context) {
 	cookie, err := c.Cookie("jwt")
@@ -288,8 +286,8 @@ func getUser(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(401, gin.H{
-			"error": "Unable to create JWT.",
+		c.JSON(200, gin.H{
+			"message": "Unauthenticated.",
 		})
 		return
 	}
@@ -303,8 +301,6 @@ func getUser(c *gin.Context) {
 	c.JSON(200, users)
 	return
 }
-
-
 
 //TODO make docs
 func postSignout(c *gin.Context) {
@@ -340,7 +336,7 @@ func getUsersUsername(c *gin.Context) {
 	DB.Limit(1).Find(&users, "username = ?", username)
 	if len(users) == 1 {
 		c.JSON(200, gin.H{
-			"user":   users[0],
+			"user": users[0],
 		})
 	} else {
 		c.JSON(404, gin.H{
