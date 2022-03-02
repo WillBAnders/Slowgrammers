@@ -94,7 +94,7 @@ func getCoursesCode(c *gin.Context) {
 func getTutors(c *gin.Context) {
 	//TODO: Pagination support
 	var tutors []Tutor
-	DB.Order("username").Find(&tutors)
+	DB.Joins("User").Order("User__username").Find(&tutors)
 	c.JSON(200, gin.H{
 		"tutors": tutors,
 	})
@@ -129,28 +129,26 @@ func getTutors(c *gin.Context) {
 func getTutorsUsername(c *gin.Context) {
 	username := c.Params.ByName("username")
 	var tutors []Tutor
-	DB.Limit(1).Find(&tutors, "username = ?", username)
+	DB.Preload("Availability").Limit(1).Find(&tutors, "username = ?", username)
 	if len(tutors) == 1 {
+		days := []string{} //make([]string, 5)
+		for _, availability := range tutors[0].Availability {
+			days = append(days, availability.Day)
+		}
+
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
-		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].ID)
-		var availability []Availability
-		DB.Joins("Availability").Select("day").Find(&availability, "tutor_id = ?", tutors[0].ID)
-		var user []User
-		DB.Where("username = ?", tutors[0].Username).Find(&user)
+		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].UserID)
 		courses := []Course{}
 		for _, tutoring := range tutorings {
 			courses = append(courses, tutoring.Course)
 		}
-		availabilityList := []string{} //make([]string, 5)
-		for _, openings := range availability {
-			availabilityList = append(availabilityList, openings.Day)
-		}
+
 		c.JSON(200, gin.H{
 			"tutor":        tutors[0],
-			"profile":      user,
+			"profile":      tutors[0].User, //TODO
+			"availability": days,           //TODO
 			"courses":      courses,
-			"availability": availabilityList,
 		})
 	} else {
 		c.JSON(404, gin.H{

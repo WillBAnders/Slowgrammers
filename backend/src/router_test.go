@@ -113,7 +113,7 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 
 	suite.Run("Single Tutor", test(
 		[]Tutoring{
-			{Course: course, Tutor: Tutor{Username: "Username"}},
+			{Course: course, Tutor: Tutor{User: User{Username: "Username"}}},
 		},
 		`{
 			"course": {"code": "code", "name": "Name"},
@@ -125,9 +125,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 
 	suite.Run("Multiple Tutors", test(
 		[]Tutoring{
-			{Course: course, Tutor: Tutor{Username: "Alice"}},
-			{Course: course, Tutor: Tutor{Username: "Bob"}},
-			{Course: course, Tutor: Tutor{Username: "Clair"}},
+			{Course: course, Tutor: Tutor{User: User{Username: "Alice"}}},
+			{Course: course, Tutor: Tutor{User: User{Username: "Bob"}}},
+			{Course: course, Tutor: Tutor{User: User{Username: "Clair"}}},
 		},
 		`{
 			"course": {"code": "code", "name": "Name"},
@@ -141,9 +141,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 
 	suite.Run("Tutors Order", test(
 		[]Tutoring{
-			{Course: course, Tutor: Tutor{Username: "Clair"}},
-			{Course: course, Tutor: Tutor{Username: "Bob"}},
-			{Course: course, Tutor: Tutor{Username: "Alice"}},
+			{Course: course, Tutor: Tutor{User: User{Username: "Clair"}}},
+			{Course: course, Tutor: Tutor{User: User{Username: "Bob"}}},
+			{Course: course, Tutor: Tutor{User: User{Username: "Alice"}}},
 		},
 		`{
 			"course": {"code": "code", "name": "Name"},
@@ -180,7 +180,7 @@ func (suite *RouterSuite) TestGetTutors() {
 
 	suite.Run("Single", test(
 		[]Tutor{
-			{Username: "Username"},
+			{User: User{Username: "Username"}},
 		},
 		`{
 			"tutors": [
@@ -191,9 +191,9 @@ func (suite *RouterSuite) TestGetTutors() {
 
 	suite.Run("Multiple", test(
 		[]Tutor{
-			{Username: "Alice"},
-			{Username: "Bob"},
-			{Username: "Clair"},
+			{User: User{Username: "Alice"}},
+			{User: User{Username: "Bob"}},
+			{User: User{Username: "Clair"}},
 		},
 		`{
 			"tutors": [
@@ -206,9 +206,9 @@ func (suite *RouterSuite) TestGetTutors() {
 
 	suite.Run("Order", test(
 		[]Tutor{
-			{Username: "Clair"},
-			{Username: "Bob"},
-			{Username: "Alice"},
+			{User: User{Username: "Clair"}},
+			{User: User{Username: "Bob"}},
+			{User: User{Username: "Alice"}},
 		},
 		`{
 			"tutors": [
@@ -222,13 +222,13 @@ func (suite *RouterSuite) TestGetTutors() {
 
 func (suite *RouterSuite) TestGetTutorsUsername() {
 	//Fix ID to ensure multiple references use the same tutor
-	tutor := Tutor{ID: 1, Username: "Username"}
+	tutor := Tutor{User: User{ID: 1, Username: "Username"}}
 
 	test := func(tutorings []Tutoring, expected string) func() {
 		return manualSetupTest(func() {
 			DB.Create(&tutor)
 			DB.Create(tutorings)
-			w := GET("/tutors/" + tutor.Username)
+			w := GET("/tutors/" + tutor.User.Username)
 			suite.Equal(200, w.Code)
 			suite.JSONEq(expected, w.Body.String())
 		})
