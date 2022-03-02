@@ -6,16 +6,16 @@ import { useParams } from "react-router-dom";
 import axios from 'axios';
 import {ThreeDots} from 'react-loader-spinner';
 
-const ProfilePage = () => {
+const ProfilePage = ({name}) => {
     //Typography variant doesn't work with responsive design, so I have to go with font sizes
     let params = useParams();
-    console.log(params.username);
-    const username= params.username;
+    let username;
+    if (name && name == params){
+        username = name; //own account
+    } else{
+        username= params.username; //other account
+    }
     let url = '/tutors/' + username;
-    /*const [info, setInfo] = React.useState(() => {
-        axios.get(url)
-            .then(data => setInfo(data.data));
-    });*/
     const [info, setInfo] = React.useState();
     const [isLoading, setLoading] = React.useState(true);
     React.useEffect(() => {
@@ -50,6 +50,7 @@ const ProfilePage = () => {
         return(
             <div>
                 <Stack
+                    title="Avatar_and_Name"
                     direction="row"
                     spacing={{xs:2, md: 3}}
                     sx={{
@@ -81,6 +82,7 @@ const ProfilePage = () => {
                 </Typography>
                 </Stack>
                 <Stack
+                    title="Username_and_Rating"
                     direction="row"
                     spacing={{xs:15, md: 80}}
                 >
@@ -101,12 +103,13 @@ const ProfilePage = () => {
                         
                     </Typography>
                     {<Rating 
-                        name="read-only" 
+                        title="Rating"
                         value = {info.tutor.rating}
                         readOnly
                     />}
                 </Stack>
                 <Typography
+                    title="Email_Address"
                     sx={{
                         ml:{
                             xs: 8,
@@ -121,6 +124,7 @@ const ProfilePage = () => {
                     {info.profile[0].email}
                 </Typography>
                 <Typography
+                    title="Phone_Number"
                     sx={{
                         ml:{
                             xs: 8,
@@ -135,6 +139,7 @@ const ProfilePage = () => {
                     {info.profile[0].phone}
                 </Typography>
                 <Box
+                    title="Bio"
                     sx={{
                         ml:{
                             xs: 8,

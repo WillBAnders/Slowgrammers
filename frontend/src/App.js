@@ -37,6 +37,7 @@ function App() {
           <Route path="/tutors" element={<TutorPage />} />
           <Route path="/signUp" element={<SignUpPage />} />
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
+          <Route path="/:username" element={<ProfilePage name = {name}/>} />
           <Route path="/tutors/:username" element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>

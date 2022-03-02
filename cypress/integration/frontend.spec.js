@@ -2,7 +2,7 @@
 
 describe('general testing', () => {
   beforeEach(() => {
-   
+    
   })
 
   it('goes to tutor page and confirm number of tutors', () => {
@@ -33,5 +33,16 @@ describe('general testing', () => {
     cy.visit('localhost:3000/tutors')
     cy.contains('TutorsVILLE').click()
     cy.url().should('eq', "http://localhost:3000/")
+  })
+
+  it('Check Alice tutor page', () =>{
+    cy.visit('localhost:3000/tutors/Alice')
+    cy.findByTitle('Avatar_and_Name');
+    cy.should('contain', "Alice Smith");
+    cy.findByTitle('Username_and_Rating');
+    cy.should('contain', "@Alice");
+    cy.findByTitle('Rating').should('have.attr', 'aria-label', "5 Stars");
+    cy.findByTitle('Email_Address').should('contain', "alicemsmith@gmail.com");
+    cy.findByTitle('Phone_Number').should('contain', "(567) 890-1234");
   })
 })

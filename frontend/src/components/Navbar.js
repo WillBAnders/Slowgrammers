@@ -49,6 +49,7 @@ const Navbar = ({ name, setName }) => {
 
   let buttons;
   if (name) {
+
     buttons = (
       <Box sx={{ flexGrow: 0 }}>
         <Tooltip title="Open settings">
@@ -72,14 +73,16 @@ const Navbar = ({ name, setName }) => {
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
         >
+          <Link to={"/" + name} style={{ textDecoration: 'none', color: "black" }}>
+            <MenuItem onClick={handleCloseUserMenu}>
+              <Typography textAlign="center">Profile</Typography>
+            </MenuItem>
+          </Link>
           <MenuItem onClick={handleCloseUserMenu}>
-            <Typography textAlign="center">Profile</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleCloseUserMenu}>
-            <Typography textAlign="center">Finance</Typography>
+            <Typography textAlign="center" color="black">Finance</Typography>
           </MenuItem>
           <MenuItem onClick={signout}>
-            <Typography textAlign="center">Logout</Typography>
+            <Typography textAlign="center" color="black">Logout</Typography>
           </MenuItem>
         </Menu>
       </Box>
