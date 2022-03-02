@@ -53,7 +53,7 @@ const Navbar = ({ name, setName }) => {
     buttons = (
       <Box sx={{ flexGrow: 0 }}>
         <Tooltip title="Open settings">
-          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+          <IconButton title="menu" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
             <Avatar alt="John Doe" src="" />
           </IconButton>
         </Tooltip>
@@ -81,7 +81,7 @@ const Navbar = ({ name, setName }) => {
           <MenuItem onClick={handleCloseUserMenu}>
             <Typography textAlign="center" color="black">Finance</Typography>
           </MenuItem>
-          <MenuItem onClick={signout}>
+          <MenuItem title="signout" onClick={signout}>
             <Typography textAlign="center" color="black">Logout</Typography>
           </MenuItem>
         </Menu>
@@ -93,6 +93,7 @@ const Navbar = ({ name, setName }) => {
       <Box sx={{ flexGrow: 0 }}>
         <Link to="/SignUp" style={{ textDecoration: 'none', color: 'white' }}>
           <Button
+            title="signupbutton"
             variant="contained"
             color="secondary"
             sx={{ margin: "5px" }}
@@ -102,6 +103,7 @@ const Navbar = ({ name, setName }) => {
         </Link>
         <Link to="/SignIn" style={{ textDecoration: 'none', color: 'white' }}>
           <Button
+            title="signinbutton"
             variant="contained"
             color="secondary"
             sx={{ margin: "5px" }}

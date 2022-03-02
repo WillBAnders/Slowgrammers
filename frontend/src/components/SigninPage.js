@@ -21,30 +21,30 @@ export default function SigninPage({ setName }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     console.log(username + password)
 
     const res = await fetch('/signin', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify({
-            username,
-            password
-        })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        username,
+        password
+      })
     });
-    
+
     setNavigate(true);
     //const content = await res.json();  
 
-    if(res.status === 200){
+    if (res.status === 200) {
       console.log(res)
       setName(true)
     }
   };
 
   if (navigate) {
-    return <Navigate to="/"/>;
+    return <Navigate to="/" />;
   }
   return (
     <ThemeProvider theme={theme}>
@@ -62,7 +62,7 @@ export default function SigninPage({ setName }) {
             backgroundPosition: 'center',
           }}
         />
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square sx={{pt:{xs: "30px", md: "40px"}}}>
+        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square sx={{ pt: { xs: "30px", md: "40px" } }}>
           <Box
             sx={{
               my: 8,
@@ -80,13 +80,14 @@ export default function SigninPage({ setName }) {
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
+                title="username"
                 margin="normal"
                 required
                 fullWidth
                 label="Username"
                 autoComplete="username"
                 autoFocus
-                onChange={(e) => {setUsername(e.target.value)}}
+                onChange={(e) => { setUsername(e.target.value) }}
               />
               <TextField
                 margin="normal"
@@ -95,10 +96,12 @@ export default function SigninPage({ setName }) {
                 label="Password"
                 type="password"
                 autoComplete="current-password"
-                onChange={(e) => {setPassword(e.target.value)}}
+                title="password"
+                onChange={(e) => { setPassword(e.target.value) }}
               />
               <Button
                 type="submit"
+                title="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
