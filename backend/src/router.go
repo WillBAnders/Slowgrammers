@@ -165,7 +165,7 @@ type AuthBody struct {
 }
 
 // Handler for /signup. Takes a username and password and creates a new user
-// account. Errors if:
+// account. Returns a success message. Errors if:
 //
 //  - The body has missing/unknown fields (400)
 //  - The username already exists (401)
@@ -173,6 +173,9 @@ type AuthBody struct {
 // Body Schema: {
 //   username: String
 //   password: String
+// }
+// Response Schema: {
+//   message: String
 // }
 // Error Schema: {
 //   error: String
@@ -200,6 +203,10 @@ func postSignup(c *gin.Context) {
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	DB.Create(&User{Username: body.Username, Password: string(hash)})
+
+	c.JSON(200, gin.H{
+		"message": "success",
+	})
 }
 
 // Handler for /signin. Takes a username and password and logs in an existing
