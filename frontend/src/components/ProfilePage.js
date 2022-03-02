@@ -1,9 +1,7 @@
 import React from 'react'
 import { Avatar, TextField, Box, Paper, Stack, Button, CardHeader, Card, CardContent, Typography, Rating } from "@mui/material";
 import {blue} from '@mui/material/colors'
-import sans from "../styles/sans.png"
 import { useParams } from "react-router-dom";
-import axios from 'axios';
 import {ThreeDots} from 'react-loader-spinner';
 
 const ProfilePage = ({name}) => {

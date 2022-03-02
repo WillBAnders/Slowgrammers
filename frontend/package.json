@@ -51,6 +51,8 @@
   },
   "proxy": "http://localhost:8080",
   "devDependencies": {
+    "@testing-library/cypress": "^8.0.2",
+    "cypress": "^9.5.1",
     "jest": "^27.4.7",
     "mini-css-extract-plugin": "2.4.5"
   }
