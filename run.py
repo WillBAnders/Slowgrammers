@@ -1,23 +1,45 @@
-import subprocess
 import os
+import sys
+from threading import Thread
 
-#just the init part of the script, adding the run part soon...
+def startFrontend():
+    os.chdir("frontend")
+    os.system("npm start")
+    
+def startBackend():
+    os.chdir("backend/cmd/server")
+    os.system("go run main.go")
 
-print("Creating database")
-os.chdir("backend/cmd/initdb")
-os.system("go run main.go")
-os.system("cp database.db ../server/database.db")
+def init():
+    print("Creating database")
+    os.chdir("backend/cmd/initdb")
+    os.system("go run main.go")
+    os.system("cp database.db ../server/database.db")
 
-print("Installing node modules")
-os.chdir("../../../frontend")
-os.system("npm install")
-os.chdir("..")
+    print("Installing node modules")
+    os.chdir("../../../frontend")
+    os.system("npm install")
+    os.chdir("..")
+    
+def run():
+    Thread(target = startFrontend).start()
+    Thread(target = startBackend).start()
+    
+def test():
+    print("Option not implimented yet")
 
-
-#run script part - in progress
-#subprocess.Popen(r'cd frontend & npm start',shell=True,stdout=subprocess.PIPE)
-#subprocess.Popen(r'cd backend/cmd/server & go run main.go',shell=True,stdout=subprocess.PIPE)
-
-
-
-#add test part
+def main():
+    if(not len(sys.argv) == 2):
+        print("Invalid number of arguments. Should be `python3 run.py [init/run/test]`")
+        return
+    if(sys.argv[1].lower() == "init"):
+        init()
+    elif(sys.argv[1].lower() == "run"):
+        run()
+    elif(sys.argv[1].lower() == "test"):
+        test()
+    else:
+        print("Unknown argument " + sys.argv[1] + ". Should be `python3 run.py [init/run/test]`")
+    
+if __name__=="__main__":
+    main()
