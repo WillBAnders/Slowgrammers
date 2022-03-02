@@ -13,6 +13,8 @@ def startBackend():
 def init():
     print("Creating database")
     os.chdir("backend/cmd/initdb")
+    if os.path.isfile("./database.db"):
+        os.system("rm database.db")
     os.system("go run main.go")
     os.system("cp database.db ../server/database.db")
 
@@ -20,6 +22,14 @@ def init():
     os.chdir("../../../frontend")
     os.system("npm install")
     os.chdir("..")
+    
+def initdb():
+    print("Creating database")
+    os.chdir("backend/cmd/initdb")
+    if os.path.isfile("./database.db"):
+        os.system("rm database.db")
+    os.system("go run main.go")
+    os.system("cp database.db ../server/database.db")
     
 def run():
     Thread(target = startFrontend).start()
@@ -30,7 +40,7 @@ def test():
 
 def main():
     if(not len(sys.argv) == 2):
-        print("Invalid number of arguments. Should be `python3 run.py [init/run/test]`")
+        print("Invalid number of arguments. Should be `python3 run.py [init/run/test/initdb]`")
         return
     if(sys.argv[1].lower() == "init"):
         init()
@@ -38,8 +48,10 @@ def main():
         run()
     elif(sys.argv[1].lower() == "test"):
         test()
+    elif(sys.argv[1].lower() == "initdb"):
+        initdb()
     else:
-        print("Unknown argument " + sys.argv[1] + ". Should be `python3 run.py [init/run/test]`")
+        print("Unknown argument " + sys.argv[1] + ". Should be `python3 run.py [init/run/test/initdb]`")
     
 if __name__=="__main__":
     main()
