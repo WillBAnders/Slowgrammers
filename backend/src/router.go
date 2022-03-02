@@ -165,18 +165,17 @@ type AuthBody struct {
 }
 
 // Handler for /signup. Takes a username and password and creates a new user
-// account, returning a JWT. Errors if:
+// account. Returns a success message. Errors if:
 //
 //  - The body has missing/unknown fields (400)
 //  - The username already exists (401)
-//  - A server issue prevents creating a JWT (500)
 //
 // Body Schema: {
 //   username: String
 //   password: String
 // }
 // Response Schema: {
-//   token: JWT
+//   message: String
 // }
 // Error Schema: {
 //   error: String
@@ -204,6 +203,10 @@ func postSignup(c *gin.Context) {
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	DB.Create(&User{Username: body.Username, Password: string(hash)})
+
+	c.JSON(200, gin.H{
+		"message": "success",
+	})
 }
 
 // Handler for /signin. Takes a username and password and logs in an existing
@@ -213,6 +216,7 @@ func postSignup(c *gin.Context) {
 //  - The username does not exist (401)
 //  - The password is invalid (401)
 //  - A server issue prevents creating a JWT (500)
+//	- Unable to create cookie (500)
 //
 // Body Schema: {
 //   username: String
@@ -263,6 +267,9 @@ func postSignin(c *gin.Context) {
 	cookie, err := c.Cookie("jwt")
 
 	if err == nil {
+		c.JSON(500, gin.H{
+			"error": "Cookie not able to be setup in signin",
+		})
 		fmt.Printf("Cookie not able to be setup in signin: %s", cookie)
 		return
 	}
@@ -273,7 +280,26 @@ func postSignin(c *gin.Context) {
 	})
 }
 
-//TODO make docs
+// Handler for /user. Returns the information of the logged in user.
+//  Returns unathenticated if not logged in.
+//
+// Response Schema(logged in): {
+//   {
+//     {
+// 		username: String,
+// 		firstname: String,
+// 		lastname: String,
+// 		email: String,
+// 		phone: String
+//   }
+// }
+//
+// Response Schema(NOT logged in): {
+//   {
+//     {
+// 		message: String
+//   }
+// }
 func getUser(c *gin.Context) {
 	cookie, err := c.Cookie("jwt")
 
@@ -302,7 +328,17 @@ func getUser(c *gin.Context) {
 	return
 }
 
-//TODO make docs
+// Handler for /signout. Logs out the currently logged in user
+// and removes cookie, returning a success message. Errors if:
+//
+//  - No user to sign out (401)
+//
+// Response Schema: {
+//   message: String
+// }
+// Error Schema: {
+//   error: String
+// }
 func postSignout(c *gin.Context) {
 
 	c.SetCookie("jwt", "", -1, "", "", false, true)
@@ -310,7 +346,11 @@ func postSignout(c *gin.Context) {
 	cookie, err := c.Cookie("jwt")
 
 	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "No user & cookie to signout",
+		})
 		fmt.Printf("cookie not recieved signout: %s , %s \n", cookie, err)
+		return
 	}
 
 	c.JSON(200, gin.H{
