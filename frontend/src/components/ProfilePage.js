@@ -1,21 +1,19 @@
 import React from 'react'
 import { Avatar, TextField, Box, Paper, Stack, Button, CardHeader, Card, CardContent, Typography, Rating } from "@mui/material";
 import {blue} from '@mui/material/colors'
-import sans from "../styles/sans.png"
 import { useParams } from "react-router-dom";
-import axios from 'axios';
 import {ThreeDots} from 'react-loader-spinner';
 
-const ProfilePage = () => {
+const ProfilePage = ({name}) => {
     //Typography variant doesn't work with responsive design, so I have to go with font sizes
     let params = useParams();
-    console.log(params.username);
-    const username= params.username;
+    let username;
+    if (name && name == params){
+        username = name; //own account
+    } else{
+        username= params.username; //other account
+    }
     let url = '/tutors/' + username;
-    /*const [info, setInfo] = React.useState(() => {
-        axios.get(url)
-            .then(data => setInfo(data.data));
-    });*/
     const [info, setInfo] = React.useState();
     const [isLoading, setLoading] = React.useState(true);
     React.useEffect(() => {
@@ -33,7 +31,6 @@ const ProfilePage = () => {
     }, [url]);
     console.log("info: ");
     console.log(info);
-    //console.log(info.tutor);
     if (isLoading) {
         return (
           <div  className="loadingContainer">
@@ -47,119 +44,125 @@ const ProfilePage = () => {
         </div>
         )
       } else {
-    return(
-        <div>
-            <Stack
-                direction="row"
-                spacing={{xs:2, md: 3}}
-                sx={{
-                    ml: {
-                        md: '200px'
+        let fullname = info.profile[0].firstname + " " + info.profile[0].lastname;
+        return(
+            <div>
+                <Stack
+                    title="Avatar_and_Name"
+                    direction="row"
+                    spacing={{xs:2, md: 3}}
+                    sx={{
+                        ml: {
+                            md: '200px'
+                        }
+                    }}
+                >
+                <Avatar 
+                    sx={{
+                        mt: {md: '5px'},
+                        bgcolor: blue[500],
+                        width: {xs: 50, md: 100},
+                        height: {xs: 50, md: 100}
+                    }}
+                    alt= {
+                        fullname
                     }
-                }}
-            >
-            <Avatar 
-                sx={{
-                    mt: {md: '5px'},
-                    bgcolor: blue[500],
-                    width: {xs: 50, md: 100},
-                    height: {xs: 50, md: 100}
-                }}
-                alt= {
-                    "Sans Undertale"
-                }
-                src={sans} />
-            <Typography 
-                sx={{
-                    fontSize:{
-                        md:75,
-                        xs:30
-                    }
-                }}
-            >
-                First Name, Last Name
-            </Typography>
-            </Stack>
-            <Stack
-                direction="row"
-                spacing={{xs:15, md: 80}}
-            >
+                    />
+                <Typography 
+                    sx={{
+                        fontSize:{
+                            md:75,
+                            xs:30
+                        }
+                    }}
+                >
+                    {fullname}
+                </Typography>
+                </Stack>
+                <Stack
+                    title="Username_and_Rating"
+                    direction="row"
+                    spacing={{xs:15, md: 80}}
+                >
+                    <Typography
+                        sx={{
+                            ml:{
+                                xs: 8,
+                                md: 40
+                            },
+                            fontSize:{
+                                md:40,
+                                xs:20
+                            }
+                        }}
+                        color="gray"
+                    >
+                        @{info.tutor.username}
+                        
+                    </Typography>
+                    {<Rating 
+                        title="Rating"
+                        value = {info.tutor.rating}
+                        readOnly
+                    />}
+                </Stack>
                 <Typography
+                    title="Email_Address"
                     sx={{
                         ml:{
                             xs: 8,
-                            md: 40
+                            md: 41
                         },
                         fontSize:{
-                            md:40,
-                            xs:20
+                            md:30,
+                            xs:15
                         }
                     }}
-                    color="gray"
                 >
-                    @{info.tutor.username}
-                    
+                    {info.profile[0].email}
                 </Typography>
-                {<Rating 
-                    name="read-only" 
-                    value = {info.tutor.rating}
-                    readOnly
-                />}
-            </Stack>
-            <Typography
-                sx={{
-                    ml:{
-                        xs: 8,
-                        md: 41
-                    },
-                    fontSize:{
-                        md:30,
-                        xs:15
-                    }
-                }}
-            >
-                sans.undertale@ufl.edu
-            </Typography>
-            <Typography
-                sx={{
-                    ml:{
-                        xs: 8,
-                        md: 41
-                    },
-                    fontSize:{
-                        md:30,
-                        xs:15
-                    }
-                }}
-            >
-                229-655-4245
-            </Typography>
-            <Box
-                sx={{
-                    ml:{
-                        xs: 8,
-                        md: 41
-                    },
-                    width: {xs: 300, md: 700},
-                    height: {xs: 150, md: 300},
-                    backgroundColor: '#dfdfdf'
-                }}
-            >
                 <Typography
-                sx={{
-                    fontSize:{
-                        md:20,
-                        xs:10
-                    }
-                }}
-                style={{wordWrap: "break-word"}}
+                    title="Phone_Number"
+                    sx={{
+                        ml:{
+                            xs: 8,
+                            md: 41
+                        },
+                        fontSize:{
+                            md:30,
+                            xs:15
+                        }
+                    }}
                 >
-                    Sample Bio
-                </Typography>    
-            </Box>
-        </div>
+                    {info.profile[0].phone}
+                </Typography>
+                <Box
+                    title="Bio"
+                    sx={{
+                        ml:{
+                            xs: 8,
+                            md: 41
+                        },
+                        width: {xs: 300, md: 700},
+                        height: {xs: 150, md: 300},
+                        backgroundColor: '#dfdfdf'
+                    }}
+                >
+                    <Typography
+                    sx={{
+                        fontSize:{
+                            md:20,
+                            xs:10
+                        }
+                    }}
+                    style={{wordWrap: "break-word"}}
+                    >
+                        {info.tutor.bio}
+                    </Typography>    
+                </Box>
+            </div>
 
-    )}
+        )}
 }
 
 export default ProfilePage

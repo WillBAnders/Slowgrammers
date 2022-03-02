@@ -21,28 +21,28 @@ export default function SignupPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     console.log(username + password)
 
     const res = await fetch('/signup', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            username,
-            password
-        })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        password
+      })
     });
     setNavigate(true);
     console.log(res)
   };
 
   if (navigate) {
-    return <Navigate to="/SignIn"/>;
+    return <Navigate to="/SignIn" />;
   }
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs" sx={{pt:{xs: "30px", md: "40px"}}}>
+      <Container component="main" maxWidth="xs" sx={{ pt: { xs: "30px", md: "40px" } }}>
         <CssBaseline />
         <Box
           sx={{
@@ -62,25 +62,28 @@ export default function SignupPage() {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
+                  title="username"
                   required
                   fullWidth
                   label="Username"
                   autoComplete="username"
-                  onChange={(e) => {setUsername(e.target.value)}}
+                  onChange={(e) => { setUsername(e.target.value) }}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  title="password"
                   required
                   fullWidth
                   label="Password"
                   type="password"
                   autoComplete="new-password"
-                  onChange={(e) => {setPassword(e.target.value)}}
+                  onChange={(e) => { setPassword(e.target.value) }}
                 />
               </Grid>
             </Grid>
             <Button
+              title="submit"
               type="submit"
               fullWidth
               variant="contained"

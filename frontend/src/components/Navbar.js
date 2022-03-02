@@ -49,10 +49,11 @@ const Navbar = ({ name, setName }) => {
 
   let buttons;
   if (name) {
+
     buttons = (
       <Box sx={{ flexGrow: 0 }}>
         <Tooltip title="Open settings">
-          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+          <IconButton title="menu" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
             <Avatar alt="John Doe" src="" />
           </IconButton>
         </Tooltip>
@@ -72,14 +73,16 @@ const Navbar = ({ name, setName }) => {
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
         >
+          <Link to={"/" + name} style={{ textDecoration: 'none', color: "black" }}>
+            <MenuItem onClick={handleCloseUserMenu}>
+              <Typography textAlign="center">Profile</Typography>
+            </MenuItem>
+          </Link>
           <MenuItem onClick={handleCloseUserMenu}>
-            <Typography textAlign="center">Profile</Typography>
+            <Typography textAlign="center" color="black">Finance</Typography>
           </MenuItem>
-          <MenuItem onClick={handleCloseUserMenu}>
-            <Typography textAlign="center">Finance</Typography>
-          </MenuItem>
-          <MenuItem onClick={signout}>
-            <Typography textAlign="center">Logout</Typography>
+          <MenuItem title="signout" onClick={signout}>
+            <Typography textAlign="center" color="black">Logout</Typography>
           </MenuItem>
         </Menu>
       </Box>
@@ -90,6 +93,7 @@ const Navbar = ({ name, setName }) => {
       <Box sx={{ flexGrow: 0 }}>
         <Link to="/SignUp" style={{ textDecoration: 'none', color: 'white' }}>
           <Button
+            title="signupbutton"
             variant="contained"
             color="secondary"
             sx={{ margin: "5px" }}
@@ -99,6 +103,7 @@ const Navbar = ({ name, setName }) => {
         </Link>
         <Link to="/SignIn" style={{ textDecoration: 'none', color: 'white' }}>
           <Button
+            title="signinbutton"
             variant="contained"
             color="secondary"
             sx={{ margin: "5px" }}
