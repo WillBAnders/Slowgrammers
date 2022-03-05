@@ -2,6 +2,7 @@ package src
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -68,7 +69,7 @@ func getCoursesCode(c *gin.Context) {
 	if len(courses) == 1 {
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
-		DB.Joins("Tutor").Order("Tutor__username").Find(&tutorings, "course_id = ?", courses[0].ID)
+		DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
 		tutors := []Tutor{}
 		for _, tutoring := range tutorings {
 			tutors = append(tutors, tutoring.Tutor)
@@ -129,13 +130,8 @@ func getTutors(c *gin.Context) {
 func getTutorsUsername(c *gin.Context) {
 	username := c.Params.ByName("username")
 	var tutors []Tutor
-	DB.Preload("Availability").Limit(1).Find(&tutors, "username = ?", username)
+	DB.Joins("User").Limit(1).Find(&tutors, "User__username = ?", username)
 	if len(tutors) == 1 {
-		days := []string{} //make([]string, 5)
-		for _, availability := range tutors[0].Availability {
-			days = append(days, availability.Day)
-		}
-
 		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 		var tutorings []Tutoring
 		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].UserID)
@@ -146,8 +142,8 @@ func getTutorsUsername(c *gin.Context) {
 
 		c.JSON(200, gin.H{
 			"tutor":        tutors[0],
-			"profile":      tutors[0].User, //TODO
-			"availability": days,           //TODO
+			"profile":      tutors[0].User,                              //TODO
+			"availability": strings.Split(tutors[0].Availability, ", "), //TODO
 			"courses":      courses,
 		})
 	} else {

@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -118,7 +119,7 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				{"username": "Username"}
+				`+stringify(Tutor{User: User{Username: "Username"}})+`
 			]
 		}`,
 	))
@@ -132,9 +133,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				{"username": "Alice"},
-				{"username": "Bob"},
-				{"username": "Clair"}
+				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
+				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
+				`+stringify(Tutor{User: User{Username: "Clair"}})+`
 			]
 		}`,
 	))
@@ -148,9 +149,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				{"username": "Alice"},
-				{"username": "Bob"},
-				{"username": "Clair"}
+				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
+				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
+				`+stringify(Tutor{User: User{Username: "Clair"}})+`
 			]
 		}`,
 	))
@@ -184,7 +185,7 @@ func (suite *RouterSuite) TestGetTutors() {
 		},
 		`{
 			"tutors": [
-				{"username": "Username"}
+				`+stringify(Tutor{User: User{Username: "Username"}})+`
 			]
 		}`,
 	))
@@ -197,9 +198,9 @@ func (suite *RouterSuite) TestGetTutors() {
 		},
 		`{
 			"tutors": [
-				{"username": "Alice"},
-				{"username": "Bob"},
-				{"username": "Clair"}
+				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
+				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
+				`+stringify(Tutor{User: User{Username: "Clair"}})+`
 			]
 		}`,
 	))
@@ -212,9 +213,9 @@ func (suite *RouterSuite) TestGetTutors() {
 		},
 		`{
 			"tutors": [
-				{"username": "Alice"},
-				{"username": "Bob"},
-				{"username": "Clair"}
+				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
+				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
+				`+stringify(Tutor{User: User{Username: "Clair"}})+`
 			]
 		}`,
 	))
@@ -237,31 +238,37 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 	suite.Run("Empty Courses", test(
 		[]Tutoring{},
 		`{
-			"tutor": {"username": "Username"},
+			"tutor": `+stringify(tutor)+`,
+			"profile": `+stringify(tutor.User)+`,
+			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
 			"courses": []
 		}`,
 	))
 
-	suite.Run("Single Tutor", test(
+	suite.Run("Single Course", test(
 		[]Tutoring{
 			{Course: Course{Code: "code", Name: "Name"}, Tutor: tutor},
 		},
 		`{
-			"tutor": {"username": "Username"},
+			"tutor": `+stringify(tutor)+`,
+			"profile": `+stringify(tutor.User)+`,
+			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
 			"courses": [
 				{"code": "code", "name": "Name"}
 			]
 		}`,
 	))
 
-	suite.Run("Multiple Tutors", test(
+	suite.Run("Multiple Courses", test(
 		[]Tutoring{
 			{Course: Course{Code: "1", Name: "First"}, Tutor: tutor},
 			{Course: Course{Code: "2", Name: "Second"}, Tutor: tutor},
 			{Course: Course{Code: "3", Name: "Third"}, Tutor: tutor},
 		},
 		`{
-			"tutor": {"username": "Username"},
+			"tutor": `+stringify(tutor)+`,
+			"profile": `+stringify(tutor.User)+`,
+			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
 			"courses": [
 				{"code": "1", "name": "First"},
 				{"code": "2", "name": "Second"},
@@ -277,7 +284,9 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "1", Name: "First"}, Tutor: tutor},
 		},
 		`{
-			"tutor": {"username": "Username"},
+			"tutor": `+stringify(tutor)+`,
+			"profile": `+stringify(tutor.User)+`,
+			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
 			"courses": [
 				{"code": "1", "name": "First"},
 				{"code": "2", "name": "Second"},
@@ -306,8 +315,9 @@ func (suite *RouterSuite) TestSignup() {
 
 		data := gin.H{}
 		_ = json.Unmarshal(w.Body.Bytes(), &data)
-		claims, _ := ParseJWT(data["token"].(string))
-		suite.Equal("Username", claims.Username)
+		//fmt.Println("json: " + string(w.Body.Bytes()))
+		//claims, _ := ParseJWT(data["token"].(string))
+		suite.Equal("success", data["message"])
 	}))
 
 	suite.Run("Invalid Request (Missing Field)", manualSetupTest(func() {
@@ -356,7 +366,7 @@ func (suite *RouterSuite) TestSignin() {
 		data := gin.H{}
 		_ = json.Unmarshal(w.Body.Bytes(), &data)
 		claims, _ := ParseJWT(data["token"].(string))
-		suite.Equal("Username", claims.Username)
+		suite.Equal("Username", claims.Issuer)
 	}))
 
 	suite.Run("Invalid Request (Missing Field)", manualSetupTest(func() {
@@ -403,4 +413,9 @@ func POST(path string, body gin.H) *httptest.ResponseRecorder {
 	req.Header.Set("Content-Type", "application/json")
 	Router.ServeHTTP(w, req)
 	return w
+}
+
+func stringify(data any) string {
+	result, _ := json.Marshal(data)
+	return string(result)
 }

@@ -10,7 +10,7 @@ var DB *gorm.DB
 func InitDatabase(dsn string) {
 	//TODO: Error handling
 	DB, _ = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
-	_ = DB.AutoMigrate(&User{}, &Course{}, &Tutor{}, &Availability{}, &Tutoring{})
+	_ = DB.AutoMigrate(&User{}, &Course{}, &Tutor{}, &Tutoring{})
 }
 
 type User struct {
@@ -30,22 +30,24 @@ type Course struct {
 }
 
 type Tutor struct {
-	UserID       uint           `json:"-"`
-	User         User           `gorm:"foreignKey:UserID" json:"user"`
-	Rating       float32        `gorm:"not null" json:"rating"`
-	Bio          string         `json:"bio"`
-	Availability []Availability `json:"availability"`
+	UserID       uint    `gorm:"primaryKey" json:"-"`
+	User         User    `gorm:"foreignKey:UserID" json:"user"`
+	Rating       float32 `gorm:"not null" json:"rating"`
+	Bio          string  `gorm:"not null" json:"bio"`
+	Availability string  `gorm:"not null" json:"availability"`
+	//TODO: Courses via many2many join table?
 }
 
-type Availability struct {
-	TutorID uint   `json:"-"`
-	Tutor   Tutor  `gorm:"foreignKey:TutorID" json:"tutor"`
-	Day     string `gorm:"not null" json:"day"`
-}
+/*type Availability struct {
+	//TODO: Add to Tutor (Gorm issues)
+    //TODO: Include times
+	TutorID uint   `gorm:"primaryKey" json:"-"`
+	Day     string `gorm:"primaryKey, not null" json:"day"`
+}*/
 
 type Tutoring struct {
-	TutorID  uint   `json:"-"`
+	TutorID  uint   `gorm:"primaryKey" json:"-"`
 	Tutor    Tutor  `gorm:"foreignKey:TutorID" json:"tutor"`
-	CourseID uint   `json:"-"`
+	CourseID uint   `gorm:"primaryKey" json:"-"`
 	Course   Course `gorm:"foreignKey:CourseID" json:"course"`
 }
