@@ -95,9 +95,10 @@ func getCoursesCode(c *gin.Context) {
 func getTutors(c *gin.Context) {
 	//TODO: Pagination support
 	var tutors []Tutor
-	DB.Joins("User").Order("User__username").Find(&tutors)
+	//DB.Joins("User").Order("User__username").Find(&tutors)
+	DB.Find(&tutors) //not connecting to User table
 	c.JSON(200, gin.H{
-		"tutors": tutors,
+		"tutors": tutors,   
 	})
 }
 
@@ -359,6 +360,10 @@ func postSignout(c *gin.Context) {
 // Response Schema: {
 //   user: User {
 //     username: String
+//	   firstname: String
+//	   lastname: String
+//	   email: String
+//	   phone: String
 //   }
 // }
 // Error Schema: {
