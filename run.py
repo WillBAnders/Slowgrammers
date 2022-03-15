@@ -9,6 +9,15 @@ def startFrontend():
 def startBackend():
     os.chdir("backend/cmd/server")
     os.system("go run main.go")
+    
+def testFrontend():
+    os.chdir("frontend")
+    os.system("npm test")
+    
+def testBackend():
+    os.chdir("backend")
+    os.system("go fmt")
+    os.system("go test ./src")
 
 def init():
     print("Creating database")
@@ -36,11 +45,15 @@ def run():
     Thread(target = startBackend).start()
     
 def test():
-    print("Option not implimented yet")
+    print("Testing backend")
+    testBackend()
+    os.chdir("..")
+    print("Testing frontend")
+    testFrontend()
 
 def main():
     if(not len(sys.argv) == 2):
-        print("Invalid number of arguments. Should be `python3 run.py [init/run/test/initdb]`")
+        print("Invalid number of arguments. Should be `python3 run.py [init/run/test/initdb/runback/runfront/testback/testfront]`")
         return
     if(sys.argv[1].lower() == "init"):
         init()
@@ -50,8 +63,16 @@ def main():
         test()
     elif(sys.argv[1].lower() == "initdb"):
         initdb()
+    elif(sys.argv[1].lower() == "runback"):
+        startBackend()
+    elif(sys.argv[1].lower() == "runfront"):
+        startFrontend()
+    elif(sys.argv[1].lower() == "testback"):
+        testBackend()
+    elif(sys.argv[1].lower() == "testfront"):
+        testFrontend()
     else:
-        print("Unknown argument " + sys.argv[1] + ". Should be `python3 run.py [init/run/test/initdb]`")
+        print("Unknown argument " + sys.argv[1] + ". Should be `python3 run.py [init/run/test/initdb/runback/runfront/testback/testfront]`")
     
 if __name__=="__main__":
     main()
