@@ -11,7 +11,8 @@ const CoursePage = () => {
         let buttons = [];
         for (let i = 0; i < courses.length; i++) {
             let text = courses.at(i).code + ": " + courses.at(i).name;
-            let link = "/Courses/" + courses.at(i).code;
+            let link = "/courses/" + courses.at(i).code;
+            console.log(link);
             if (text.toUpperCase().includes(filter.toUpperCase())) {
                 //Added the key to be equal to i (might have to make unique IDs for each of the courses)
                     buttons.push(

@@ -34,7 +34,7 @@ function App() {
         <Routes>
           <Route path="/" exact element={<LandingPage />} />
           <Route path="/courses" element={<CoursePage />} />
-          <Route path="/tutors" element={<TutorPage />} />
+          <Route path="/courses/:coursecode" element={<TutorPage />} />
           <Route path="/signUp" element={<SignUpPage />} />
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
           <Route path="/:username" element={<ProfilePage name = {name}/>} />

@@ -1,63 +1,44 @@
 import React from 'react'
 import { Stack, CardHeader, CardContent, Rating, Card, Typography, Grid, TextField, Paper, Box } from '@mui/material'
-import tutorsList from '../tests/Tutors'
+import { useParams } from "react-router-dom";
+import {ThreeDots} from 'react-loader-spinner';
+
 
 const TutorPage = () => {
     const [tutors, setTutors] = React.useState([]);
+    const [isLoading, setLoading] = React.useState(true);
+    let params = useParams().coursecode;
     //Effect callbacks are synchronous to prevent race conditions. So we need to put the async function inside
     React.useEffect(() => {
         async function fetchTutors(){
-            const data = await fetch("/tutors").then(r => r.json());
+            const data = await fetch(`/courses/${params}`).then(r => r.json());
             setTutors(data.tutors);
+            setLoading(false);
         }
         fetchTutors();
     }, []);
-
-    function getTutorInfo(tutorArray){
-        //[
-        // {
-        //     "courses": [
-        //         {
-        //             "code": "cop-3502",
-        //             "name": "Programming Fundamentals 1"
-        //         }
-        //     ],
-        //     "tutor": {
-        //         "username": "Alice"
-        //     }
-        // }
-        //]
-        var tutorsInfo = [];
-
-        async function fetchTutorInfo(name){
-            const data = await fetch(`/tutors/${name}`).then(r => r.json());
-            tutorsInfo.push(data)
-        }
-
-        tutorArray.forEach(tutor => {
-            fetchTutorInfo(tutor.username)
-        });
-
-        console.log(tutorsInfo)
-        return tutorsInfo
-    }
 
     function writeOutTutors(_tutors, filter){
         if (filter === undefined) {
             filter = "";
         }
+        console.log(_tutors);
         let tutorList = [];
         for (let i = 0; i < _tutors.length; i++){
-                let title = _tutors.at(i).firstName + " " + _tutors.at(i).lastName;
-                let courses = _tutors.at(i).classCode;
+                console.log(_tutors.at(i));
+                let title = _tutors.at(i).profile.firstName + " " + _tutors.at(i).profile.lastName;
+                console.log(title);
+                let courses = _tutors.at(i).courses;
+                console.log(courses);
                 let coursesuppercased = courses.map(courses => courses.toUpperCase());
                 let avail = _tutors.at(i).availability;
+                console.log(avail);
                 let availuppercased = avail.map(avail => avail.toUpperCase());
                 if (title.toUpperCase().includes(filter.toUpperCase()) || coursesuppercased.find(element => element.includes(filter.toUpperCase())) || availuppercased.find(element => element.includes(filter.toUpperCase()))) tutorList.push(
                 <Card key={_tutors.at(i).id} >
                     <CardHeader 
                         title={title}
-                        subheader={<Rating name="read-only" precision={0.1} size="small" value={_tutors.at(i).rating} readOnly />}
+                        subheader={<Rating name="read-only" precision={0.1} size="small" value={_tutors.at(i).tutor.rating} readOnly />}
                     />
                     <CardContent>
                         <Typography
@@ -139,71 +120,85 @@ const TutorPage = () => {
     const handleChange = e => {
         setValue(e.target.value);
     };
-    return (
-        <div>
-            <Box sx={{display:"flex", justifyContent:"center"}}>
-                <Typography
-                    className="main-text"
-                    variant="h2"
-                    justifyContent="center"
-                    sx={{
-                        marginTop: "10px"
-                    }}
-                >
-                    Tutors
-                </Typography>
-            </Box>
-            <Box 
-                display="flex" 
-                width="100%"
-                alignItems="center"
-                justifyContent="center"
-            >
-                <Paper
-                    elevation={0}
-                    sx={{
-                        width: "400px",
-                        margin: "10px",
-                        maxWidth: "750px"
-                    }}
-                >
-                    <TextField 
-                        value={value}
-                        fullWidth 
-                        title="SearchBar"
-                        id="tutor-search" 
-                        label="Search Here" 
-                        variant="outlined"
-                        onChange={handleChange} 
-                        inputProps={{
-                            "data-testid": "SearchBarin",
-                            "title": "SearchBarInput"
+    if (isLoading) {
+        return (
+            <div  className="loadingContainer">
+            <ThreeDots
+            type="ThreeDots"
+            color="#00b22d"
+            height={100}
+            width={100}
+            //3 secs
+            />
+            </div>
+            )
+    } else {
+        return (
+            <div>
+                <Box sx={{display:"flex", justifyContent:"center"}}>
+                    <Typography
+                        className="main-text"
+                        variant="h2"
+                        justifyContent="center"
+                        sx={{
+                            marginTop: "10px"
                         }}
-                        />
-                </Paper>
-            </Box>
-
-            <Grid 
-                container 
-                spacing={0} 
-                alignItems="center"
-                justifyContent="center"
-                direction="column"
-                style={{ minHeight: '100vh', width: "100%"}}
-            >
-                <Stack
-                    title = "tutorlist"
-                    direction="column"
+                    >
+                        Tutors
+                    </Typography>
+                </Box>
+                <Box 
+                    display="flex" 
+                    width="100%"
+                    alignItems="center"
                     justifyContent="center"
-                    alignItems="stretch"
-                    spacing={1}
-                    sx={{ width: "80%"}}
                 >
-                    {writeOutTutors(tutorsList, value)}
-                </Stack>
-            </Grid>
-        </div>
-    )
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            width: "400px",
+                            margin: "10px",
+                            maxWidth: "750px"
+                        }}
+                    >
+                        <TextField 
+                            value={value}
+                            fullWidth 
+                            title="SearchBar"
+                            id="tutor-search" 
+                            label="Search Here" 
+                            variant="outlined"
+                            onChange={handleChange} 
+                            inputProps={{
+                                "data-testid": "SearchBarin",
+                                "title": "SearchBarInput"
+                            }}
+                            />
+                    </Paper>
+                </Box>
+
+                <Grid 
+                    container 
+                    spacing={0} 
+                    alignItems="center"
+                    justifyContent="center"
+                    direction="column"
+                    style={{ minHeight: '100vh', width: "100%"}}
+                >
+                    <Stack
+                        title = "tutorlist"
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="stretch"
+                        spacing={1}
+                        sx={{ width: "80%"}}
+                    >
+                        {writeOutTutors(tutors, value)}
+                    </Stack>
+                </Grid>
+            </div>
+        )
+    }
 }
 
 // to get the full list of tutors and the information:
