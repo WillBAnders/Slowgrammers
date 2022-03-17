@@ -8,6 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
+	
+	"database/sql"
+    _ "github.com/mattn/go-sqlite3"
 )
 
 var Router *gin.Engine
@@ -27,6 +30,7 @@ func InitRouter() {
 	Router.POST("/signout", postSignout)
 	Router.GET("/user", getUser)
 	Router.GET("/users/:username", getUsersUsername)
+	Router.GET("/tutors/class/:code", getTutorsCourse)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -382,4 +386,60 @@ func getUsersUsername(c *gin.Context) {
 			"error": "User " + username + " not found.",
 		})
 	}
+}
+
+
+
+func getTutorsCourse(c *gin.Context) {
+	courseCode := c.Params.ByName("code")
+	database, _ := sql.Open("sqlite3", "../cmd/server/database.db")
+	
+	var (
+		firstname string
+		lastname string
+		code string
+		courseName string
+		availability string
+		username string
+		rating float32
+	)
+	
+	rows, err := database.Query("SELECT FullTutorData.first_name, FullTutorData.last_name, FullTutorData.username, FullTutorData.code, FullTutorData.name, FullTutorData.rating, FullTutorData.availability FROM Courses, (SELECT Users.first_name, Users.last_name, Users.username, Courses.code AS code, Courses.name, Tutors.rating, Tutors.availability FROM Users, Tutors, Tutorings, Courses WHERE Users.id = Tutors.user_id  and Tutors.user_id = Tutorings.tutor_id and Tutorings.course_id = Courses.id) AS FullTutorData WHERE COurses.code = ? and Courses.code = FullTutorData.code", courseCode)
+	if err != nil {
+		//log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&firstname, &lastname, &code, &courseName, &availability, &username, &rating)
+		if err != nil {
+			//log.Fatal(err)
+		}
+		fmt.Println(username)
+	}
+	err = rows.Err()
+	if err != nil {
+		//log.Fatal(err)
+	}
+	database.Close()
+	fmt.Println("WE ARE ALL MAD HERE")
+	//query := fmt.Sprintf("SELECT FullTutorData.first_name, FullTutorData.last_name, FullTutorData.username, FullTutorData.code, FullTutorData.name, FullTutorData.rating, FullTutorData.availability FROM Courses, (SELECT Users.first_name, Users.last_name, Users.username, Courses.code AS code, Courses.name, Tutors.rating, Tutors.availability FROM Users, Tutors, Tutorings, Courses WHERE Users.id = Tutors.user_id  and Tutors.user_id = Tutorings.tutor_id and Tutorings.course_id = Courses.id) AS FullTutorData WHERE COurses.code = %v and Courses.code = FullTutorData.code", courseCode)
+	//fmt.Println(query)
+	//take course code, find course id
+	//use course id in tutorsings to get all tutor ids
+	//use tutor id to get tutor info and tutor (aka user) id to get user info
+	
+	
+	/*
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", username)
+	if len(users) == 1 {
+		c.JSON(200, gin.H{
+			"user": users[0],
+		})
+	} else {
+		c.JSON(404, gin.H{
+			"error": "User " + username + " not found.",
+		})
+	}
+	*/
 }
