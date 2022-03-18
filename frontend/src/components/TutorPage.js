@@ -26,28 +26,28 @@ const TutorPage = () => {
         let tutorList = [];
         for (let i = 0; i < _tutors.length; i++){
                 console.log(_tutors.at(i));
-                let title = _tutors.at(i).profile.firstName + " " + _tutors.at(i).profile.lastName;
+                let title = _tutors.at(i).user.firstname + " " + _tutors.at(i).user.lastname;
                 console.log(title);
-                let courses = _tutors.at(i).courses;
+                /*let courses = _tutors.at(i).courses;
                 console.log(courses);
-                let coursesuppercased = courses.map(courses => courses.toUpperCase());
+                let coursesuppercased = courses.map(courses => courses.toUpperCase());*/
                 let avail = _tutors.at(i).availability;
                 console.log(avail);
-                let availuppercased = avail.map(avail => avail.toUpperCase());
-                if (title.toUpperCase().includes(filter.toUpperCase()) || coursesuppercased.find(element => element.includes(filter.toUpperCase())) || availuppercased.find(element => element.includes(filter.toUpperCase()))) tutorList.push(
+                let availuppercased = avail.toUpperCase(); //avail.map(avail => avail.toUpperCase());
+                if (title.toUpperCase().includes(filter.toUpperCase()) /*|| coursesuppercased.find(element => element.includes(filter.toUpperCase()))*/ || availuppercased.find(element => element.includes(filter.toUpperCase()))) tutorList.push(
                 <Card key={_tutors.at(i).id} >
                     <CardHeader 
                         title={title}
-                        subheader={<Rating name="read-only" precision={0.1} size="small" value={_tutors.at(i).tutor.rating} readOnly />}
+                        subheader={<Rating name="read-only" precision={0.1} size="small" value={_tutors.at(i).rating} readOnly />}
                     />
                     <CardContent>
-                        <Typography
+                        {/*<Typography
                             component="div"
                             sx={{marginBottom: "10px"}}
                         >
                             Classes:
                             {writeOutClasses(courses)}
-                        </Typography>
+                        </Typography>*/}
                         <Typography 
                             sx={{marginBottom: "10px"}}
                             component="div"

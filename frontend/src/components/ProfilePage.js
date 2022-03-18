@@ -8,7 +8,7 @@ const ProfilePage = ({name}) => {
     //Typography variant doesn't work with responsive design, so I have to go with font sizes
     let params = useParams();
     let username;
-    if (name && name == params){
+    if (name && name === params){
         username = name; //own account
     } else{
         username= params.username; //other account
@@ -44,7 +44,7 @@ const ProfilePage = ({name}) => {
         </div>
         )
       } else {
-        let fullname = info.profile[0].firstname + " " + info.profile[0].lastname;
+        let fullname = info.profile.firstname + " " + info.profile.lastname;
         return(
             <div>
                 <Stack
@@ -97,7 +97,7 @@ const ProfilePage = ({name}) => {
                         }}
                         color="gray"
                     >
-                        @{info.tutor.username}
+                        @{username}
                         
                     </Typography>
                     {<Rating 
@@ -119,7 +119,7 @@ const ProfilePage = ({name}) => {
                         }
                     }}
                 >
-                    {info.profile[0].email}
+                    {info.profile.email}
                 </Typography>
                 <Typography
                     title="Phone_Number"
@@ -134,7 +134,7 @@ const ProfilePage = ({name}) => {
                         }
                     }}
                 >
-                    {info.profile[0].phone}
+                    {info.profile.phone}
                 </Typography>
                 <Box
                     title="Bio"
