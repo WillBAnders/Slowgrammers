@@ -89,7 +89,8 @@ const TutorPage = () => {
         )
     }
 
-    function writeOutAvailability(days){
+    function writeOutAvailability(incourse){
+        const days = incourse.split(",");
         return (
             <Grid
                 container
@@ -183,7 +184,7 @@ const TutorPage = () => {
                     alignItems="center"
                     justifyContent="center"
                     direction="column"
-                    style={{ minHeight: '100vh', width: "100%"}}
+                    style={{ width: "100%"}}
                 >
                     <Stack
                         title = "tutorlist"
