@@ -8,6 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
+	
+	//"database/sql"
+    //_ "github.com/mattn/go-sqlite3"
+	//"encoding/json"
+	//"net/http"
 )
 
 var Router *gin.Engine
@@ -27,6 +32,7 @@ func InitRouter() {
 	Router.POST("/signout", postSignout)
 	Router.GET("/user", getUser)
 	Router.GET("/users/:username", getUsersUsername)
+	Router.GET("/tutors/class/:code", getTutorsCourse)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -380,6 +386,47 @@ func getUsersUsername(c *gin.Context) {
 	} else {
 		c.JSON(404, gin.H{
 			"error": "User " + username + " not found.",
+		})
+	}
+}
+
+// Handler for /tutors/class/:code. Returns all the tutors who are associated with that class code, including their other subjects
+// If the :code is not defined, returns a 404 with an error message.
+//
+// Response Schema: {
+//   tutors: {
+//     username: String
+//	   firstname: String
+//	   lastname: String
+//	   rating: Float
+//	   availability: String
+//	   code: String
+//	   name: String (this is the class name)
+//   }
+// }
+// Error Schema: {
+//   error: String
+// }
+func getTutorsCourse(c *gin.Context) {
+	courseCode := c.Params.ByName("code")
+	type Result struct {
+		Username      string
+		FirstName     string
+		LastName      string
+		Rating        float32
+		Availability  string
+		Code          string
+		Name          string
+	}
+	var result []Result
+	DB.Raw("SELECT TutorData.username, TutorData.first_name, TutorData.last_name, TutorData.rating, TutorData.availability, Courses.code, Courses.name FROM Courses, Tutorings, ( SELECT Tutors.user_id AS id, username, first_name, last_name, rating, availability FROM Users, Tutors, Courses, Tutorings WHERE Users.id = Tutors.user_id and Tutorings.tutor_id = Tutors.user_id and Tutorings.course_id = Courses.id and Courses.code = ?) AS TutorData WHERE Courses.id = Tutorings.course_id and Tutorings.tutor_id = TutorData.id", courseCode).Scan(&result)
+	if len(result) > 0 {
+		c.JSON(200, gin.H{
+			"tutors": result,
+		})
+	} else {
+		c.JSON(404, gin.H{
+			"error": "Course Code " + courseCode + " has no tutors.",
 		})
 	}
 }
