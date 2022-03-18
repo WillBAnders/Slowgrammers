@@ -390,18 +390,36 @@ func getUsersUsername(c *gin.Context) {
 	}
 }
 
-
-
+// Handler for /tutors/class/:code. Returns all the tutors who are associated with that class code, including their other subjects
+// If the :code is not defined, returns a 404 with an error message.
+//
+// Response Schema: {
+//   tutors: {
+//     username: String
+//	   firstname: String
+//	   lastname: String
+//	   rating: Float
+//	   availability: String
+//	   code: String
+//	   name: String (this is the class name)
+//   }
+// }
+// Error Schema: {
+//   error: String
+// }
 func getTutorsCourse(c *gin.Context) {
 	courseCode := c.Params.ByName("code")
 	type Result struct {
-		Name string
+		Username      string
+		FirstName     string
+		LastName      string
+		Rating        float32
+		Availability  string
+		Code          string
+		Name          string
 	}
 	var result []Result
-	DB.Raw("SELECT name FROM Courses WHERE code = ?", courseCode).Scan(&result)
-	fmt.Println(&result)
-	fmt.Println(result)
-	
+	DB.Raw("SELECT TutorData.username, TutorData.first_name, TutorData.last_name, TutorData.rating, TutorData.availability, Courses.code, Courses.name FROM Courses, Tutorings, ( SELECT Tutors.user_id AS id, username, first_name, last_name, rating, availability FROM Users, Tutors, Courses, Tutorings WHERE Users.id = Tutors.user_id and Tutorings.tutor_id = Tutors.user_id and Tutorings.course_id = Courses.id and Courses.code = ?) AS TutorData WHERE Courses.id = Tutorings.course_id and Tutorings.tutor_id = TutorData.id", courseCode).Scan(&result)
 	if len(result) > 0 {
 		c.JSON(200, gin.H{
 			"tutors": result,
@@ -411,81 +429,4 @@ func getTutorsCourse(c *gin.Context) {
 			"error": "Course Code " + courseCode + " has no tutors.",
 		})
 	}
-	
-	
-	
-
-	/*
-	courseCode := c.Params.ByName("code")
-	database, _ := sql.Open("sqlite3", "database.db")
-	defer database.Close()
-	
-	type Thingy struct {
-		firstname string
-		lastname string
-		code string
-		courseName string
-		availability string
-		username string
-		rating float32
-	}
-	var tutors []Thingy
-	
-	
-	rows, err := database.Query("SELECT FullTutorData.first_name, FullTutorData.last_name, FullTutorData.username, FullTutorData.code, FullTutorData.name, FullTutorData.rating, FullTutorData.availability FROM Courses, (SELECT Users.first_name, Users.last_name, Users.username, Courses.code AS code, Courses.name, Tutors.rating, Tutors.availability FROM Users, Tutors, Tutorings, Courses WHERE Users.id = Tutors.user_id  and Tutors.user_id = Tutorings.tutor_id and Tutorings.course_id = Courses.id) AS FullTutorData WHERE COurses.code = ? and Courses.code = FullTutorData.code", courseCode)
-	defer rows.Close()
-	if err != nil {
-		panic(err)
-	}
-	
-	thingy := Thingy{}
-	for rows.Next() {
-		
-		err = rows.Scan(&thingy.firstname, &thingy.lastname, &thingy.username, &thingy.code, &thingy.courseName, &thingy.rating, &thingy.availability)
-		fmt.Println(thingy)
-		tutors = append(tutors, thingy)
-	}
-	fmt.Println(tutors[0])
-	
-	jsonPessoal, errr := json.Marshal(tutors)
-	if errr != nil {
-		fmt.Println("Oh these turbulent times!")
-	}
-	
-	c.JSON(http.StatusOK, gin.H{ 
-            "code" : http.StatusOK, 
-            "message": string(jsonPessoal),// cast it to string before showing
-	})
-	*/
-	/*
-	if len(tutors) > 0 {
-		c.JSON(200, tutors)
-	} else {
-		c.JSON(404, gin.H{
-			"error": "Course Code " + courseCode + " has no tutors.",
-		})
-	}
-	*/
-	
-	
-	//query := fmt.Sprintf("SELECT FullTutorData.first_name, FullTutorData.last_name, FullTutorData.username, FullTutorData.code, FullTutorData.name, FullTutorData.rating, FullTutorData.availability FROM Courses, (SELECT Users.first_name, Users.last_name, Users.username, Courses.code AS code, Courses.name, Tutors.rating, Tutors.availability FROM Users, Tutors, Tutorings, Courses WHERE Users.id = Tutors.user_id  and Tutors.user_id = Tutorings.tutor_id and Tutorings.course_id = Courses.id) AS FullTutorData WHERE COurses.code = %v and Courses.code = FullTutorData.code", courseCode)
-	//fmt.Println(query)
-	//take course code, find course id
-	//use course id in tutorsings to get all tutor ids
-	//use tutor id to get tutor info and tutor (aka user) id to get user info
-	
-	
-	/*
-	var users []User
-	DB.Limit(1).Find(&users, "username = ?", username)
-	if len(users) == 1 {
-		c.JSON(200, gin.H{
-			"user": users[0],
-		})
-	} else {
-		c.JSON(404, gin.H{
-			"error": "User " + username + " not found.",
-		})
-	}
-	*/
 }
