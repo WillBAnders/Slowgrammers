@@ -9,8 +9,10 @@ import (
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 	
-	"database/sql"
-    _ "github.com/mattn/go-sqlite3"
+	//"database/sql"
+    //_ "github.com/mattn/go-sqlite3"
+	//"encoding/json"
+	//"net/http"
 )
 
 var Router *gin.Engine
@@ -392,9 +394,33 @@ func getUsersUsername(c *gin.Context) {
 
 func getTutorsCourse(c *gin.Context) {
 	courseCode := c.Params.ByName("code")
-	database, _ := sql.Open("sqlite3", "../cmd/server/database.db")
+	type Result struct {
+		Name string
+	}
+	var result []Result
+	DB.Raw("SELECT name FROM Courses WHERE code = ?", courseCode).Scan(&result)
+	fmt.Println(&result)
+	fmt.Println(result)
 	
-	var (
+	if len(result) > 0 {
+		c.JSON(200, gin.H{
+			"tutors": result,
+		})
+	} else {
+		c.JSON(404, gin.H{
+			"error": "Course Code " + courseCode + " has no tutors.",
+		})
+	}
+	
+	
+	
+
+	/*
+	courseCode := c.Params.ByName("code")
+	database, _ := sql.Open("sqlite3", "database.db")
+	defer database.Close()
+	
+	type Thingy struct {
 		firstname string
 		lastname string
 		code string
@@ -402,26 +428,46 @@ func getTutorsCourse(c *gin.Context) {
 		availability string
 		username string
 		rating float32
-	)
+	}
+	var tutors []Thingy
+	
 	
 	rows, err := database.Query("SELECT FullTutorData.first_name, FullTutorData.last_name, FullTutorData.username, FullTutorData.code, FullTutorData.name, FullTutorData.rating, FullTutorData.availability FROM Courses, (SELECT Users.first_name, Users.last_name, Users.username, Courses.code AS code, Courses.name, Tutors.rating, Tutors.availability FROM Users, Tutors, Tutorings, Courses WHERE Users.id = Tutors.user_id  and Tutors.user_id = Tutorings.tutor_id and Tutorings.course_id = Courses.id) AS FullTutorData WHERE COurses.code = ? and Courses.code = FullTutorData.code", courseCode)
-	if err != nil {
-		//log.Fatal(err)
-	}
 	defer rows.Close()
-	for rows.Next() {
-		err := rows.Scan(&firstname, &lastname, &code, &courseName, &availability, &username, &rating)
-		if err != nil {
-			//log.Fatal(err)
-		}
-		fmt.Println(username)
-	}
-	err = rows.Err()
 	if err != nil {
-		//log.Fatal(err)
+		panic(err)
 	}
-	database.Close()
-	fmt.Println("WE ARE ALL MAD HERE")
+	
+	thingy := Thingy{}
+	for rows.Next() {
+		
+		err = rows.Scan(&thingy.firstname, &thingy.lastname, &thingy.username, &thingy.code, &thingy.courseName, &thingy.rating, &thingy.availability)
+		fmt.Println(thingy)
+		tutors = append(tutors, thingy)
+	}
+	fmt.Println(tutors[0])
+	
+	jsonPessoal, errr := json.Marshal(tutors)
+	if errr != nil {
+		fmt.Println("Oh these turbulent times!")
+	}
+	
+	c.JSON(http.StatusOK, gin.H{ 
+            "code" : http.StatusOK, 
+            "message": string(jsonPessoal),// cast it to string before showing
+	})
+	*/
+	/*
+	if len(tutors) > 0 {
+		c.JSON(200, tutors)
+	} else {
+		c.JSON(404, gin.H{
+			"error": "Course Code " + courseCode + " has no tutors.",
+		})
+	}
+	*/
+	
+	
 	//query := fmt.Sprintf("SELECT FullTutorData.first_name, FullTutorData.last_name, FullTutorData.username, FullTutorData.code, FullTutorData.name, FullTutorData.rating, FullTutorData.availability FROM Courses, (SELECT Users.first_name, Users.last_name, Users.username, Courses.code AS code, Courses.name, Tutors.rating, Tutors.availability FROM Users, Tutors, Tutorings, Courses WHERE Users.id = Tutors.user_id  and Tutors.user_id = Tutorings.tutor_id and Tutorings.course_id = Courses.id) AS FullTutorData WHERE COurses.code = %v and Courses.code = FullTutorData.code", courseCode)
 	//fmt.Println(query)
 	//take course code, find course id
