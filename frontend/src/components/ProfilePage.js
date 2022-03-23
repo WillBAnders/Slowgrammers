@@ -25,32 +25,6 @@ const ProfilePage = (user) => {
     }, [url]);
     console.log("info: ");
     console.log(info);
-    const isTutorRating = ({tutorRating}) =>{
-        if (tutorRating) return(
-            <Rating 
-                title="Rating"
-                value = {info.tutor.rating}
-                readOnly
-            />
-        );
-        else return (
-            <Typography
-                sx={{
-                    ml:{
-                        xs: 8,
-                        md: 40
-                    },
-                    fontSize:{
-                        md:40,
-                        xs:20
-                    }
-                }}
-                color="gray"
-            >
-                No Rating Provided
-            </Typography>
-        );
-    }
     if (isLoading) {
         return (
           <div  className="loadingContainer">
@@ -59,6 +33,7 @@ const ProfilePage = (user) => {
           color="#00b22d"
           height={100}
           width={100}
+           //3 secs
         />
         </div>
         )
@@ -95,7 +70,7 @@ const ProfilePage = (user) => {
                         }
                     }}
                 >
-                    {fullname ?? "Anonymous"}
+                    {fullname}
                 </Typography>
                 </Stack>
                 <Stack
@@ -116,9 +91,14 @@ const ProfilePage = (user) => {
                         }}
                         color="gray"
                     >
-                        {info.profile.username ?? "@NoUsername"}  
+                        @{username}
+                        
                     </Typography>
-                    {isTutorRating(tutorRating)}
+                    {<Rating 
+                        title="Rating"
+                        value = {info.tutor.rating}
+                        readOnly
+                    />}
                 </Stack>
                 <Typography
                     title="Email_Address"
@@ -165,7 +145,7 @@ const ProfilePage = (user) => {
                     }}
                     style={{wordWrap: "break-word"}}
                     >
-                        {info.tutor.bio ?? ""}
+                        {info.tutor.bio}
                     </Typography>    
                 </Box>
             </div>
