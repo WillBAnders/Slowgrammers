@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { Link as ScrollLink } from 'react-scroll'
 
-const pages = ['About Us', 'Services', 'Contact Us'];
+const pages = ['About Us', 'Service', 'Contact Us'];
 //const settings = ['Profile', 'Finance', 'Logout'];
 
 const Navbar = ({ name, setName }) => {
