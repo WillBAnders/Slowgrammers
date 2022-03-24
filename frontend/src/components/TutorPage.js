@@ -33,7 +33,7 @@ const TutorPage = () => {
             let coursesuppercased = courses.map(courses => courses.toUpperCase());*/
             let avail = _tutors.at(i).availability;
             console.log(avail);
-            let availuppercased = avail.toUpperCase(); //avail.map(avail => avail.toUpperCase());
+            let availuppercased = avail.map(avail => avail.toUpperCase());
             if (title.toUpperCase().includes(filter.toUpperCase()) /*|| coursesuppercased.find(element => element.includes(filter.toUpperCase()))*/ || availuppercased.find(element => element.includes(filter.toUpperCase()))) {
                 const link = "/tutors/" + _tutors.at(i).user.username;
                 tutorList.push(
@@ -95,7 +95,7 @@ const TutorPage = () => {
     }
 
     function writeOutAvailability(incourse){
-        const days = incourse.split(",");
+        const days = incourse;//.split(",");
         return (
             <Grid
                 container

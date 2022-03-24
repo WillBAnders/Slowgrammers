@@ -119,7 +119,7 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				`+stringify(Tutor{User: User{Username: "Username"}})+`
+				{"user": `+stringify(User{Username: "Username"})+`, "rating": 0.0, "bio": "", "availability": []}
 			]
 		}`,
 	))
@@ -133,9 +133,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
-				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
-				`+stringify(Tutor{User: User{Username: "Clair"}})+`
+				{"user": `+stringify(User{Username: "Alice"})+`, "rating": 0.0, "bio": "", "availability": []},
+				{"user": `+stringify(User{Username: "Bob"})+`, "rating": 0.0, "bio": "", "availability": []},
+				{"user": `+stringify(User{Username: "Clair"})+`, "rating": 0.0, "bio": "", "availability": []}
 			]
 		}`,
 	))
@@ -149,9 +149,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
-				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
-				`+stringify(Tutor{User: User{Username: "Clair"}})+`
+				{"user": `+stringify(User{Username: "Alice"})+`, "rating": 0.0, "bio": "", "availability": []},
+				{"user": `+stringify(User{Username: "Bob"})+`, "rating": 0.0, "bio": "", "availability": []},
+				{"user": `+stringify(User{Username: "Clair"})+`, "rating": 0.0, "bio": "", "availability": []}
 			]
 		}`,
 	))
@@ -238,9 +238,12 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 	suite.Run("Empty Courses", test(
 		[]Tutoring{},
 		`{
-			"tutor": `+stringify(tutor)+`,
-			"profile": `+stringify(tutor.User)+`,
-			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
+			"tutor": {
+				"user": `+stringify(tutor.User)+`,
+				"rating": `+stringify(tutor.Rating)+`,
+				"bio": `+stringify(tutor.Bio)+`,
+				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
+            },
 			"courses": []
 		}`,
 	))
@@ -250,9 +253,12 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "code", Name: "Name"}, Tutor: tutor},
 		},
 		`{
-			"tutor": `+stringify(tutor)+`,
-			"profile": `+stringify(tutor.User)+`,
-			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
+			"tutor": {
+				"user": `+stringify(tutor.User)+`,
+				"rating": `+stringify(tutor.Rating)+`,
+				"bio": `+stringify(tutor.Bio)+`,
+				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
+            },
 			"courses": [
 				{"code": "code", "name": "Name"}
 			]
@@ -266,9 +272,12 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "3", Name: "Third"}, Tutor: tutor},
 		},
 		`{
-			"tutor": `+stringify(tutor)+`,
-			"profile": `+stringify(tutor.User)+`,
-			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
+			"tutor": {
+				"user": `+stringify(tutor.User)+`,
+				"rating": `+stringify(tutor.Rating)+`,
+				"bio": `+stringify(tutor.Bio)+`,
+				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
+            },
 			"courses": [
 				{"code": "1", "name": "First"},
 				{"code": "2", "name": "Second"},
@@ -284,9 +293,12 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "1", Name: "First"}, Tutor: tutor},
 		},
 		`{
-			"tutor": `+stringify(tutor)+`,
-			"profile": `+stringify(tutor.User)+`,
-			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
+			"tutor": {
+				"user": `+stringify(tutor.User)+`,
+				"rating": `+stringify(tutor.Rating)+`,
+				"bio": `+stringify(tutor.Bio)+`,
+				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
+            },
 			"courses": [
 				{"code": "1", "name": "First"},
 				{"code": "2", "name": "Second"},

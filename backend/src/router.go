@@ -8,11 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
-	
-	//"database/sql"
-    //_ "github.com/mattn/go-sqlite3"
-	//"encoding/json"
-	//"net/http"
 )
 
 var Router *gin.Engine
@@ -47,6 +42,7 @@ func getCourses(c *gin.Context) {
 	//TODO: Pagination support
 	var courses []Course
 	DB.Order("code").Find(&courses)
+
 	c.JSON(200, gin.H{
 		"courses": courses,
 	})
@@ -62,7 +58,16 @@ func getCourses(c *gin.Context) {
 //     name: String
 //   }
 //   tutors: []Tutor {
-//     username: String
+//     user: User {
+//       username: String
+//       firstname: String
+//       lastname: String
+//       email: String
+//       phone: String
+//     }
+//     rating: Float
+//     bio: String
+//     availability: []String
 //   }
 // }
 // Error Schema: {
@@ -70,25 +75,34 @@ func getCourses(c *gin.Context) {
 // }
 func getCoursesCode(c *gin.Context) {
 	code := c.Params.ByName("code")
+
 	var courses []Course
 	DB.Limit(1).Find(&courses, "code = ?", code)
-	if len(courses) == 1 {
-		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
-		var tutorings []Tutoring
-		DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
-		tutors := []Tutor{}
-		for _, tutoring := range tutorings {
-			tutors = append(tutors, tutoring.Tutor)
-		}
-		c.JSON(200, gin.H{
-			"course": courses[0],
-			"tutors": tutors,
-		})
-	} else {
+	if len(courses) != 1 {
 		c.JSON(404, gin.H{
 			"error": "Course " + code + " not found.",
 		})
+		return
 	}
+
+	//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
+	var tutorings []Tutoring
+	DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
+	tutors := make([]gin.H, len(tutorings))
+	for i, tutoring := range tutorings {
+		//TODO: Limit the amount of data being returned
+		tutors[i] = gin.H{
+			"user":         tutoring.Tutor.User,
+			"rating":       tutoring.Tutor.Rating,
+			"bio":          tutoring.Tutor.Bio,
+			"availability": strings.FieldsFunc(tutoring.Tutor.Availability, func(r rune) bool { return r == ',' }), //TODO
+		}
+	}
+
+	c.JSON(200, gin.H{
+		"course": courses[0],
+		"tutors": tutors,
+	})
 }
 
 // Handler for /tutors. Returns all tutors ordered by username.
@@ -101,10 +115,9 @@ func getCoursesCode(c *gin.Context) {
 func getTutors(c *gin.Context) {
 	//TODO: Pagination support
 	var tutors []Tutor
-	//DB.Joins("User").Order("User__username").Find(&tutors)
-	DB.Find(&tutors) //not connecting to User table
+	DB.Joins("User").Order("User__username").Find(&tutors)
 	c.JSON(200, gin.H{
-		"tutors": tutors,   
+		"tutors": tutors,
 	})
 }
 
@@ -114,50 +127,55 @@ func getTutors(c *gin.Context) {
 //
 // Response Schema: {
 //   tutor: Tutor {
-//     username: String
-//	   rating: Float
-//	   bio: String
-//   }
-//   profile: User {
-//     username: String
-//	   firstname: String
-//	   lastname: String
-//	   email: String
-//	   phone: String
+//     user: User {
+//       username: String
+//       firstname: String
+//       lastname: String
+//       email: String
+//       phone: String
+//     }
+//     rating: Float
+//     bio: String
+//     availability: []String
 //   }
 //   courses: []Course {
 //     code: String
 //     name: String
 //   }
-//   availability: []String {}
 // }
 // Error Schema: {
 //   error: String
 // }
 func getTutorsUsername(c *gin.Context) {
 	username := c.Params.ByName("username")
+
 	var tutors []Tutor
 	DB.Joins("User").Limit(1).Find(&tutors, "User__username = ?", username)
-	if len(tutors) == 1 {
-		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
-		var tutorings []Tutoring
-		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].UserID)
-		courses := []Course{}
-		for _, tutoring := range tutorings {
-			courses = append(courses, tutoring.Course)
-		}
-
-		c.JSON(200, gin.H{
-			"tutor":        tutors[0],
-			"profile":      tutors[0].User,                              //TODO
-			"availability": strings.Split(tutors[0].Availability, ", "), //TODO
-			"courses":      courses,
-		})
-	} else {
+	if len(tutors) != 1 {
 		c.JSON(404, gin.H{
 			"error": "Tutor " + username + " not found.",
 		})
+		return
 	}
+
+	//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
+	var tutorings []Tutoring
+	DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].UserID)
+	//TODO: Error here with empty tutorings?
+	courses := make([]Course, len(tutorings))
+	for i, tutoring := range tutorings {
+		courses[i] = tutoring.Course
+	}
+
+	c.JSON(200, gin.H{
+		"tutor": gin.H{
+			"user":         tutors[0].User,
+			"rating":       tutors[0].Rating,
+			"bio":          tutors[0].Bio,
+			"availability": strings.FieldsFunc(tutors[0].Availability, func(r rune) bool { return r == ',' }), //TODO
+		},
+		"courses": courses,
+	})
 }
 
 type AuthBody struct {
@@ -410,13 +428,13 @@ func getUsersUsername(c *gin.Context) {
 func getTutorsCourse(c *gin.Context) {
 	courseCode := c.Params.ByName("code")
 	type Result struct {
-		Username      string
-		FirstName     string
-		LastName      string
-		Rating        float32
-		Availability  string
-		Code          string
-		Name          string
+		Username     string
+		FirstName    string
+		LastName     string
+		Rating       float32
+		Availability string
+		Code         string
+		Name         string
 	}
 	var result []Result
 	DB.Raw("SELECT TutorData.username, TutorData.first_name, TutorData.last_name, TutorData.rating, TutorData.availability, Courses.code, Courses.name FROM Courses, Tutorings, ( SELECT Tutors.user_id AS id, username, first_name, last_name, rating, availability FROM Users, Tutors, Courses, Tutorings WHERE Users.id = Tutors.user_id and Tutorings.tutor_id = Tutors.user_id and Tutorings.course_id = Courses.id and Courses.code = ?) AS TutorData WHERE Courses.id = Tutorings.course_id and Tutorings.tutor_id = TutorData.id", courseCode).Scan(&result)

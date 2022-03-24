@@ -44,7 +44,7 @@ const ProfilePage = ({name}) => {
         </div>
         )
       } else {
-        let fullname = info.profile.firstname + " " + info.profile.lastname;
+        let fullname = info.tutor.user.firstname + " " + info.tutor.user.lastname;
         return(
             <div>
                 <Stack
@@ -119,7 +119,7 @@ const ProfilePage = ({name}) => {
                         }
                     }}
                 >
-                    {info.profile.email}
+                    {info.tutor.user.email}
                 </Typography>
                 <Typography
                     title="Phone_Number"
@@ -134,7 +134,7 @@ const ProfilePage = ({name}) => {
                         }
                     }}
                 >
-                    {info.profile.phone}
+                    {info.tutor.user.phone}
                 </Typography>
                 <Box
                     title="Bio"
