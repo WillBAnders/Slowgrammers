@@ -33,7 +33,7 @@ function App() {
           <Route path="/courses/:coursecode" element={<TutorPage />} />
           <Route path="/signUp" element={<SignUpPage setName={setName} />} />
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
-          <Route path="/profile" element={<ProfilePage name = {name}/>} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tutors/:username" element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>

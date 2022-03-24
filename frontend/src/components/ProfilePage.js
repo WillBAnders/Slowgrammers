@@ -7,12 +7,7 @@ import {ThreeDots} from 'react-loader-spinner';
 const ProfilePage = ({name}) => {
     //Typography variant doesn't work with responsive design, so I have to go with font sizes
     let params = useParams();
-    let username = name;
-    /*if (name && name === params){
-        username = name; //own account
-    } else{
-        username= params.username; //other account
-    }*/
+    let username = name ?? params.username;
     let url = '/tutors/' + username;
     const [info, setInfo] = React.useState();
     const [isLoading, setLoading] = React.useState(true);
