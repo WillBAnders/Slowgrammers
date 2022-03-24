@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-//var secret = "secret"
+var secret = "secret"
 
 type Claims struct {
 	*jwt.StandardClaims
@@ -14,15 +14,14 @@ type Claims struct {
 }
 
 func CreateJWT(username string) (string, error) {
-
-	claims := jwt.StandardClaims{
-		Issuer:    username,
-		IssuedAt:  time.Now().Unix(),
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
+		&jwt.StandardClaims{
+			Issuer:    "Server",
+			IssuedAt:  time.Now().Unix(),
+			ExpiresAt: time.Now().Local().Add(24 * time.Hour).Unix(),
+		},
+		username,
+	})
 	return token.SignedString([]byte(secret))
 }
 
@@ -33,6 +32,7 @@ func ParseJWT(tokenString string) (*Claims, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	//TODO: Handle expired tokens with proper error code
 	return token.Claims.(*Claims), nil
 }

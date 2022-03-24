@@ -39,7 +39,7 @@ export default function SigninPage({ setName }) {
 
     if (res.status === 200) {
       console.log(res)
-      setName(true)
+      setName(username)
     }
   };
 

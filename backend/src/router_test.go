@@ -325,11 +325,8 @@ func (suite *RouterSuite) TestSignup() {
 		w := test("Username", "Password")
 		suite.Equal(200, w.Code)
 
-		data := gin.H{}
-		_ = json.Unmarshal(w.Body.Bytes(), &data)
-		//fmt.Println("json: " + string(w.Body.Bytes()))
-		//claims, _ := ParseJWT(data["token"].(string))
-		suite.Equal("success", data["message"])
+		claims, _ := ParseJWT(w.Result().Cookies()[0].Value)
+		suite.Equal("Username", claims.Username)
 	}))
 
 	suite.Run("Invalid Request (Missing Field)", manualSetupTest(func() {
@@ -375,10 +372,10 @@ func (suite *RouterSuite) TestSignin() {
 		w := test("Username", "Password")
 		suite.Equal(200, w.Code)
 
-		data := gin.H{}
-		_ = json.Unmarshal(w.Body.Bytes(), &data)
-		claims, _ := ParseJWT(data["token"].(string))
-		suite.Equal("Username", claims.Issuer)
+		cookie := w.Result().Cookies()[0]
+		suite.Equal("jwt", cookie.Name)
+		claims, _ := ParseJWT(cookie.Value)
+		suite.Equal("Username", claims.Username)
 	}))
 
 	suite.Run("Invalid Request (Missing Field)", manualSetupTest(func() {
@@ -411,9 +408,62 @@ func (suite *RouterSuite) TestSignin() {
 	}))
 }
 
-func GET(path string) *httptest.ResponseRecorder {
+func (suite *RouterSuite) TestSignout() {
+	suite.Run("Success", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&User{Username: "Username", Password: string(hash)})
+
+		w := POST("/signin", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+		suite.Equal(200, w.Code)
+
+		w = POST("/signout", gin.H{})
+		suite.Equal(200, w.Code)
+		cookie := w.Result().Cookies()[0]
+		suite.Equal("jwt", cookie.Name)
+		suite.Equal("", cookie.Value)
+	}))
+
+	suite.Run("Unauthenticated", manualSetupTest(func() {
+		w := POST("/signout", gin.H{})
+		suite.Equal(200, w.Code)
+	}))
+}
+
+func (suite *RouterSuite) TestProfile() {
+	suite.Run("Success", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&User{Username: "Username", Password: string(hash)})
+
+		w := POST("/signin", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+		suite.Equal(200, w.Code)
+		cookies := w.Result().Cookies()
+		suite.Equal("jwt", cookies[0].Name)
+
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"user": `+stringify(User{Username: "Username"})+`
+		}`, w.Body.String())
+	}))
+
+	suite.Run("Unauthenticated", manualSetupTest(func() {
+		w := GET("/profile")
+		suite.Equal(401, w.Code)
+	}))
+}
+
+func GET(path string, cookies ...*http.Cookie) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", path, nil)
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
 	Router.ServeHTTP(w, req)
 	return w
 }
