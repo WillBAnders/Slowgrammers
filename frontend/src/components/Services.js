@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom'
 
 const Services = () => {
     return (
-        <div id="Services">
+        <div id="Service">
             <Typography
                 className="main-text"
-                sx={{ 
+                sx={{
                     fontWeight: 525,
                     paddingLeft: {
                         xs: "0px",
@@ -19,70 +19,43 @@ const Services = () => {
                         xs: "30px",
                         md: "0px"
                     }
-                 }}
+                }}
                 variant="h2"
             >
-                Our Services    
+                Our Service
             </Typography>
-            <Grid 
-                container 
-                spacing={2} 
+            <Grid
+                container
+                spacing={2}
                 alignItems="center"
                 justifyContent="center"
                 style={{ minHeight: '100vh' }}
-                >
+            >
                 <Grid item xs={12} md={5} container justify="center">
                     <Card className="card-size">
-                            <CardMedia
-                                component="img"
-                                className="service-photo"
-                                src="/images/tutors.png"
-                                title="Tutors"
-                                sx={{maxHeight: '308px'}}
-                            />
-                            <CardHeader
-                                title={'Tutors'}
-                                className="card-title"
-                            />
-                            <CardContent >
-                                <Typography>
-                                    TutorsVILLE has many tutors which specialize in certain subjects and can help you!
-                                </Typography>
-                            </CardContent>
-                            <Box className="button-size">
-                                <Link to="/Tutors" style={{ textDecoration: 'none' }}>
-                                    <Button variant="contained">
-                                        See Tutors
-                                    </Button>
-                                </Link>
-                            </Box>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} md={5} container justify="center">
-                    <Card className="card-size">
-                            <CardMedia
-                                component="img"
-                                className="service-photo"
-                                src="/images/courses.jpg"
-                                title="Tutors"
-                                sx={{maxHeight: '308px'}}
-                            />
-                            <CardHeader
-                                title={'Courses'}
-                                className="card-title"
-                            />  
-                            <CardContent>
-                                <Typography>
+                        <CardMedia
+                            component="img"
+                            className="service-photo"
+                            src="/images/courses.jpg"
+                            title="Tutors"
+                            sx={{ maxHeight: '308px' }}
+                        />
+                        <CardHeader
+                            title={'Courses'}
+                            className="card-title"
+                        />
+                        <CardContent>
+                            <Typography>
                                 TutorsVILLE has course selection so you can get help tailored exactly to what you need!
                                 </Typography>
-                            </CardContent>
-                            <Box className="button-size">
-                                <Link to="/Courses" style={{ textDecoration: 'none' }}>
-                                    <Button variant="contained">
-                                        See Courses
+                        </CardContent>
+                        <Box className="button-size">
+                            <Link to="/Courses" style={{ textDecoration: 'none' }}>
+                                <Button variant="contained">
+                                    See Courses
                                     </Button>
-                                </Link>
-                            </Box>
+                            </Link>
+                        </Box>
                     </Card>
                 </Grid>
             </Grid>
