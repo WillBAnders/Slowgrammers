@@ -24,7 +24,7 @@ jobs:
 
       - name: Go Run Server
         working-directory: backend
-        run: go run ./cmd/server/main.go
+        run: go run ./cmd/server/main.go &
 
       - name: Cypress Run
         uses: cypress-io/github-action@v2
