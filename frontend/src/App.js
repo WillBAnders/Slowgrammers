@@ -9,23 +9,19 @@ import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
 
 function App() {
-  const [name, setName] = useState(false);
+  const [name, setName] = useState(null);
 
   useEffect(() => {
-    (
-      async () => {
-        const response = await fetch('/user', {
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
+    fetch("/profile", {
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    }).then(r => r.json()).then(r => {
+      console.log("setName ", r.user?.username)
+      setName(r.user?.username)
+    })
+  }, []);
 
-        const content = await response.json();
-        if (content[0]) {
-          setName(content[0].username);
-        }
-      }
-    )();
-  });
+  console.log("Re-render App.js, name = " + name)
 
   return (
     <div>
@@ -35,9 +31,9 @@ function App() {
           <Route path="/" exact element={<LandingPage />} />
           <Route path="/courses" element={<CoursePage />} />
           <Route path="/courses/:coursecode" element={<TutorPage />} />
-          <Route path="/signUp" element={<SignUpPage />} />
+          <Route path="/signUp" element={<SignUpPage setName={setName} />} />
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
-          <Route path="/:username" element={<ProfilePage name = {name}/>} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tutors/:username" element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>

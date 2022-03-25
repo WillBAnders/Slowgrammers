@@ -7,12 +7,7 @@ import {ThreeDots} from 'react-loader-spinner';
 const ProfilePage = ({name}) => {
     //Typography variant doesn't work with responsive design, so I have to go with font sizes
     let params = useParams();
-    let username;
-    if (name && name === params){
-        username = name; //own account
-    } else{
-        username= params.username; //other account
-    }
+    let username = name ?? params.username;
     let url = '/tutors/' + username;
     const [info, setInfo] = React.useState();
     const [isLoading, setLoading] = React.useState(true);
@@ -44,7 +39,7 @@ const ProfilePage = ({name}) => {
         </div>
         )
       } else {
-        let fullname = info.profile.firstname + " " + info.profile.lastname;
+        let fullname = info.tutor.user.firstname + " " + info.tutor.user.lastname;
         return(
             <div>
                 <Stack
@@ -119,7 +114,7 @@ const ProfilePage = ({name}) => {
                         }
                     }}
                 >
-                    {info.profile.email}
+                    {info.tutor.user.email}
                 </Typography>
                 <Typography
                     title="Phone_Number"
@@ -134,7 +129,7 @@ const ProfilePage = ({name}) => {
                         }
                     }}
                 >
-                    {info.profile.phone}
+                    {info.tutor.user.phone}
                 </Typography>
                 <Box
                     title="Bio"

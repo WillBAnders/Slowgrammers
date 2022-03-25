@@ -1,22 +1,15 @@
 package src
 
 import (
-	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
-	
-	//"database/sql"
-    //_ "github.com/mattn/go-sqlite3"
-	//"encoding/json"
-	//"net/http"
 )
 
 var Router *gin.Engine
-var secret = "secret"
 
 func InitRouter() {
 	Router = gin.Default()
@@ -30,9 +23,7 @@ func InitRouter() {
 	Router.POST("/signup", postSignup)
 	Router.POST("/signin", postSignin)
 	Router.POST("/signout", postSignout)
-	Router.GET("/user", getUser)
-	Router.GET("/users/:username", getUsersUsername)
-	Router.GET("/tutors/class/:code", getTutorsCourse)
+	Router.GET("/profile", getProfile)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -47,6 +38,7 @@ func getCourses(c *gin.Context) {
 	//TODO: Pagination support
 	var courses []Course
 	DB.Order("code").Find(&courses)
+
 	c.JSON(200, gin.H{
 		"courses": courses,
 	})
@@ -62,7 +54,16 @@ func getCourses(c *gin.Context) {
 //     name: String
 //   }
 //   tutors: []Tutor {
-//     username: String
+//     user: User {
+//       username: String
+//       firstname: String
+//       lastname: String
+//       email: String
+//       phone: String
+//     }
+//     rating: Float
+//     bio: String
+//     availability: []String
 //   }
 // }
 // Error Schema: {
@@ -70,25 +71,34 @@ func getCourses(c *gin.Context) {
 // }
 func getCoursesCode(c *gin.Context) {
 	code := c.Params.ByName("code")
+
 	var courses []Course
 	DB.Limit(1).Find(&courses, "code = ?", code)
-	if len(courses) == 1 {
-		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
-		var tutorings []Tutoring
-		DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
-		tutors := []Tutor{}
-		for _, tutoring := range tutorings {
-			tutors = append(tutors, tutoring.Tutor)
-		}
-		c.JSON(200, gin.H{
-			"course": courses[0],
-			"tutors": tutors,
-		})
-	} else {
+	if len(courses) != 1 {
 		c.JSON(404, gin.H{
 			"error": "Course " + code + " not found.",
 		})
+		return
 	}
+
+	//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
+	var tutorings []Tutoring
+	DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
+	tutors := make([]gin.H, len(tutorings))
+	for i, tutoring := range tutorings {
+		//TODO: Limit the amount of data being returned
+		tutors[i] = gin.H{
+			"user":         tutoring.Tutor.User,
+			"rating":       tutoring.Tutor.Rating,
+			"bio":          tutoring.Tutor.Bio,
+			"availability": strings.FieldsFunc(tutoring.Tutor.Availability, func(r rune) bool { return r == ',' }), //TODO
+		}
+	}
+
+	c.JSON(200, gin.H{
+		"course": courses[0],
+		"tutors": tutors,
+	})
 }
 
 // Handler for /tutors. Returns all tutors ordered by username.
@@ -101,10 +111,10 @@ func getCoursesCode(c *gin.Context) {
 func getTutors(c *gin.Context) {
 	//TODO: Pagination support
 	var tutors []Tutor
-	//DB.Joins("User").Order("User__username").Find(&tutors)
-	DB.Find(&tutors) //not connecting to User table
+	DB.Joins("User").Order("User__username").Find(&tutors)
+
 	c.JSON(200, gin.H{
-		"tutors": tutors,   
+		"tutors": tutors,
 	})
 }
 
@@ -114,50 +124,55 @@ func getTutors(c *gin.Context) {
 //
 // Response Schema: {
 //   tutor: Tutor {
-//     username: String
-//	   rating: Float
-//	   bio: String
-//   }
-//   profile: User {
-//     username: String
-//	   firstname: String
-//	   lastname: String
-//	   email: String
-//	   phone: String
+//     user: User {
+//       username: String
+//       firstname: String
+//       lastname: String
+//       email: String
+//       phone: String
+//     }
+//     rating: Float
+//     bio: String
+//     availability: []String
 //   }
 //   courses: []Course {
 //     code: String
 //     name: String
 //   }
-//   availability: []String {}
 // }
 // Error Schema: {
 //   error: String
 // }
 func getTutorsUsername(c *gin.Context) {
 	username := c.Params.ByName("username")
+
 	var tutors []Tutor
 	DB.Joins("User").Limit(1).Find(&tutors, "User__username = ?", username)
-	if len(tutors) == 1 {
-		//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
-		var tutorings []Tutoring
-		DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].UserID)
-		courses := []Course{}
-		for _, tutoring := range tutorings {
-			courses = append(courses, tutoring.Course)
-		}
-
-		c.JSON(200, gin.H{
-			"tutor":        tutors[0],
-			"profile":      tutors[0].User,                              //TODO
-			"availability": strings.Split(tutors[0].Availability, ", "), //TODO
-			"courses":      courses,
-		})
-	} else {
+	if len(tutors) != 1 {
 		c.JSON(404, gin.H{
 			"error": "Tutor " + username + " not found.",
 		})
+		return
 	}
+
+	//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
+	var tutorings []Tutoring
+	DB.Joins("Course").Order("Course__code").Find(&tutorings, "tutor_id = ?", tutors[0].UserID)
+	//TODO: Error here with empty tutorings?
+	courses := make([]Course, len(tutorings))
+	for i, tutoring := range tutorings {
+		courses[i] = tutoring.Course
+	}
+
+	c.JSON(200, gin.H{
+		"tutor": gin.H{
+			"user":         tutors[0].User,
+			"rating":       tutors[0].Rating,
+			"bio":          tutors[0].Bio,
+			"availability": strings.FieldsFunc(tutors[0].Availability, func(r rune) bool { return r == ',' }), //TODO
+		},
+		"courses": courses,
+	})
 }
 
 type AuthBody struct {
@@ -166,18 +181,19 @@ type AuthBody struct {
 }
 
 // Handler for /signup. Takes a username and password and creates a new user
-// account. Returns a success message. Errors if:
+// account. Sets a jwt session to authenticate the user. Returns an empty
+// object. Errors if:
 //
 //  - The body has missing/unknown fields (400)
 //  - The username already exists (401)
+//  - A server issue prevents creating a JWT (500)
+//     - The user is still successfully created
 //
 // Body Schema: {
 //   username: String
 //   password: String
 // }
-// Response Schema: {
-//   message: String
-// }
+// Response Schema: {}
 // Error Schema: {
 //   error: String
 // }
@@ -205,27 +221,33 @@ func postSignup(c *gin.Context) {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	DB.Create(&User{Username: body.Username, Password: string(hash)})
 
-	c.JSON(200, gin.H{
-		"message": "success",
-	})
+	token, err := CreateJWT(body.Username)
+	if err != nil {
+		//TODO: Use status 207 to indicate the account was successfully created?
+		c.JSON(500, gin.H{
+			"error": "Unable to create JWT: " + err.Error() + ".",
+		})
+		return
+	}
+	c.SetCookie("jwt", token, int(24*time.Hour.Seconds()), "", "", true, true)
+
+	c.JSON(200, gin.H{})
 }
 
 // Handler for /signin. Takes a username and password and logs in an existing
-// user account, returning a JWT. Errors if:
+// user account. Sets a jwt session to authenticate the user. Returns an empty
+// object. Errors if:
 //
 //  - The body has missing/unknown fields (400)
 //  - The username does not exist (401)
 //  - The password is invalid (401)
 //  - A server issue prevents creating a JWT (500)
-//	- Unable to create cookie (500)
 //
 // Body Schema: {
 //   username: String
 //   password: String
 // }
-// Response Schema: {
-//   token: JWT
-// }
+// Response Schema: {}
 // Error Schema: {
 //   error: String
 // }
@@ -256,177 +278,74 @@ func postSignin(c *gin.Context) {
 		})
 	}
 
-	ss, err := CreateJWT(body.Username)
-
+	token, err := CreateJWT(body.Username)
 	if err != nil {
 		c.JSON(500, gin.H{
-			"error": "Unable to create JWT.",
+			"error": "Unable to create JWT: " + err.Error() + ".",
 		})
 		return
 	}
+	c.SetCookie("jwt", token, int(24*time.Hour.Seconds()), "", "", true, true)
 
-	cookie, err := c.Cookie("jwt")
-
-	if err == nil {
-		c.JSON(500, gin.H{
-			"error": "Cookie not able to be setup in signin",
-		})
-		fmt.Printf("Cookie not able to be setup in signin: %s", cookie)
-		return
-	}
-	c.SetCookie("jwt", ss, 3600*24, "/", "", false, true)
-
-	c.JSON(200, gin.H{
-		"token": ss,
-	})
+	c.JSON(200, gin.H{})
 }
 
-// Handler for /user. Returns the information of the logged in user.
-//  Returns unathenticated if not logged in.
+// Handler for /signout. Signs out the user if currently authenticated. Returns
+// an empty object.
 //
-// Response Schema(logged in): {
-//   {
-//     {
-// 		username: String,
-// 		firstname: String,
-// 		lastname: String,
-// 		email: String,
-// 		phone: String
-//   }
-// }
-//
-// Response Schema(NOT logged in): {
-//   {
-//     {
-// 		message: String
-//   }
-// }
-func getUser(c *gin.Context) {
-	cookie, err := c.Cookie("jwt")
-
-	if err != nil {
-		fmt.Printf("cookie not recieved get user\n")
-	}
-	//will have to change the secret in the future
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
-	})
-
-	if err != nil {
-		c.JSON(200, gin.H{
-			"message": "Unauthenticated.",
-		})
-		return
-	}
-
-	claims := token.Claims.(*jwt.StandardClaims)
-
-	var users []User
-
-	DB.Limit(1).Find(&users, "username = ?", claims.Issuer)
-
-	c.JSON(200, users)
-	return
-}
-
-// Handler for /signout. Logs out the currently logged in user
-// and removes cookie, returning a success message. Errors if:
-//
-//  - No user to sign out (401)
-//
-// Response Schema: {
-//   message: String
-// }
-// Error Schema: {
-//   error: String
-// }
+// Response Schema: {}
 func postSignout(c *gin.Context) {
+	c.SetCookie("jwt", "", 0, "", "", true, true)
 
-	c.SetCookie("jwt", "", -1, "", "", false, true)
-
-	cookie, err := c.Cookie("jwt")
-
-	if err != nil {
-		c.JSON(401, gin.H{
-			"error": "No user & cookie to signout",
-		})
-		fmt.Printf("cookie not recieved signout: %s , %s \n", cookie, err)
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"message": "success",
-	})
-	return
+	c.JSON(200, gin.H{})
 }
 
-// Handler for /users/:username. Returns the user identified by :username
-// If the tutor :username is not defined, returns a 404 with an error message.
+// Handler for /profile. Returns the user profile for the authenticated user.
+// Errors if:
+//
+//  - There is no authenticated user (401)
+//  - A server issue prevents parsing the JWT (500)
+//  - The user does not exist in the database (500)
 //
 // Response Schema: {
 //   user: User {
 //     username: String
-//	   firstname: String
-//	   lastname: String
-//	   email: String
-//	   phone: String
+//     firstname: String
+//     lastname: String
+//     email: String
+//     phone: String
 //   }
 // }
 // Error Schema: {
 //   error: String
 // }
-func getUsersUsername(c *gin.Context) {
-	username := c.Params.ByName("username")
-	var users []User
-	DB.Limit(1).Find(&users, "username = ?", username)
-	if len(users) == 1 {
-		c.JSON(200, gin.H{
-			"user": users[0],
+func getProfile(c *gin.Context) {
+	token, err := c.Cookie("jwt")
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Requires an authenticated user.",
 		})
-	} else {
-		c.JSON(404, gin.H{
-			"error": "User " + username + " not found.",
-		})
+		return
 	}
-}
 
-// Handler for /tutors/class/:code. Returns all the tutors who are associated with that class code, including their other subjects
-// If the :code is not defined, returns a 404 with an error message.
-//
-// Response Schema: {
-//   tutors: {
-//     username: String
-//	   firstname: String
-//	   lastname: String
-//	   rating: Float
-//	   availability: String
-//	   code: String
-//	   name: String (this is the class name)
-//   }
-// }
-// Error Schema: {
-//   error: String
-// }
-func getTutorsCourse(c *gin.Context) {
-	courseCode := c.Params.ByName("code")
-	type Result struct {
-		Username      string
-		FirstName     string
-		LastName      string
-		Rating        float32
-		Availability  string
-		Code          string
-		Name          string
-	}
-	var result []Result
-	DB.Raw("SELECT TutorData.username, TutorData.first_name, TutorData.last_name, TutorData.rating, TutorData.availability, Courses.code, Courses.name FROM Courses, Tutorings, ( SELECT Tutors.user_id AS id, username, first_name, last_name, rating, availability FROM Users, Tutors, Courses, Tutorings WHERE Users.id = Tutors.user_id and Tutorings.tutor_id = Tutors.user_id and Tutorings.course_id = Courses.id and Courses.code = ?) AS TutorData WHERE Courses.id = Tutorings.course_id and Tutorings.tutor_id = TutorData.id", courseCode).Scan(&result)
-	if len(result) > 0 {
-		c.JSON(200, gin.H{
-			"tutors": result,
+	claims, err := ParseJWT(token)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to parse JWT: " + err.Error() + ".",
 		})
-	} else {
-		c.JSON(404, gin.H{
-			"error": "Course Code " + courseCode + " has no tutors.",
-		})
+		return
 	}
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", claims.Username)
+	if len(users) != 1 {
+		c.JSON(500, gin.H{
+			"error": "User " + claims.Username + " is authenticated but does not exist in the database.",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"user": users[0],
+	})
 }

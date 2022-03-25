@@ -43,7 +43,7 @@ const Navbar = ({ name, setName }) => {
       credentials: 'include',
     });
 
-    setName(false);
+    setName(null);
     handleCloseUserMenu()
   }
 
@@ -73,7 +73,7 @@ const Navbar = ({ name, setName }) => {
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
         >
-          <Link to={"/" + name} style={{ textDecoration: 'none', color: "black" }}>
+          <Link to="/profile" style={{ textDecoration: 'none', color: "black" }}>
             <MenuItem onClick={handleCloseUserMenu}>
               <Typography textAlign="center">Profile</Typography>
             </MenuItem>
