@@ -1,8 +1,8 @@
 import { React, useState, useEffect } from "react";
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
-import CoursePage from "./components/CoursePage"
+import CoursesPage from "./components/CoursesPage"
 import LandingPage from "./components/LandingPage"
-import TutorPage from './components/TutorPage'
+import CoursePage from './components/CoursePage'
 import SignUpPage from "./components/SignUpPage";
 import SignInPage from "./components/SigninPage";
 import Navbar from './components/Navbar';
@@ -29,8 +29,8 @@ function App() {
         <Navbar name={name} setName={setName} />
         <Routes>
           <Route path="/" exact element={<LandingPage />} />
-          <Route path="/courses" element={<CoursePage />} />
-          <Route path="/courses/:coursecode" element={<TutorPage />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:coursecode" element={<CoursePage />} />
           <Route path="/signUp" element={<SignUpPage setName={setName} />} />
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
           <Route path="/profile" element={<ProfilePage />} />

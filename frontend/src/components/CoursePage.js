@@ -1,5 +1,5 @@
 import React from 'react'
-import { Stack, CardHeader, CardContent, Rating, Card, Typography, Grid, TextField, Paper, Box } from '@mui/material'
+import { Button, Stack, CardHeader, CardContent, Rating, Card, Typography, Grid, TextField, Paper, Box } from '@mui/material'
 import { useParams, Link } from "react-router-dom";
 import {ThreeDots} from 'react-loader-spinner';
 
@@ -24,6 +24,31 @@ const TutorPage = () => {
         }
         console.log(_tutors);
         let tutorList = [];
+        if (_tutors.length === 0){
+            return(
+                <Box sx={{display:"flex", justifyContent:"center"}}>
+                    <Stack>
+                        <Typography
+                        variant="h4"
+                        justifyContent="center">
+                            No Tutors Available
+                        </Typography>
+                        <Link to="/courses" style={{ textDecoration: 'none', color: "blue" }}>
+                            <Button
+                                variant="contained"
+                                size="large"
+                                sx={{
+                                    ml: {
+                                        xs: "100px",
+                                    }
+                                }}>
+                                Go Back
+                            </Button>  
+                        </Link> 
+                    </Stack>             
+                </Box>
+            );
+        }
         for (let i = 0; i < _tutors.length; i++){
             console.log(_tutors.at(i));
             let title = _tutors.at(i).user.firstname + " " + _tutors.at(i).user.lastname;
@@ -33,7 +58,7 @@ const TutorPage = () => {
             let coursesuppercased = courses.map(courses => courses.toUpperCase());*/
             let avail = _tutors.at(i).availability;
             console.log(avail);
-            let availuppercased = avail.map(avail => avail.toUpperCase());
+            let availuppercased = avail => avail.toUpperCase();
             if (title.toUpperCase().includes(filter.toUpperCase()) /*|| coursesuppercased.find(element => element.includes(filter.toUpperCase()))*/ || availuppercased.find(element => element.includes(filter.toUpperCase()))) {
                 const link = "/tutors/" + _tutors.at(i).user.username;
                 tutorList.push(
@@ -95,7 +120,7 @@ const TutorPage = () => {
     }
 
     function writeOutAvailability(incourse){
-        const days = incourse;//.split(",");
+        const days = incourse.split(",");
         return (
             <Grid
                 container
@@ -200,6 +225,20 @@ const TutorPage = () => {
                         sx={{ width: "80%"}}
                     >
                         {writeOutTutors(tutors, value)}
+                        <Link to="/courses" style={{ textDecoration: 'none', color: "blue" }}>
+                            <Button
+                                variant="contained"
+                                size="large"
+                                sx={{
+                                    ml: {
+                                        xs:"100px",
+                                        sm:"260px",
+                                        md: "515px",
+                                    }
+                                }}>
+                                Go Back
+                            </Button>  
+                        </Link> 
                     </Stack>
                 </Grid>
             </div>
