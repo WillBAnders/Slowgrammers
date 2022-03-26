@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import {ThreeDots} from 'react-loader-spinner';
 
 
-const TutorPage = () => {
+const CoursePage = () => {
     const [tutors, setTutors] = React.useState([]);
     const [isLoading, setLoading] = React.useState(true);
     let params = useParams().coursecode;
@@ -252,4 +252,4 @@ const TutorPage = () => {
 //what should be getting called in the page (~line 196)
 //    {writeOutTutors(getTutorInfo(tutors), value)}
 
-export default TutorPage
+export default CoursePage

@@ -7,6 +7,7 @@ import SignUpPage from "./components/SignUpPage";
 import SignInPage from "./components/SigninPage";
 import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
+import ErrorPage from "./components/ErrorPage";
 
 function App() {
   const [name, setName] = useState(null);
@@ -35,6 +36,7 @@ function App() {
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tutors/:username" element={<ProfilePage />} />
+          <Route path= "*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>
     </div>
