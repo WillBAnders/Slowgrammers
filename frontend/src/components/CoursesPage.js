@@ -2,7 +2,7 @@ import React from 'react';
 import {Box, Card, CardHeader, Paper, Stack, TextField} from "@mui/material";
 import {Link} from "react-router-dom";
 
-export default function CoursePage() {
+export default function CoursesPage() {
   const [courses, setCourses] = React.useState([]);
   const [filter, setFilter] = React.useState("");
 
