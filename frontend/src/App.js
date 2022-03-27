@@ -3,8 +3,8 @@ import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
 import CoursesPage from "./components/CoursesPage"
 import LandingPage from "./components/LandingPage"
 import CoursePage from './components/CoursePage'
-import SignUpPage from "./components/SignUpPage";
-import SignInPage from "./components/SigninPage";
+import SignupPage from "./components/SignupPage";
+import SigninPage from "./components/SigninPage";
 import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
 import ErrorPage from "./components/ErrorPage";
@@ -32,8 +32,8 @@ function App() {
           <Route path="/" exact element={<LandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:coursecode" element={<CoursePage />} />
-          <Route path="/signUp" element={<SignUpPage setName={setName} />} />
-          <Route path="/signIn" element={<SignInPage setName={setName} />} />
+          <Route path="/signup" element={<SignupPage setName={setName} />} />
+          <Route path="/signin" element={<SigninPage setName={setName} />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tutors/:username" element={<ProfilePage />} />
           <Route path= "*" element={<ErrorPage />} />
