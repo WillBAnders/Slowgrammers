@@ -1,0 +1,25 @@
+name: Jest
+
+on:
+  push:
+    branches: [ bleeding ]
+  pull_request:
+    branches: [ bleeding ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+
+      - name: NPM Install
+        working-directory: frontend
+        run: npm install
+
+      - name: Jest
+        working-directory: frontend
+        run: npm run test:jest
