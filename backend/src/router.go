@@ -219,7 +219,7 @@ func postSignup(c *gin.Context) {
 	}
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
-	DB.Create(&User{Username: body.Username, Password: string(hash)})
+	DB.Create(&User{Username: body.Username, Password: string(hash), FirstName: "Anonymous", LastName: "", Email: "unknown email", Phone: "unknown number"})
 
 	token, err := CreateJWT(body.Username)
 	if err != nil {
