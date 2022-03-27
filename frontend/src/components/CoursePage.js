@@ -217,7 +217,16 @@ const CoursePage = () => {
                     direction="column"
                     style={{ width: "100%"}}
                 >
-                    {writeOutTutors(tutors, value)}
+                    <Stack
+                        title = "tutorlist"
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="stretch"
+                        spacing={1}
+                        sx={{ width: "80%"}}
+                    >
+                        {writeOutTutors(tutors, value)}
+                    </Stack>
                 </Grid>
             </div>
         )
