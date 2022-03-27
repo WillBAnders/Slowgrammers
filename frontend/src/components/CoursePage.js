@@ -216,30 +216,7 @@ const CoursePage = () => {
                     direction="column"
                     style={{ width: "100%"}}
                 >
-                    <Stack
-                        title = "tutorlist"
-                        direction="column"
-                        justifyContent="center"
-                        alignItems="stretch"
-                        spacing={1}
-                        sx={{ width: "80%"}}
-                    >
-                        {writeOutTutors(tutors, value)}
-                        <Link to="/courses" style={{ textDecoration: 'none', color: "blue" }}>
-                            <Button
-                                variant="contained"
-                                size="large"
-                                sx={{
-                                    ml: {
-                                        xs:"100px",
-                                        sm:"260px",
-                                        md: "515px",
-                                    }
-                                }}>
-                                Go Back
-                            </Button>  
-                        </Link> 
-                    </Stack>
+                    {writeOutTutors(tutors, value)}
                 </Grid>
             </div>
         )
