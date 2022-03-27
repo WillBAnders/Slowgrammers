@@ -2,6 +2,7 @@ name: Go Test
 
 on:
   push:
+    paths: [ "backend/**" ]
     branches: [ bleeding ]
   pull_request:
     branches: [ bleeding ]

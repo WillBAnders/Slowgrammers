@@ -2,6 +2,7 @@ name: Jest
 
 on:
   push:
+    paths: [ "frontend/**" ]
     branches: [ bleeding ]
   pull_request:
     branches: [ bleeding ]
