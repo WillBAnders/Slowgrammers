@@ -1,12 +1,13 @@
 import { React, useState, useEffect } from "react";
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
-import CoursePage from "./components/CoursePage"
+import CoursesPage from "./components/CoursesPage"
 import LandingPage from "./components/LandingPage"
-import TutorPage from './components/TutorPage'
+import CoursePage from './components/CoursePage'
 import SignUpPage from "./components/SignUpPage";
 import SignInPage from "./components/SigninPage";
 import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
+import ErrorPage from "./components/ErrorPage";
 
 function App() {
   const [name, setName] = useState(null);
@@ -29,12 +30,13 @@ function App() {
         <Navbar name={name} setName={setName} />
         <Routes>
           <Route path="/" exact element={<LandingPage />} />
-          <Route path="/courses" element={<CoursePage />} />
-          <Route path="/courses/:coursecode" element={<TutorPage />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:coursecode" element={<CoursePage />} />
           <Route path="/signUp" element={<SignUpPage setName={setName} />} />
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/tutors/:username" element={<ProfilePage />} />
+          <Route path= "*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>
     </div>

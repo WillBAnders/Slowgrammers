@@ -58,7 +58,8 @@ const CoursePage = () => {
             let coursesuppercased = courses.map(courses => courses.toUpperCase());*/
             let avail = _tutors.at(i).availability;
             console.log(avail);
-            let availuppercased = avail => avail.toUpperCase();
+            let availuppercased = avail.map(avail => avail.toUpperCase());
+            //let availuppercased = avail => avail.toUpperCase();
             if (title.toUpperCase().includes(filter.toUpperCase()) /*|| coursesuppercased.find(element => element.includes(filter.toUpperCase()))*/ || availuppercased.find(element => element.includes(filter.toUpperCase()))) {
                 const link = "/tutors/" + _tutors.at(i).user.username;
                 tutorList.push(
@@ -120,7 +121,7 @@ const CoursePage = () => {
     }
 
     function writeOutAvailability(incourse){
-        const days = incourse.split(",");
+        const days = incourse;//.split(",");
         return (
             <Grid
                 container
@@ -225,20 +226,6 @@ const CoursePage = () => {
                         sx={{ width: "80%"}}
                     >
                         {writeOutTutors(tutors, value)}
-                        <Link to="/courses" style={{ textDecoration: 'none', color: "blue" }}>
-                            <Button
-                                variant="contained"
-                                size="large"
-                                sx={{
-                                    ml: {
-                                        xs:"100px",
-                                        sm:"260px",
-                                        md: "515px",
-                                    }
-                                }}>
-                                Go Back
-                            </Button>  
-                        </Link> 
                     </Stack>
                 </Grid>
             </div>
