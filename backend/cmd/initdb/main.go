@@ -9,14 +9,14 @@ func main() {
 	src.InitDatabase("database.db")
 
 	users := []src.User{
-		{Username: "Alice", Password: "password", FirstName: "Alice", LastName: "Smith", Email: "alicemsmith@gmail.com", Phone: "(567) 890-1234"},
-		{Username: "Bob", Password: "password", FirstName: "Bob", LastName: "Crachett", Email: "bobbyc@gmail.com", Phone: "(678) 901-2345"},
-		{Username: "Clair", Password: "password", FirstName: "Clair", LastName: "Carson", Email: "claircarson@gmail.com", Phone: "(789) 012-3456"},
-		{Username: "David", Password: "password", FirstName: "David", LastName: "Davidson", Email: "davidsquared@outlook.com", Phone: "(890) 123-4567"},
-		{Username: "Eve", Password: "password", FirstName: "Evangeline", LastName: "Mae", Email: "emae@gmail.com", Phone: "(123) 456-7890"},
-		{Username: "Fred", Password: "password", FirstName: "Fred", LastName: "Flintstone", Email: "freddyflint@aol.com", Phone: "(234) 567-8901"},
-		{Username: "Greta", Password: "password", FirstName: "Greta", LastName: "Glade", Email: "gg@hotmail.com", Phone: "(345) 678-9012"},
-		{Username: "Henry", Password: "password", FirstName: "Henry", LastName: "Hue", Email: "henrytheeight@ufl.edu", Phone: "(456) 789-0123"},
+		{Username: "Alice", Password: "$2a$10$pxi/o3ODHt.dDJ/GLtBaNOibH78yBYYtvjrCAJ3.3jk1JcKhi6Q7e", FirstName: "Alice", LastName: "Smith", Email: "alicemsmith@gmail.com", Phone: "(567) 890-1234"},
+		{Username: "Bob", Password: "$2a$10$pxi/o3ODHt.dDJ/GLtBaNOibH78yBYYtvjrCAJ3.3jk1JcKhi6Q7e", FirstName: "Bob", LastName: "Crachett", Email: "bobbyc@gmail.com", Phone: "(678) 901-2345"},
+		{Username: "Clair", Password: "$2a$10$pxi/o3ODHt.dDJ/GLtBaNOibH78yBYYtvjrCAJ3.3jk1JcKhi6Q7e", FirstName: "Clair", LastName: "Carson", Email: "claircarson@gmail.com", Phone: "(789) 012-3456"},
+		{Username: "David", Password: "$2a$10$pxi/o3ODHt.dDJ/GLtBaNOibH78yBYYtvjrCAJ3.3jk1JcKhi6Q7e", FirstName: "David", LastName: "Davidson", Email: "davidsquared@outlook.com", Phone: "(890) 123-4567"},
+		{Username: "Eve", Password: "$2a$10$pxi/o3ODHt.dDJ/GLtBaNOibH78yBYYtvjrCAJ3.3jk1JcKhi6Q7e", FirstName: "Evangeline", LastName: "Mae", Email: "emae@gmail.com", Phone: "(123) 456-7890"},
+		{Username: "Fred", Password: "$2a$10$pxi/o3ODHt.dDJ/GLtBaNOibH78yBYYtvjrCAJ3.3jk1JcKhi6Q7e", FirstName: "Fred", LastName: "Flintstone", Email: "freddyflint@aol.com", Phone: "(234) 567-8901"},
+		{Username: "Greta", Password: "$2a$10$pxi/o3ODHt.dDJ/GLtBaNOibH78yBYYtvjrCAJ3.3jk1JcKhi6Q7e", FirstName: "Greta", LastName: "Glade", Email: "gg@hotmail.com", Phone: "(345) 678-9012"},
+		{Username: "Henry", Password: "$2a$10$pxi/o3ODHt.dDJ/GLtBaNOibH78yBYYtvjrCAJ3.3jk1JcKhi6Q7e", FirstName: "Henry", LastName: "Hue", Email: "henrytheeight@ufl.edu", Phone: "(456) 789-0123"},
 	}
 	src.DB.Create(users)
 

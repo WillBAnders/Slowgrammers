@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { Link as ScrollLink } from 'react-scroll'
 
-const pages = ['About Us', 'Services', 'Contact Us'];
+const pages = ['About Us', 'Service', 'Contact Us'];
 //const settings = ['Profile', 'Finance', 'Logout'];
 
 const Navbar = ({ name, setName }) => {
@@ -43,7 +43,7 @@ const Navbar = ({ name, setName }) => {
       credentials: 'include',
     });
 
-    setName(false);
+    setName(null);
     handleCloseUserMenu()
   }
 
@@ -73,7 +73,7 @@ const Navbar = ({ name, setName }) => {
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
         >
-          <Link to={"/" + name} style={{ textDecoration: 'none', color: "black" }}>
+          <Link to="/profile" style={{ textDecoration: 'none', color: "black" }}>
             <MenuItem onClick={handleCloseUserMenu}>
               <Typography textAlign="center">Profile</Typography>
             </MenuItem>

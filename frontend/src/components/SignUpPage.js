@@ -14,7 +14,7 @@ import { Link, Navigate } from 'react-router-dom'
 
 const theme = createTheme();
 
-export default function SignupPage() {
+export default function SignupPage({ setName }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [navigate, setNavigate] = useState(false);
@@ -32,6 +32,7 @@ export default function SignupPage() {
         password
       })
     });
+    setName(username);
     setNavigate(true);
     console.log(res)
   };

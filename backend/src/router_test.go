@@ -119,7 +119,7 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				`+stringify(Tutor{User: User{Username: "Username"}})+`
+				{"user": `+stringify(User{Username: "Username"})+`, "rating": 0.0, "bio": "", "availability": []}
 			]
 		}`,
 	))
@@ -133,9 +133,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
-				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
-				`+stringify(Tutor{User: User{Username: "Clair"}})+`
+				{"user": `+stringify(User{Username: "Alice"})+`, "rating": 0.0, "bio": "", "availability": []},
+				{"user": `+stringify(User{Username: "Bob"})+`, "rating": 0.0, "bio": "", "availability": []},
+				{"user": `+stringify(User{Username: "Clair"})+`, "rating": 0.0, "bio": "", "availability": []}
 			]
 		}`,
 	))
@@ -149,9 +149,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
-				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
-				`+stringify(Tutor{User: User{Username: "Clair"}})+`
+				{"user": `+stringify(User{Username: "Alice"})+`, "rating": 0.0, "bio": "", "availability": []},
+				{"user": `+stringify(User{Username: "Bob"})+`, "rating": 0.0, "bio": "", "availability": []},
+				{"user": `+stringify(User{Username: "Clair"})+`, "rating": 0.0, "bio": "", "availability": []}
 			]
 		}`,
 	))
@@ -238,9 +238,12 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 	suite.Run("Empty Courses", test(
 		[]Tutoring{},
 		`{
-			"tutor": `+stringify(tutor)+`,
-			"profile": `+stringify(tutor.User)+`,
-			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
+			"tutor": {
+				"user": `+stringify(tutor.User)+`,
+				"rating": `+stringify(tutor.Rating)+`,
+				"bio": `+stringify(tutor.Bio)+`,
+				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
+            },
 			"courses": []
 		}`,
 	))
@@ -250,9 +253,12 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "code", Name: "Name"}, Tutor: tutor},
 		},
 		`{
-			"tutor": `+stringify(tutor)+`,
-			"profile": `+stringify(tutor.User)+`,
-			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
+			"tutor": {
+				"user": `+stringify(tutor.User)+`,
+				"rating": `+stringify(tutor.Rating)+`,
+				"bio": `+stringify(tutor.Bio)+`,
+				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
+            },
 			"courses": [
 				{"code": "code", "name": "Name"}
 			]
@@ -266,9 +272,12 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "3", Name: "Third"}, Tutor: tutor},
 		},
 		`{
-			"tutor": `+stringify(tutor)+`,
-			"profile": `+stringify(tutor.User)+`,
-			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
+			"tutor": {
+				"user": `+stringify(tutor.User)+`,
+				"rating": `+stringify(tutor.Rating)+`,
+				"bio": `+stringify(tutor.Bio)+`,
+				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
+            },
 			"courses": [
 				{"code": "1", "name": "First"},
 				{"code": "2", "name": "Second"},
@@ -284,9 +293,12 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "1", Name: "First"}, Tutor: tutor},
 		},
 		`{
-			"tutor": `+stringify(tutor)+`,
-			"profile": `+stringify(tutor.User)+`,
-			"availability": `+stringify(strings.Split(tutor.Availability, ", "))+`,
+			"tutor": {
+				"user": `+stringify(tutor.User)+`,
+				"rating": `+stringify(tutor.Rating)+`,
+				"bio": `+stringify(tutor.Bio)+`,
+				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
+            },
 			"courses": [
 				{"code": "1", "name": "First"},
 				{"code": "2", "name": "Second"},
@@ -313,11 +325,8 @@ func (suite *RouterSuite) TestSignup() {
 		w := test("Username", "Password")
 		suite.Equal(200, w.Code)
 
-		data := gin.H{}
-		_ = json.Unmarshal(w.Body.Bytes(), &data)
-		//fmt.Println("json: " + string(w.Body.Bytes()))
-		//claims, _ := ParseJWT(data["token"].(string))
-		suite.Equal("success", data["message"])
+		claims, _ := ParseJWT(w.Result().Cookies()[0].Value)
+		suite.Equal("Username", claims.Username)
 	}))
 
 	suite.Run("Invalid Request (Missing Field)", manualSetupTest(func() {
@@ -363,10 +372,10 @@ func (suite *RouterSuite) TestSignin() {
 		w := test("Username", "Password")
 		suite.Equal(200, w.Code)
 
-		data := gin.H{}
-		_ = json.Unmarshal(w.Body.Bytes(), &data)
-		claims, _ := ParseJWT(data["token"].(string))
-		suite.Equal("Username", claims.Issuer)
+		cookie := w.Result().Cookies()[0]
+		suite.Equal("jwt", cookie.Name)
+		claims, _ := ParseJWT(cookie.Value)
+		suite.Equal("Username", claims.Username)
 	}))
 
 	suite.Run("Invalid Request (Missing Field)", manualSetupTest(func() {
@@ -399,9 +408,62 @@ func (suite *RouterSuite) TestSignin() {
 	}))
 }
 
-func GET(path string) *httptest.ResponseRecorder {
+func (suite *RouterSuite) TestSignout() {
+	suite.Run("Success", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&User{Username: "Username", Password: string(hash)})
+
+		w := POST("/signin", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+		suite.Equal(200, w.Code)
+
+		w = POST("/signout", gin.H{})
+		suite.Equal(200, w.Code)
+		cookie := w.Result().Cookies()[0]
+		suite.Equal("jwt", cookie.Name)
+		suite.Equal("", cookie.Value)
+	}))
+
+	suite.Run("Unauthenticated", manualSetupTest(func() {
+		w := POST("/signout", gin.H{})
+		suite.Equal(200, w.Code)
+	}))
+}
+
+func (suite *RouterSuite) TestProfile() {
+	suite.Run("Success", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&User{Username: "Username", Password: string(hash)})
+
+		w := POST("/signin", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+		suite.Equal(200, w.Code)
+		cookies := w.Result().Cookies()
+		suite.Equal("jwt", cookies[0].Name)
+
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"user": `+stringify(User{Username: "Username"})+`
+		}`, w.Body.String())
+	}))
+
+	suite.Run("Unauthenticated", manualSetupTest(func() {
+		w := GET("/profile")
+		suite.Equal(401, w.Code)
+	}))
+}
+
+func GET(path string, cookies ...*http.Cookie) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", path, nil)
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
 	Router.ServeHTTP(w, req)
 	return w
 }

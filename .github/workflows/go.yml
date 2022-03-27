@@ -1,0 +1,24 @@
+name: Go Test
+
+on:
+  push:
+    paths: [ "backend/**" ]
+    branches: [ bleeding ]
+  pull_request:
+    branches: [ bleeding ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+
+      - name: Go Test
+        working-directory: backend
+        run: go test ./src/...
