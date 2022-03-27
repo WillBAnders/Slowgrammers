@@ -3,7 +3,6 @@ package src
 import (
 	"strings"
 	"time"
-	"fmt"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -346,37 +345,7 @@ func getProfile(c *gin.Context) {
 		return
 	}
 
-}
-
-type Entry struct {
-	Username string `json:"username" binding:"required"`
-	Code     string `json:"code" binding:"required"`
-}
-
-func postCoursesCodeUsernameRemove(c *gin.Context) {
-	var body Entry
-	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(400, gin.H{
-			"error": "Invalid request: " + err.Error() + ".",
-		})
-		return
-	}
-	fmt.Println(body.Username) //for testing
-	fmt.Println(body.Code) //for testing
-	
-	var user []User
-	DB.Limit(1).Find(&user, "username = ?", body.Username)
-	
-	var course []Course
-	DB.Limit(1).Find(&course, "code = ?", body.Code)
-	
-	//var tutorings []Tutoring
-	DB.Where("tutor_id = ? AND course_id = ?", user[0].ID, course[0].ID).Delete(&Tutoring{})
-	
-	//Add error handling - no user match, for example
-	
 	c.JSON(200, gin.H{
-		"message": "Tutor " + body.Username + " removed from " + body.Code + ".",
+		"user": users[0],
 	})
 }
-
