@@ -2,9 +2,11 @@ import React from 'react'
 import { Button, Stack, CardHeader, CardContent, Rating, Card, Typography, Grid, TextField, Paper, Box } from '@mui/material'
 import { useParams, Link } from "react-router-dom";
 import {ThreeDots} from 'react-loader-spinner';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
-const CoursePage = () => {
+const CoursePage = ({username}) => {
     const [tutors, setTutors] = React.useState([]);
     const [isLoading, setLoading] = React.useState(true);
     let params = useParams().coursecode;
@@ -17,6 +19,53 @@ const CoursePage = () => {
         }
         fetchTutors();
     }, []);
+
+    function addClass(){
+        let link = `/profile` 
+        fetch(link, {
+            method: 'PATCH'
+        })
+        console.log("add");
+    }
+
+    function removeClass(){
+        let link = `/profile` 
+        fetch(link, {
+            method: 'PATCH'
+        })
+        console.log("remove");
+    }
+
+    function becomeTutorButton(){
+        let usernamelist = [];
+        for (let i = 0; i < tutors.length; i++){
+           usernamelist.push(tutors[i].user.username);
+        }
+        console.log("Username List: ");
+        console.log(usernamelist);
+        if (usernamelist.includes(username)){
+            return(
+                <Button 
+                    aria-label='DeleteIcon' 
+                    variant="contained" 
+                    color="error"
+                    onClick={removeClass(username)}>
+                    <DeleteIcon />
+                </Button>
+            )
+        }
+        else{
+            return(
+                <Button 
+                    aria-label='AddIcon' 
+                    variant="contained" 
+                    color="success"
+                    onClick={addClass(username)}>
+                    <AddIcon />
+                </Button>
+            )
+        }
+    }
 
     function writeOutTutors(_tutors, filter){
         if (filter === undefined) {
@@ -193,19 +242,22 @@ const CoursePage = () => {
                             maxWidth: "750px"
                         }}
                     >
-                        <TextField 
-                            value={value}
-                            fullWidth 
-                            title="SearchBar"
-                            id="tutor-search" 
-                            label="Search Here" 
-                            variant="outlined"
-                            onChange={handleChange} 
-                            inputProps={{
-                                "data-testid": "SearchBarin",
-                                "title": "SearchBarInput"
-                            }}
+                        <Stack direction="row">
+                            <TextField 
+                                value={value}
+                                fullWidth 
+                                title="SearchBar"
+                                id="tutor-search" 
+                                label="Search Here" 
+                                variant="outlined"
+                                onChange={handleChange} 
+                                inputProps={{
+                                    "data-testid": "SearchBarin",
+                                    "title": "SearchBarInput"
+                                }}
                             />
+                            {becomeTutorButton("Alice")}
+                        </Stack>
                     </Paper>
                 </Box>
 
