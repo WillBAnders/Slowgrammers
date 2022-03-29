@@ -355,6 +355,7 @@ func getProfile(c *gin.Context) {
 
 //not all of this is needed to make an update, at least according to the guide. We shall see.
 type ProfileUpdateData struct { 
+	ID        uint   `json:"-"`
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
 	Email     string `json:"email"`
@@ -363,6 +364,7 @@ type ProfileUpdateData struct {
 
 // ADD DESCRIPTION
 func patchProfile(c *gin.Context) {
+	
 	token, err := c.Cookie("jwt")
 	if err != nil {
 		c.JSON(401, gin.H{
@@ -370,7 +372,7 @@ func patchProfile(c *gin.Context) {
 		})
 		return
 	}
-
+	
 	claims, err := ParseJWT(token)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -390,9 +392,7 @@ func patchProfile(c *gin.Context) {
 	}
 	
 	DB.Find(&users, "username = ?", claims.Username)
-	DB.Model(&users).Updates(edits)
+	DB.Model(&users[0]).Updates(edits)
 	
-	c.JSON(200, gin.H{
-		"user": users[0],
-	})
+	c.JSON(200, gin.H{})
 }
