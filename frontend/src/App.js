@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import CoursesPage from "./components/CoursesPage"
 import LandingPage from "./components/LandingPage"
 import CoursePage from './components/CoursePage'
@@ -8,6 +8,7 @@ import SignInPage from "./components/SigninPage";
 import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
 import ErrorPage from "./components/ErrorPage";
+import TutorPage from "./components/TutorPage";
 
 function App() {
   const [name, setName] = useState(null);
@@ -35,8 +36,8 @@ function App() {
           <Route path="/signUp" element={<SignUpPage setName={setName} />} />
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/tutors/:username" element={<ProfilePage />} />
-          <Route path= "*" element={<ErrorPage />} />
+          <Route path="/tutors/:username" element={<TutorPage />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>
     </div>
