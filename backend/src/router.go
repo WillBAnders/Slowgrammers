@@ -3,6 +3,7 @@ package src
 import (
 	"strings"
 	"time"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,7 @@ func InitRouter() {
 	Router.POST("/signin", postSignin)
 	Router.POST("/signout", postSignout)
 	Router.GET("/profile", getProfile)
+	Router.PATCH("/profile", patchProfile)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -345,6 +347,51 @@ func getProfile(c *gin.Context) {
 		return
 	}
 
+	c.JSON(200, gin.H{
+		"user": users[0],
+	})
+}
+
+
+//not all of this is needed to make an update, at least according to the guide. We shall see.
+type ProfileUpdateData struct { 
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+}
+
+// ADD DESCRIPTION
+func patchProfile(c *gin.Context) {
+	token, err := c.Cookie("jwt")
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Requires an authenticated user.",
+		})
+		return
+	}
+
+	claims, err := ParseJWT(token)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to parse JWT: " + err.Error() + ".",
+		})
+		return
+	}
+	
+	var users []User
+	//add error checking for nonexisting user 
+	//Note for self: https://blog.logrocket.com/how-to-build-a-rest-api-with-golang-using-gin-and-gorm/
+	
+	var edits ProfileUpdateData
+	if err := c.ShouldBindJSON(&edits); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	
+	DB.Find(&users, "username = ?", claims.Username)
+	DB.Model(&users).Updates(edits)
+	
 	c.JSON(200, gin.H{
 		"user": users[0],
 	})
