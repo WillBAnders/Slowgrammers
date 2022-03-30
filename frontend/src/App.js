@@ -3,8 +3,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import CoursesPage from "./components/CoursesPage"
 import LandingPage from "./components/LandingPage"
 import CoursePage from './components/CoursePage'
-import SignupPage from "./components/SignupPage";
-import SigninPage from "./components/SigninPage";
+import SignUpPage from "./components/SignupPage";
+import SignInPage from "./components/SigninPage";
 import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
 import ErrorPage from "./components/ErrorPage";
@@ -39,13 +39,13 @@ function App() {
         <Navbar name={name} setName={setName} />
         <Routes>
           <Route path="/" exact element={<LandingPage />} />
+          <Route path="/signUp" element={<SignUpPage setName={setName} />} />
+          <Route path="/signIn" element={<SignInPage setName={setName} />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:coursecode" element={<CoursePage username={name} />} />
-          <Route path="/signup" element={<SignupPage setName={setName} />} />
-          <Route path="/signin" element={<SigninPage setName={setName} />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/tutors/:username" element={<ProfilePage user={name}/>} />
-          <Route path= "*" element={<ErrorPage />} />
+          <Route path="/profile" element={<ProfilePage user={user} />} />
+          <Route path="/tutors/:username" element={<TutorPage />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>
     </div>
