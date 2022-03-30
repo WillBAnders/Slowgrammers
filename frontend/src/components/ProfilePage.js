@@ -1,163 +1,144 @@
-import React from 'react'
-import { Avatar, TextField, Box, Paper, Stack, Button, CardHeader, Card, CardContent, Typography, Rating } from "@mui/material";
-import {blue} from '@mui/material/colors'
-import { useParams } from "react-router-dom";
-import {ThreeDots} from 'react-loader-spinner';
+import { React, useState, useEffect, Suspense } from "react";
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import { ThreeDots } from 'react-loader-spinner';
 
-const ProfilePage = ({name}) => {
-    //Typography variant doesn't work with responsive design, so I have to go with font sizes
-    let params = useParams();
-    let username = name ?? params.username;
-    let url = '/tutors/' + username;
-    const [info, setInfo] = React.useState();
-    const [isLoading, setLoading] = React.useState(true);
-    React.useEffect(() => {
-        async function fetchInfo() {
-            await fetch(url, {}).then(r => r.json())
-            .then(data => setInfo(data));
-            setLoading(false);
+
+const ProfilePage = (user) => {
+    const [_user, setUser] = useState('');
+    const [firstname, setFirstname] = useState('');
+    const [lastname, setLastname] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+
+    useEffect(() => {
+        if (user.user != null) {
+            setUser(user)
+            setFirstname(user.user.firstname)
+            setLastname(user.user.lastname)
+            setEmail(user.user.email)
+            setPhone(user.user.phone)
         }
-        try{
-            fetchInfo();
-        }
-        catch(e){
-            console.log(e);
-        }
-    }, [url]);
-    console.log("info: ");
-    console.log(info);
-    if (isLoading) {
+    }, [user, _user])
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        fetch('/profile', {
+            method: 'PATCH',
+            body: JSON.stringify({
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                phone: phone
+            }),
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+        })
+            .then((response) => response.json())
+            .then((json) => console.log(json));
+    };
+
+    const loading = (() => {
+        return (<div className="loadingContainer">
+            <ThreeDots
+                type="ThreeDots"
+                color="#00b22d"
+                height={100}
+                width={100}
+            />
+        </div>)
+    })
+
+    if (_user === '') {
+        return (loading())
+    } else {
         return (
-          <div  className="loadingContainer">
-          <ThreeDots
-          type="ThreeDots"
-          color="#00b22d"
-          height={100}
-          width={100}
-           //3 secs
-        />
-        </div>
-        )
-      } else {
-        let fullname = info.tutor.user.firstname + " " + info.tutor.user.lastname;
-        return(
             <div>
-                <Stack
-                    title="Avatar_and_Name"
-                    direction="row"
-                    spacing={{xs:2, md: 3}}
-                    sx={{
-                        ml: {
-                            md: '200px'
-                        }
-                    }}
-                >
-                <Avatar 
-                    sx={{
-                        mt: {md: '5px'},
-                        bgcolor: blue[500],
-                        width: {xs: 50, md: 100},
-                        height: {xs: 50, md: 100}
-                    }}
-                    alt= {
-                        fullname
-                    }
-                    />
-                <Typography 
-                    sx={{
-                        fontSize:{
-                            md:75,
-                            xs:30
-                        }
-                    }}
-                >
-                    {fullname}
-                </Typography>
-                </Stack>
-                <Stack
-                    title="Username_and_Rating"
-                    direction="row"
-                    spacing={{xs:15, md: 80}}
-                >
-                    <Typography
-                        sx={{
-                            ml:{
-                                xs: 8,
-                                md: 40
-                            },
-                            fontSize:{
-                                md:40,
-                                xs:20
-                            }
-                        }}
-                        color="gray"
-                    >
-                        @{username}
-                        
-                    </Typography>
-                    {<Rating 
-                        title="Rating"
-                        value = {info.tutor.rating}
-                        readOnly
-                    />}
-                </Stack>
                 <Typography
-                    title="Email_Address"
+                    className="main-text"
+                    align="center"
+                    justifyContent="center"
                     sx={{
-                        ml:{
-                            xs: 8,
-                            md: 41
-                        },
-                        fontSize:{
-                            md:30,
-                            xs:15
+                        fontWeight: 525,
+                        paddingTop: {
+                            xs: "30px",
+                            md: "0px"
                         }
                     }}
+                    variant="h2"
                 >
-                    {info.tutor.user.email}
-                </Typography>
-                <Typography
-                    title="Phone_Number"
-                    sx={{
-                        ml:{
-                            xs: 8,
-                            md: 41
-                        },
-                        fontSize:{
-                            md:30,
-                            xs:15
-                        }
-                    }}
-                >
-                    {info.tutor.user.phone}
-                </Typography>
+                    Edit Profile
+            </Typography>
                 <Box
-                    title="Bio"
-                    sx={{
-                        ml:{
-                            xs: 8,
-                            md: 41
-                        },
-                        width: {xs: 300, md: 700},
-                        height: {xs: 150, md: 300},
-                        backgroundColor: '#dfdfdf'
-                    }}
+                    alignItems="center"
+                    justifyContent="center"
+                    display="flex"
+                    width="100%"
                 >
-                    <Typography
-                    sx={{
-                        fontSize:{
-                            md:20,
-                            xs:10
-                        }
-                    }}
-                    style={{wordWrap: "break-word"}}
-                    >
-                        {info.tutor.bio}
-                    </Typography>    
+                    <Suspense fallback={loading()}>
+                        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                            <Grid container >
+                                <Grid item xs={5}>
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        id="firstname"
+                                        label="First Name"
+                                        defaultValue={_user.user == null ? 'firstname' : _user.user.firstname}
+                                        onChange={(e) => { setFirstname(e.target.value) }}
+                                        sx={{ m: 1 }}
+                                    />
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        id="email"
+                                        label="Email"
+                                        defaultValue={_user.user == null ? 'email' : _user.user.email}
+                                        onChange={(e) => { setEmail(e.target.value) }}
+                                        sx={{ m: 1 }}
+                                    />
+                                </Grid>
+                                <Grid item xs={5}>
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        id="lastname"
+                                        label="Last Name"
+                                        defaultValue={_user.user == null ? 'lastname' : _user.user.lastname}
+                                        onChange={(e) => { setLastname(e.target.value) }}
+                                        sx={{ m: 1, pl: 1 }}
+                                    />
+
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="phone"
+                                        label="Phone Number"
+                                        defaultValue={_user.user == null ? 'phone' : _user.user.phone}
+                                        onChange={(e) => { setPhone(e.target.value) }}
+                                        sx={{ m: 1, pl: 1 }}
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Button
+                                type="submit"
+                                title="submit"
+                                variant="contained"
+                            >
+                                Update
+                  </Button>
+                        </Box>
+                    </Suspense>
                 </Box>
             </div>
-
-        )}
+        )
+    }
 }
 
 export default ProfilePage
