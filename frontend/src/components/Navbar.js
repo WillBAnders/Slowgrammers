@@ -53,9 +53,11 @@ const Navbar = ({ name, setName }) => {
     buttons = (
       <Box sx={{ flexGrow: 0 }}>
         <Tooltip title="Open settings">
-          <IconButton title="menu" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-            <Avatar alt="John Doe" src="" />
-          </IconButton>
+          <div>
+            <IconButton title="menu" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <Avatar alt="John Doe" src="" />
+            </IconButton>
+          </div>
         </Tooltip>
         <Menu
           sx={{ mt: '45px' }}

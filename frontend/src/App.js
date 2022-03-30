@@ -12,18 +12,26 @@ import TutorPage from "./components/TutorPage";
 
 function App() {
   const [name, setName] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     fetch("/profile", {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     }).then(r => r.json()).then(r => {
-      console.log("setName ", r.user?.username)
+      //console.log("setName ", r.user?.username)
       setName(r.user?.username)
+      setUser({
+        username: r.user.username,
+        firstname: r.user.firstname,
+        lastname: r.user.lastname,
+        email: r.user.email,
+        phone: r.user.phone
+      })
     })
   }, []);
 
-  console.log("Re-render App.js, name = " + name)
+  //console.log("Re-render App.js, name = " + name)
 
   return (
     <div>
@@ -35,7 +43,7 @@ function App() {
           <Route path="/courses/:coursecode" element={<CoursePage />} />
           <Route path="/signUp" element={<SignUpPage setName={setName} />} />
           <Route path="/signIn" element={<SignInPage setName={setName} />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfilePage user={user} />} />
           <Route path="/tutors/:username" element={<TutorPage />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
