@@ -34,7 +34,8 @@ const CoursePage = ({username}) => {
             credentials: 'include',
         })
             .then((response) => response.json())
-            .then((json) => console.log(json));
+            .then((json) => console.log(json))
+            .then(window.location.reload(false));
     }
 
     const removeClass = async(event) =>{
@@ -50,7 +51,8 @@ const CoursePage = ({username}) => {
             credentials: 'include',
         })
             .then((response) => response.json())
-            .then((json) => console.log(json));
+            .then((json) => console.log(json))
+            .then(window.location.reload(false));
     }
 
     function becomeTutorButton(){
