@@ -357,12 +357,15 @@ func getProfile(c *gin.Context) {
 // for updating of the profile
 // Submit as { "attr": "val", "attr": "val" }
 type ProfileUpdateData struct { 
-	ID        uint   `json:"-"`
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
+	ID           uint    `json:"-"`
+	FirstName    string  `json:"firstname"`
+	LastName     string  `json:"lastname"`
+	Email        string  `json:"email"`
+	Phone        string  `json:"phone"`
+	Bio          string  `json:"bio"`
+	Availability string  `json:"availability"`
 }
+
 
 // Handler for PATCH /profile. Returns a success string if update operation is complete.
 // Errors if:
@@ -383,6 +386,8 @@ type ProfileUpdateData struct {
 Need to add:
 Error to check if user exists in DB (500 error)
 Prevent changes to ID
+Add edit of classes
+Add as a tutor if editing tutor portion (assuming it is left as blank on the profile until edited by user)
 */
 
 
@@ -410,6 +415,19 @@ func patchProfile(c *gin.Context) {
 			"error": err.Error(),
 		})
 		return
+	}
+	
+	var tutors []Tutor
+	DB.Joins("User").Find(&tutors, "User__username = ?", claims.Username)
+	
+	if len(tutors) > 0 { 
+		if edits.Bio != "" {
+			tutors[0].Bio =  edits.Bio
+		}
+		if edits.Availability != "" {
+			tutors[0].Availability =  edits.Availability
+		} 
+		DB.Save(&tutors)
 	}
 	
 	var users []User
