@@ -356,6 +356,11 @@ func getProfile(c *gin.Context) {
 // None or all of these attributes (accept for ID) can be used when send to PATCH /profile
 // for updating of the profile
 // Submit as { "attr": "val", "attr": "val" }
+type ClassItem struct {
+	Code string `json:"code"`
+	Action bool `json:"action"`
+}
+
 type ProfileUpdateData struct { 
 	ID           uint    `json:"-"`
 	FirstName    string  `json:"firstname"`
@@ -364,6 +369,7 @@ type ProfileUpdateData struct {
 	Phone        string  `json:"phone"`
 	Bio          string  `json:"bio"`
 	Availability string  `json:"availability"`
+	Tutoring     []ClassItem  `json:"tutoring"`
 }
 
 
@@ -388,6 +394,8 @@ Error to check if user exists in DB (500 error)
 Prevent changes to ID
 Add edit of classes
 Add as a tutor if editing tutor portion (assuming it is left as blank on the profile until edited by user)
+Check for sending extra json data that is not used (ie tutor stuff for nontutor). Currently assumes proper stuff sent
+Currently assumes class actions are correct and frontend is telling the truth
 */
 
 
@@ -430,9 +438,39 @@ func patchProfile(c *gin.Context) {
 		DB.Save(&tutors)
 	}
 	
+	if len(tutors) > 0 && len(edits.Tutoring) > 0 {
+		for i := 0; i < len(edits.Tutoring); i ++ {
+			var courses []Course
+			DB.Find(&courses, "code = ?", edits.Tutoring[i].Code)
+			if edits.Tutoring[i].Action {
+				//add class
+				newClass := Tutoring{Tutor: tutors[0], Course: courses[0]}
+				DB.Create(&newClass)
+			} else {
+				//remove class
+				DB.Where("tutor_id = ? AND course_id = ?", tutors[0].UserID, courses[0].ID).Delete(&Tutoring{})
+			}
+		}
+	}
+	
+	//It's angry at me, so I'm doing it this less pretty way, even though the nice way used to work. Tutor class stuff put it to flames
+	//So long, old way. Rest in reeses pieces. You will be missed.
 	var users []User
 	DB.Find(&users, "username = ?", claims.Username)
-	DB.Model(&users[0]).Updates(edits)
+	if edits.FirstName != "" {
+		users[0].FirstName =  edits.FirstName
+	}
+	if edits.LastName != "" {
+		users[0].LastName =  edits.LastName
+	}
+	if edits.Email != "" {
+		users[0].Email =  edits.Email
+	}
+	if edits.Phone != "" {
+		users[0].Phone =  edits.Phone
+	}
+	DB.Save(&users)
+	//DB.Model(&users[0]).Updates(edits)
 	
 	c.JSON(200, gin.H{})
 }
