@@ -1,9 +1,16 @@
 /// <reference types="cypress" />
 
 describe('general testing', () => {
+
+  Cypress.on('uncaught:exception', (err, runnable) => {
+    return false;
+  });
+  
+
   beforeEach(() => {
 
   })
+  //Cypress.config("waitAfterEachCommand", 2000)
 
   //Courses
   it('goes to courses page and confirm number of courses', () => {
@@ -61,13 +68,13 @@ describe('general testing', () => {
   it('Go to sign up page from sign in', () => {
     cy.visit('localhost:3000/Signin')
     cy.contains('Don\'t have an account? Sign Up').click()
-    cy.url().should('eq', "http://localhost:3000/SignUp")
+    cy.url().should('eq', "http://localhost:3000/signup")
   })
 
   it('Go to sign in page from sign up', () => {
     cy.visit('localhost:3000/Signup')
     cy.contains('Already have an account? Sign in').click()
-    cy.url().should('eq', "http://localhost:3000/SignIn")
+    cy.url().should('eq', "http://localhost:3000/signin")
   })
 
   it('Submit sign up page', () => {
@@ -75,7 +82,7 @@ describe('general testing', () => {
     cy.findByTitle('username').type('COP')
     cy.findByTitle('password').type('12!Abe')
     cy.findByTitle('submit').click()
-    cy.url().should('eq', "http://localhost:3000/SignIn")
+    cy.url().should('eq', "http://localhost:3000/")
   })
 
   it('Submit sign up page and go to sign in automatically', () => {
@@ -83,7 +90,60 @@ describe('general testing', () => {
     cy.findByTitle('username').type('Abe')
     cy.findByTitle('password').type('12!Abe')
     cy.findByTitle('submit').click()
-    cy.url().should('eq', "http://localhost:3000/SignIn")
+    cy.url().should('eq', "http://localhost:3000/")
+  })
+/*
+  it('Create an account, edit profile, check new profile', () => {
+    cy.visit('localhost:3000/SignUp')
+    cy.findByTitle('username').type('COP')
+    cy.findByTitle('password').type('12!Abe')
+    cy.findByTitle('submit').click()
+    cy.visit('localhost:3000/profile')
+    cy.findByTitle('firstname').type('Jon')
+    cy.findByTitle('lastname').type('Arbuckle')
+    cy.findByTitle('email').type('jon.arbuckle@gmail.com')
+    cy.findByTitle('phone').type('352-352-3523')
+    cy.contains('update').click();
+    cy.reload();
+    cy.findByTitle('firstname').should('eq', 'Jon')
+    cy.findByTitle('lastname').should('eq', 'Arbuckle')
+    cy.findByTitle('email').should('eq', 'jon.arbuckle@gmail.com')
+    cy.findByTitle('phone').should('eq', '352-352-3523')
+  })
+*/
+  it('Log in as tutor, add self to class, click on profile', () => {
+    cy.visit('localhost:3000/SignIn')
+    cy.findByTitle('username').type('Bob')
+    cy.findByTitle('password').type('password')
+    cy.findByTitle('submit').click()
+    cy.contains('See Courses').click()
+    cy.contains('COT-3100').click()
+    let before;
+    let after;
+    cy.findByTitle('addbutton').click();
+    cy.findByTitle('tutorlist').children().should('have.length', 3)
+    cy.contains("Bob").click()
+    cy.url().should('eq', 'http://localhost:3000/tutors/Bob')
+
+  })
+
+  it('Log in as tutor, remove self to class', () => {
+    cy.visit('localhost:3000/SignIn')
+    cy.findByTitle('username').type('Bob')
+    cy.findByTitle('password').type('password')
+    cy.findByTitle('submit').click()
+    cy.contains('See Courses').click()
+    cy.contains('COT-3100').click()
+    let before;
+    let after;
+    cy.findByTitle('removebutton').click();
+    cy.findByTitle('tutorlist').children().should('have.length', 2)
+
+  })
+
+  it('Error Page', () =>{
+    cy.visit('localhost:3000/gotoerror')
+    cy.contains('ERROR')
   })
 
   /*it('Sign up, sign in, check for one cookie', () => {
@@ -103,7 +163,7 @@ describe('general testing', () => {
         expect(cookies[0]).to.have.property('name', 'jwt')
       })
   })*/
-
+/*
   it('Sign up, Sign in, Sign out, check for empty cookies, make sure signout was recognized by frontend', () => {
     cy.visit('localhost:3000/SignUp')
     cy.findByTitle('username').type('Abe2')
@@ -126,5 +186,5 @@ describe('general testing', () => {
     cy.findByTitle('signinbutton').should('be.visible')
 
   })
-
+*/
 })

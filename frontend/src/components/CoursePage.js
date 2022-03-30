@@ -69,6 +69,7 @@ const CoursePage = ({username}) => {
                     aria-label='DeleteIcon' 
                     variant="contained" 
                     color="error"
+                    title="removebutton"
                     onClick={removeClass}>
                     <DeleteIcon />
                 </Button>
@@ -80,6 +81,7 @@ const CoursePage = ({username}) => {
                     aria-label='AddIcon' 
                     variant="contained" 
                     color="success"
+                    title="addbutton"
                     onClick={addClass}>
                     <AddIcon />
                 </Button>
@@ -275,7 +277,7 @@ const CoursePage = ({username}) => {
                                     "title": "SearchBarInput"
                                 }}
                             />
-                            {becomeTutorButton("Alice")}
+                            {becomeTutorButton()}
                         </Stack>
                     </Paper>
                 </Box>

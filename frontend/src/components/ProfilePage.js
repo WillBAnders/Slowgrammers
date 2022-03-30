@@ -1,4 +1,5 @@
 import { React, useState, useEffect, Suspense } from "react";
+import { Navigate } from 'react-router';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -57,7 +58,8 @@ const ProfilePage = (user) => {
 
     if (_user === '') {
         return (loading())
-    } else {
+    } 
+    else {
         return (
             <div>
                 <Typography
@@ -88,6 +90,7 @@ const ProfilePage = (user) => {
                                     <TextField
                                         fullWidth
                                         required
+                                        title="firstname"
                                         id="firstname"
                                         label="First Name"
                                         defaultValue={_user.user == null ? 'firstname' : _user.user.firstname}
@@ -97,6 +100,7 @@ const ProfilePage = (user) => {
                                     <TextField
                                         fullWidth
                                         required
+                                        title="email"
                                         id="email"
                                         label="Email"
                                         defaultValue={_user.user == null ? 'email' : _user.user.email}
@@ -108,6 +112,7 @@ const ProfilePage = (user) => {
                                     <TextField
                                         fullWidth
                                         required
+                                        title="lastname"
                                         id="lastname"
                                         label="Last Name"
                                         defaultValue={_user.user == null ? 'lastname' : _user.user.lastname}
@@ -118,6 +123,7 @@ const ProfilePage = (user) => {
                                     <TextField
                                         required
                                         fullWidth
+                                        title="phone"
                                         id="phone"
                                         label="Phone Number"
                                         defaultValue={_user.user == null ? 'phone' : _user.user.phone}
