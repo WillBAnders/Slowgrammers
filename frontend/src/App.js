@@ -44,7 +44,7 @@ function App() {
           <Route path="/signup" element={<SignupPage setName={setName} />} />
           <Route path="/signin" element={<SigninPage setName={setName} />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/tutors/:username" element={<ProfilePage />} />
+          <Route path="/tutors/:username" element={<ProfilePage user={name}/>} />
           <Route path= "*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>
