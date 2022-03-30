@@ -10,6 +10,7 @@ const CoursePage = ({username}) => {
     const [tutors, setTutors] = React.useState([]);
     const [isLoading, setLoading] = React.useState(true);
     let params = useParams().coursecode;
+    console.log(params);
     //Effect callbacks are synchronous to prevent race conditions. So we need to put the async function inside
     React.useEffect(() => {
         async function fetchTutors(){
@@ -25,8 +26,7 @@ const CoursePage = ({username}) => {
         fetch('/profile', {
             method: 'PATCH',
             body: JSON.stringify({
-                code: params,
-                action: true
+                tutoring: [{code: params, action: true}]
             }),
             headers: {
                 'Content-type': 'application/json',
@@ -42,8 +42,7 @@ const CoursePage = ({username}) => {
         fetch('/profile', {
             method: 'PATCH',
             body: JSON.stringify({
-                code: params,
-                action: false
+                tutoring: [{code: params, action: false}]
             }),
             headers: {
                 'Content-type': 'application/json',
