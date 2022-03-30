@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 
 const CoursePage = ({username}) => {
+    console.log(username);
     const [tutors, setTutors] = React.useState([]);
     const [isLoading, setLoading] = React.useState(true);
     let params = useParams().coursecode;
@@ -20,20 +21,38 @@ const CoursePage = ({username}) => {
         fetchTutors();
     }, []);
 
-    function addClass(){
-        let link = `/profile` 
-        fetch(link, {
-            method: 'PATCH'
+    const addClass = async (event) => {
+        event.preventDefault();
+        fetch('/profile', {
+            method: 'PATCH',
+            body: JSON.stringify({
+                code: params,
+                action: true
+            }),
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
         })
-        console.log("add");
+            .then((response) => response.json())
+            .then((json) => console.log(json));
     }
 
-    function removeClass(){
-        let link = `/profile` 
-        fetch(link, {
-            method: 'PATCH'
+    const removeClass = async(event) =>{
+        event.preventDefault();
+        fetch('/profile', {
+            method: 'PATCH',
+            body: JSON.stringify({
+                code: params,
+                action: false
+            }),
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
         })
-        console.log("remove");
+            .then((response) => response.json())
+            .then((json) => console.log(json));
     }
 
     function becomeTutorButton(){
@@ -41,15 +60,16 @@ const CoursePage = ({username}) => {
         for (let i = 0; i < tutors.length; i++){
            usernamelist.push(tutors[i].user.username);
         }
-        console.log("Username List: ");
-        console.log(usernamelist);
+        if (!username){
+            return;
+        }
         if (usernamelist.includes(username)){
             return(
                 <Button 
                     aria-label='DeleteIcon' 
                     variant="contained" 
                     color="error"
-                    onClick={removeClass(username)}>
+                    onClick={removeClass}>
                     <DeleteIcon />
                 </Button>
             )
@@ -60,7 +80,7 @@ const CoursePage = ({username}) => {
                     aria-label='AddIcon' 
                     variant="contained" 
                     color="success"
-                    onClick={addClass(username)}>
+                    onClick={addClass}>
                     <AddIcon />
                 </Button>
             )
@@ -71,7 +91,6 @@ const CoursePage = ({username}) => {
         if (filter === undefined) {
             filter = "";
         }
-        console.log(_tutors);
         let tutorList = [];
         if (_tutors.length === 0){
             return(
