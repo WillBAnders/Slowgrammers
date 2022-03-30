@@ -7,7 +7,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 
 const CoursePage = ({username}) => {
-    console.log(username);
     const [tutors, setTutors] = React.useState([]);
     const [isLoading, setLoading] = React.useState(true);
     let params = useParams().coursecode;
