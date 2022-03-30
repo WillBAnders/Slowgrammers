@@ -3,7 +3,6 @@ package src
 import (
 	"strings"
 	"time"
-	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -353,7 +352,10 @@ func getProfile(c *gin.Context) {
 }
 
 
-//not all of this is needed to make an update, at least according to the guide. We shall see.
+// JSON Schema for updating the profile
+// None or all of these attributes (accept for ID) can be used when send to PATCH /profile
+// for updating of the profile
+// Submit as { "attr": "val", "attr": "val" }
 type ProfileUpdateData struct { 
 	ID        uint   `json:"-"`
 	FirstName string `json:"firstname"`
@@ -362,7 +364,28 @@ type ProfileUpdateData struct {
 	Phone     string `json:"phone"`
 }
 
-// ADD DESCRIPTION
+// Handler for PATCH /profile. Returns a success string if update operation is complete.
+// Errors if:
+//
+//  - There is no authenticated user (401)
+//  - A server issue prevents parsing the JWT (500)
+//  - The changed data does not fit the json schema detailed in ProfileUpdateData (400)
+//
+// Response Schema: {
+//   200
+// }
+// Error Schema: {
+//   error: String
+// }
+//Source Note: https://blog.logrocket.com/how-to-build-a-rest-api-with-golang-using-gin-and-gorm/
+
+/*
+Need to add:
+Error to check if user exists in DB (500 error)
+Prevent changes to ID
+*/
+
+
 func patchProfile(c *gin.Context) {
 	
 	token, err := c.Cookie("jwt")
@@ -381,16 +404,15 @@ func patchProfile(c *gin.Context) {
 		return
 	}
 	
-	var users []User
-	//add error checking for nonexisting user 
-	//Note for self: https://blog.logrocket.com/how-to-build-a-rest-api-with-golang-using-gin-and-gorm/
-	
 	var edits ProfileUpdateData
 	if err := c.ShouldBindJSON(&edits); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 	
+	var users []User
 	DB.Find(&users, "username = ?", claims.Username)
 	DB.Model(&users[0]).Updates(edits)
 	
