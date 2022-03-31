@@ -18,7 +18,12 @@ const CoursePage = ({username}) => {
             setTutors(data.tutors);
             setLoading(false);
         }
-        fetchTutors();
+        try{
+            fetchTutors();
+        }
+        catch(e){
+            console.log(e);
+        }
     }, []);
 
     const addClass = async (event) => {
@@ -235,6 +240,46 @@ const CoursePage = ({username}) => {
             </div>
             )
     } else {
+        if (tutors === undefined){
+            return(
+                <Box
+                    mt= {20} 
+                    sx={{
+                        display:"flex", 
+                        alignContent:"center", 
+                        justifyContent:"center",
+                    
+                    }}
+                >
+                    <Stack 
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="center"
+                    >
+                        <Typography 
+                            sx={{
+                                fontSize:{
+                                    md:60,
+                                    xs:30
+                                }
+                            }}
+                        >
+                            Error 404
+                        </Typography>
+                        <Typography 
+                            sx={{
+                                fontSize:{
+                                    md:60,
+                                    xs:30
+                                }
+                            }}
+                        >
+                            Course {params} not found.
+                        </Typography>
+                    </Stack>
+                </Box>
+            );
+        }
         return (
             <div>
                 <Box sx={{display:"flex", justifyContent:"center"}}>
