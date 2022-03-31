@@ -286,7 +286,7 @@ func postSignin(c *gin.Context) {
 		})
 		return
 	}
-	c.SetCookie("jwt", token, int(24*time.Hour.Seconds()), "", "", true, true)
+	c.SetCookie("jwt", token, int(24*time.Hour.Seconds()), "", "", false, true)
 
 	c.JSON(200, gin.H{})
 }
