@@ -5,28 +5,51 @@ import { useParams, Link } from "react-router-dom";
 
 export default function ErrorPage(){
     return(
-        <Stack>
-            <Typography 
-                color={"#ff0000"}
-                variant="h1"
+        <Box
+            mt= {20} 
+            sx={{
+                display:"flex", 
+                alignContent:"center", 
+                justifyContent:"center",
+            
+            }}
+        >
+            <Stack 
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
             >
-                ERROR 404! PAGE NOT FOUND!
-            </Typography>
-            <Link to="/" style={{ textDecoration: 'none', color: "blue" }}>
-                <Button
-                    variant="contained"
-                    size="large"
-                    color="error"
+                <Typography 
                     sx={{
-                        ml: {
-                            xs:"100px",
-                            sm:"260px",
-                            md: "560px",
+                        fontSize:{
+                            md:60,
+                            xs:30
                         }
-                    }}>
-                    Return to Home Page
-                </Button>  
-            </Link>
-        </Stack>
+                    }}
+                >
+                    Error 404
+                </Typography>
+                <Typography 
+                    sx={{
+                        fontSize:{
+                            md:60,
+                            xs:30
+                        }
+                    }}
+                >
+                    Page not found.
+                </Typography>
+                <Link to="/" style={{ textDecoration: 'none', color: "blue" }}>
+                    <Button
+                        variant="contained"
+                        size="large"
+                        color="error"
+                    >
+                        Return to Home Page
+                    </Button>  
+                </Link>
+            </Stack>
+        </Box>
+        
     );
 }
