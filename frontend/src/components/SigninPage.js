@@ -1,5 +1,4 @@
-import * as React from "react";
-import {useState} from "react";
+import React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -17,8 +16,9 @@ const theme = createTheme();
 
 export default function SigninPage({setName}) {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [invalid, setInvalid] = React.useState(false);
 
   function onSubmit(event) {
     event.preventDefault();
@@ -27,10 +27,13 @@ export default function SigninPage({setName}) {
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({username, password}),
     })
-      .then(r => r.json())
-      .then(data => {
-        setName(username);
-        navigate("/");
+      .then(res => {
+        if (res.status === 200) {
+          setName(username);
+          navigate("/");
+        } else if (res.status === 401) {
+          setInvalid(true);
+        }
       })
       .catch(error => {
         //TODO: error page
@@ -64,6 +67,9 @@ export default function SigninPage({setName}) {
               alignItems: "center",
             }}
           >
+            <div>
+              {invalid ? <Alert severity="error">Invalid username or password.</Alert> : <div/>}
+            </div>
             <Avatar sx={{m: 1, bgcolor: "secondary.main"}}>
               <LockOutlinedIcon/>
             </Avatar>
