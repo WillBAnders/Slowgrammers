@@ -32,7 +32,7 @@ describe('general testing', () => {
 
   //Tutors
   it('Return to homepage', () => {
-    cy.visit('localhost:3000/tutors')
+    cy.visit('localhost:3000/courses')
     cy.contains('TutorsVILLE').click()
     cy.url().should('eq', "http://localhost:3000/")
   })
@@ -79,16 +79,16 @@ describe('general testing', () => {
 
   it('Submit sign up page', () => {
     cy.visit('localhost:3000/SignUp')
-    cy.findByTitle('username').type('COP')
-    cy.findByTitle('password').type('12!Abe')
+    cy.findByTitle('username').type('COPUN')
+    cy.findByTitle('password').type('12!Abraham')
     cy.findByTitle('submit').click()
     cy.url().should('eq', "http://localhost:3000/")
   })
 
   it('Submit sign up page and go to sign in automatically', () => {
     cy.visit('localhost:3000/SignUp')
-    cy.findByTitle('username').type('Abe')
-    cy.findByTitle('password').type('12!Abe')
+    cy.findByTitle('username').type('Abraham')
+    cy.findByTitle('password').type('12!Abraham')
     cy.findByTitle('submit').click()
     cy.url().should('eq', "http://localhost:3000/")
   })
@@ -111,33 +111,35 @@ describe('general testing', () => {
     cy.findByTitle('phone').should('eq', '352-352-3523')
   })
 */
-  it('Log in as tutor, add self to class, click on profile', () => {
+  
+
+  it('Log in as tutor, remove self to class', () => {
     cy.visit('localhost:3000/SignIn')
-    cy.findByTitle('username').type('Bob')
+    cy.findByTitle('username').type('Alice')
     cy.findByTitle('password').type('password')
     cy.findByTitle('submit').click()
     cy.contains('See Courses').click()
-    cy.contains('COT-3100').click()
+    cy.contains('COP-3502').click()
+    let before;
+    let after;
+    cy.findByTitle('removebutton').click();
+    cy.findByTitle('tutorlist').children().should('have.length', 1)
+
+  })
+
+  it('Log in as tutor, add self to class, click on profile', () => {
+    cy.visit('localhost:3000/SignIn')
+    cy.findByTitle('username').type('Alice')
+    cy.findByTitle('password').type('password')
+    cy.findByTitle('submit').click()
+    cy.contains('See Courses').click()
+    cy.contains('COP-3502').click()
     let before;
     let after;
     cy.findByTitle('addbutton').click();
     cy.findByTitle('tutorlist').children().should('have.length', 2)
     cy.contains("Bob").click()
     cy.url().should('eq', 'http://localhost:3000/tutors/Bob')
-
-  })
-
-  it('Log in as tutor, remove self to class', () => {
-    cy.visit('localhost:3000/SignIn')
-    cy.findByTitle('username').type('Bob')
-    cy.findByTitle('password').type('password')
-    cy.findByTitle('submit').click()
-    cy.contains('See Courses').click()
-    cy.contains('COT-3100').click()
-    let before;
-    let after;
-    cy.findByTitle('removebutton').click();
-    cy.findByTitle('tutorlist').children().should('have.length', 1)
 
   })
 
