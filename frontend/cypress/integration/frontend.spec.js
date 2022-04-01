@@ -121,7 +121,7 @@ describe('general testing', () => {
     let before;
     let after;
     cy.findByTitle('addbutton').click();
-    cy.findByTitle('tutorlist').children().should('have.length', 3)
+    cy.findByTitle('tutorlist').children().should('have.length', 2)
     cy.contains("Bob").click()
     cy.url().should('eq', 'http://localhost:3000/tutors/Bob')
 
@@ -137,13 +137,13 @@ describe('general testing', () => {
     let before;
     let after;
     cy.findByTitle('removebutton').click();
-    cy.findByTitle('tutorlist').children().should('have.length', 2)
+    cy.findByTitle('tutorlist').children().should('have.length', 1)
 
   })
 
   it('Error Page', () =>{
     cy.visit('localhost:3000/gotoerror')
-    cy.contains('ERROR')
+    cy.contains('Error')
   })
 
   /*it('Sign up, sign in, check for one cookie', () => {
