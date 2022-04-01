@@ -450,10 +450,22 @@ func (suite *RouterSuite) TestProfile() {
 		suite.JSONEq(`{
 			"user": `+stringify(User{Username: "Username"})+`
 		}`, w.Body.String())
+		
+		w = PATCH("/profile", gin.H{"firstname": "Elk","lastname": "Cloner",}, cookies...)
+		suite.Equal(200, w.Code)
+		
+		w = PATCH("/profile", gin.H{"email": "coolbeans@aol.com"}, cookies...)
+		suite.Equal(200, w.Code)
+		
+		w = PATCH("/profile", gin.H{"phone": "1234567890"}, cookies...)
+		suite.Equal(200, w.Code)
 	}))
 
 	suite.Run("Unauthenticated", manualSetupTest(func() {
 		w := GET("/profile")
+		suite.Equal(401, w.Code)
+		
+		w = PATCH("/profile", gin.H{"firstname": "Elk","lastname": "Cloner",})
 		suite.Equal(401, w.Code)
 	}))
 }
@@ -473,6 +485,18 @@ func POST(path string, body gin.H) *httptest.ResponseRecorder {
 	data, _ := json.Marshal(body)
 	req, _ := http.NewRequest("POST", path, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
+	Router.ServeHTTP(w, req)
+	return w
+}
+
+func PATCH(path string, body gin.H, cookies ...*http.Cookie) *httptest.ResponseRecorder {
+	w := httptest.NewRecorder()
+	data, _ := json.Marshal(body)
+	req, _ := http.NewRequest("PATCH", path, bytes.NewBuffer(data))
+	req.Header.Set("Content-Type", "application/json")
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
 	Router.ServeHTTP(w, req)
 	return w
 }
