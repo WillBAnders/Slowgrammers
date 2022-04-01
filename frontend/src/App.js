@@ -8,6 +8,7 @@ import SigninPage from "./components/SigninPage";
 import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
 import ErrorPage from "./components/ErrorPage";
+import TutorPage from "./components/TutorPage";
 
 function App() {
   const [name, setName] = useState(null);
@@ -39,11 +40,11 @@ function App() {
         <Routes>
           <Route path="/" exact element={<LandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:coursecode" element={<CoursePage />} />
+          <Route path="/courses/:coursecode" element={<CoursePage username={name} />} />
           <Route path="/signup" element={<SignupPage setName={setName} />} />
           <Route path="/signin" element={<SigninPage setName={setName} />} />
           <Route path="/profile" element={<ProfilePage user={user} />} />
-          <Route path="/tutors/:username" element={<ProfilePage />} />
+          <Route path="/tutors/:username" element={<TutorPage />} />
           <Route path= "*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>

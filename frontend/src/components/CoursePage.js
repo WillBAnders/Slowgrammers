@@ -2,12 +2,15 @@ import React from 'react'
 import { Button, Stack, CardHeader, CardContent, Rating, Card, Typography, Grid, TextField, Paper, Box } from '@mui/material'
 import { useParams, Link } from "react-router-dom";
 import {ThreeDots} from 'react-loader-spinner';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
-const CoursePage = () => {
+const CoursePage = ({username}) => {
     const [tutors, setTutors] = React.useState([]);
     const [isLoading, setLoading] = React.useState(true);
     let params = useParams().coursecode;
+    console.log(params);
     //Effect callbacks are synchronous to prevent race conditions. So we need to put the async function inside
     React.useEffect(() => {
         async function fetchTutors(){
@@ -15,14 +18,86 @@ const CoursePage = () => {
             setTutors(data.tutors);
             setLoading(false);
         }
-        fetchTutors();
+        try{
+            fetchTutors();
+        }
+        catch(e){
+            console.log(e);
+        }
     }, []);
+
+    const addClass = async (event) => {
+        event.preventDefault();
+        fetch('/profile', {
+            method: 'PATCH',
+            body: JSON.stringify({
+                tutoring: [{code: params, action: true}]
+            }),
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+        })
+            .then((response) => response.json())
+            .then((json) => console.log(json))
+            .then(window.location.reload(false));
+    }
+
+    const removeClass = async(event) =>{
+        event.preventDefault();
+        fetch('/profile', {
+            method: 'PATCH',
+            body: JSON.stringify({
+                tutoring: [{code: params, action: false}]
+            }),
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+        })
+            .then((response) => response.json())
+            .then((json) => console.log(json))
+            .then(window.location.reload(false));
+    }
+
+    function becomeTutorButton(){
+        let usernamelist = [];
+        for (let i = 0; i < tutors.length; i++){
+           usernamelist.push(tutors[i].user.username);
+        }
+        if (!username){
+            return;
+        }
+        if (usernamelist.includes(username)){
+            return(
+                <Button 
+                    aria-label='DeleteIcon' 
+                    variant="contained" 
+                    color="error"
+                    title="removebutton"
+                    onClick={removeClass}>
+                    <DeleteIcon />
+                </Button>
+            )
+        }
+        else{
+            return(
+                <Button 
+                    aria-label='AddIcon' 
+                    variant="contained" 
+                    color="success"
+                    title="addbutton"
+                    onClick={addClass}>
+                    <AddIcon />
+                </Button>
+            )
+        }
+    }
 
     function writeOutTutors(_tutors, filter){
         if (filter === undefined) {
             filter = "";
         }
-        console.log(_tutors);
         let tutorList = [];
         if (_tutors.length === 0){
             return(
@@ -165,6 +240,46 @@ const CoursePage = () => {
             </div>
             )
     } else {
+        if (tutors === undefined){
+            return(
+                <Box
+                    mt= {20} 
+                    sx={{
+                        display:"flex", 
+                        alignContent:"center", 
+                        justifyContent:"center",
+                    
+                    }}
+                >
+                    <Stack 
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="center"
+                    >
+                        <Typography 
+                            sx={{
+                                fontSize:{
+                                    md:60,
+                                    xs:30
+                                }
+                            }}
+                        >
+                            Error 404
+                        </Typography>
+                        <Typography 
+                            sx={{
+                                fontSize:{
+                                    md:60,
+                                    xs:30
+                                }
+                            }}
+                        >
+                            Course {params} not found.
+                        </Typography>
+                    </Stack>
+                </Box>
+            );
+        }
         return (
             <div>
                 <Box sx={{display:"flex", justifyContent:"center"}}>
@@ -193,19 +308,22 @@ const CoursePage = () => {
                             maxWidth: "750px"
                         }}
                     >
-                        <TextField 
-                            value={value}
-                            fullWidth 
-                            title="SearchBar"
-                            id="tutor-search" 
-                            label="Search Here" 
-                            variant="outlined"
-                            onChange={handleChange} 
-                            inputProps={{
-                                "data-testid": "SearchBarin",
-                                "title": "SearchBarInput"
-                            }}
+                        <Stack direction="row">
+                            <TextField 
+                                value={value}
+                                fullWidth 
+                                title="SearchBar"
+                                id="tutor-search" 
+                                label="Search Here" 
+                                variant="outlined"
+                                onChange={handleChange} 
+                                inputProps={{
+                                    "data-testid": "SearchBarin",
+                                    "title": "SearchBarInput"
+                                }}
                             />
+                            {becomeTutorButton()}
+                        </Stack>
                     </Paper>
                 </Box>
 
