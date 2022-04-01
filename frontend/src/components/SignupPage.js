@@ -1,5 +1,6 @@
 import React from "react";
 import Avatar from "@mui/material/Avatar";
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -8,13 +9,13 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import {createTheme, ThemeProvider} from "@mui/material/styles";
-import {useNavigate} from "react-router";
-import {Link} from "react-router-dom";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 
 const theme = createTheme();
 
-export default function SignupPage({setName}) {
+export default function SignupPage({ setName }) {
   const navigate = useNavigate();
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -36,7 +37,7 @@ export default function SignupPage({setName}) {
     if (u === true && p === true) {
       fetch("/signup", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username,
           password,
@@ -46,7 +47,7 @@ export default function SignupPage({setName}) {
           if (res.status === 200) {
             setName(username);
             navigate("/");
-          } else if (response.status === 401) {
+          } else if (res.status === 401) {
             setUsernameTaken(true);
             setIncorrectUsername(false);
             setIncorrectPassword(false);
@@ -70,8 +71,8 @@ export default function SignupPage({setName}) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs" sx={{pt: {xs: "30px", md: "40px"}}}>
-        <CssBaseline/>
+      <Container component="main" maxWidth="xs" sx={{ pt: { xs: "30px", md: "40px" } }}>
+        <CssBaseline />
         <Box
           sx={{
             marginTop: 8,
@@ -81,17 +82,17 @@ export default function SignupPage({setName}) {
           }}
         >
           <div>
-            {usernameTaken ? <Alert severity="error" sx={{mb: 1}}>Username already taken!</Alert> : <div/>}
-            {incorrectUsername ? <Alert severity="error" sx={{mb: 1}}>Username should contain 5-20 alphanumeric or _ characters.</Alert> : <div/>}
-            {incorrectPassword ? <Alert severity="error">Password should contain 7-30 alphanumeric or -_!@#$%^&*. characters.</Alert> : <div/>}
+            {usernameTaken ? <Alert severity="error" sx={{ mb: 1 }}>Username already taken!</Alert> : <div />}
+            {incorrectUsername ? <Alert severity="error" sx={{ mb: 1 }}>Username should contain 5-20 alphanumeric or _ characters.</Alert> : <div />}
+            {incorrectPassword ? <Alert severity="error">Password should contain 7-30 alphanumeric or -_!@#$%^&*. characters.</Alert> : <div />}
           </div>
-          <Avatar sx={{m: 1, bgcolor: "secondary.main"}}>
-            <LockOutlinedIcon/>
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+            <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={onSubmit} sx={{mt: 3}}>
+          <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -120,13 +121,13 @@ export default function SignupPage({setName}) {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{mt: 3, mb: 2}}
+              sx={{ mt: 3, mb: 2 }}
             >
               Sign Up
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link to="/signin" style={{textDecoration: "none", color: "blue"}}>
+                <Link to="/signin" style={{ textDecoration: "none", color: "blue" }}>
                   Already have an account? Sign in
                 </Link>
               </Grid>
