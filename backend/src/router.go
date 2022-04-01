@@ -24,6 +24,7 @@ func InitRouter() {
 	Router.POST("/signin", postSignin)
 	Router.POST("/signout", postSignout)
 	Router.GET("/profile", getProfile)
+	Router.PATCH("/profile", patchProfile)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -348,4 +349,128 @@ func getProfile(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"user": users[0],
 	})
+}
+
+
+// JSON Schema for updating the profile
+// None or all of these attributes (accept for ID) can be used when send to PATCH /profile
+// for updating of the profile
+// Submit as { "attr": "val", "attr": "val" }
+type ClassItem struct {
+	Code string `json:"code"`
+	Action bool `json:"action"`
+}
+
+type ProfileUpdateData struct { 
+	ID           uint    `json:"-"`
+	FirstName    string  `json:"firstname"`
+	LastName     string  `json:"lastname"`
+	Email        string  `json:"email"`
+	Phone        string  `json:"phone"`
+	Bio          string  `json:"bio"`
+	Availability string  `json:"availability"`
+	Tutoring     []ClassItem  `json:"tutoring"`
+}
+
+
+// Handler for PATCH /profile. Returns a success string if update operation is complete.
+// Errors if:
+//
+//  - There is no authenticated user (401)
+//  - A server issue prevents parsing the JWT (500)
+//  - The changed data does not fit the json schema detailed in ProfileUpdateData (400)
+//
+// Response Schema: {
+//   200
+// }
+// Error Schema: {
+//   error: String
+// }
+//Source Note: https://blog.logrocket.com/how-to-build-a-rest-api-with-golang-using-gin-and-gorm/
+
+/*
+Need to add:
+Error to check if user exists in DB (500 error)
+Prevent changes to ID
+Add edit of classes
+Add as a tutor if editing tutor portion (assuming it is left as blank on the profile until edited by user)
+Check for sending extra json data that is not used (ie tutor stuff for nontutor). Currently assumes proper stuff sent
+Currently assumes class actions are correct and frontend is telling the truth
+*/
+
+
+func patchProfile(c *gin.Context) {
+	
+	token, err := c.Cookie("jwt")
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Requires an authenticated user.",
+		})
+		return
+	}
+	
+	claims, err := ParseJWT(token)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to parse JWT: " + err.Error() + ".",
+		})
+		return
+	}
+	
+	var edits ProfileUpdateData
+	if err := c.ShouldBindJSON(&edits); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	
+	var tutors []Tutor
+	DB.Joins("User").Find(&tutors, "User__username = ?", claims.Username)
+	
+	if len(tutors) > 0 { 
+		if edits.Bio != "" {
+			tutors[0].Bio =  edits.Bio
+		}
+		if edits.Availability != "" {
+			tutors[0].Availability =  edits.Availability
+		} 
+		DB.Save(&tutors)
+	}
+	
+	if len(tutors) > 0 && len(edits.Tutoring) > 0 {
+		for i := 0; i < len(edits.Tutoring); i ++ {
+			var courses []Course
+			DB.Find(&courses, "code = ?", edits.Tutoring[i].Code)
+			if edits.Tutoring[i].Action {
+				//add class
+				newClass := Tutoring{Tutor: tutors[0], Course: courses[0]}
+				DB.Create(&newClass)
+			} else {
+				//remove class
+				DB.Where("tutor_id = ? AND course_id = ?", tutors[0].UserID, courses[0].ID).Delete(&Tutoring{})
+			}
+		}
+	}
+	
+	//It's angry at me, so I'm doing it this less pretty way, even though the nice way used to work. Tutor class stuff put it to flames
+	//So long, old way. Rest in reeses pieces. You will be missed.
+	var users []User
+	DB.Find(&users, "username = ?", claims.Username)
+	if edits.FirstName != "" {
+		users[0].FirstName =  edits.FirstName
+	}
+	if edits.LastName != "" {
+		users[0].LastName =  edits.LastName
+	}
+	if edits.Email != "" {
+		users[0].Email =  edits.Email
+	}
+	if edits.Phone != "" {
+		users[0].Phone =  edits.Phone
+	}
+	DB.Save(&users)
+	//DB.Model(&users[0]).Updates(edits)
+	
+	c.JSON(200, gin.H{})
 }
