@@ -432,7 +432,34 @@ func (suite *RouterSuite) TestSignout() {
 	}))
 }
 
-func (suite *RouterSuite) TestProfile() {
+func (suite *RouterSuite) TestGetProfile() {
+	suite.Run("Success", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&User{Username: "Username", Password: string(hash)})
+
+		w := POST("/signin", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+		suite.Equal(200, w.Code)
+		cookies := w.Result().Cookies()
+		suite.Equal("jwt", cookies[0].Name)
+
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"user": `+stringify(User{Username: "Username"})+`
+		}`, w.Body.String())
+		
+	}))
+
+	suite.Run("Unauthenticated", manualSetupTest(func() {
+		w := GET("/profile")
+		suite.Equal(401, w.Code)
+	}))
+}
+
+func (suite *RouterSuite) TestPatchProfile() {
 	suite.Run("Success", manualSetupTest(func() {
 		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
 		DB.Create(&User{Username: "Username", Password: string(hash)})
@@ -454,18 +481,36 @@ func (suite *RouterSuite) TestProfile() {
 		w = PATCH("/profile", gin.H{"firstname": "Elk","lastname": "Cloner",}, cookies...)
 		suite.Equal(200, w.Code)
 		
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"user": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner"})+`
+		}`, w.Body.String())
+		
 		w = PATCH("/profile", gin.H{"email": "coolbeans@aol.com"}, cookies...)
 		suite.Equal(200, w.Code)
 		
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"user": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner", Email: "coolbeans@aol.com"})+`
+		}`, w.Body.String())
+		
 		w = PATCH("/profile", gin.H{"phone": "1234567890"}, cookies...)
 		suite.Equal(200, w.Code)
+		
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"user": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner", Email: "coolbeans@aol.com", Phone: "1234567890"})+`
+		}`, w.Body.String())
 	}))
 
 	suite.Run("Unauthenticated", manualSetupTest(func() {
-		w := GET("/profile")
-		suite.Equal(401, w.Code)
+		//w := GET("/profile")
+		//suite.Equal(401, w.Code)
 		
-		w = PATCH("/profile", gin.H{"firstname": "Elk","lastname": "Cloner",})
+		w := PATCH("/profile", gin.H{"firstname": "Elk","lastname": "Cloner",})
 		suite.Equal(401, w.Code)
 	}))
 }
