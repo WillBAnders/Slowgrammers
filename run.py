@@ -15,9 +15,9 @@ def testFrontend():
     os.system("npm test")
     
 def testBackend():
-    os.chdir("backend")
+    os.chdir("backend/src")
     os.system("go fmt")
-    os.system("go test ./src")
+    os.system("go test")
 
 def init():
     print("Creating database")
@@ -47,7 +47,7 @@ def run():
 def test():
     print("Testing backend")
     testBackend()
-    os.chdir("..")
+    os.chdir("../..")
     print("Testing frontend")
     testFrontend()
 
