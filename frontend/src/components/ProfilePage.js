@@ -24,6 +24,7 @@ const ProfilePage = (user) => {
     const [day, setDay] = React.useState('');
     const [startTime, setStartTime] = React.useState('');
     const [endTime, setEndTime] = React.useState('');
+    const [myAvailability, setMyAvailability] = React.useState([]);
 
     useEffect(() => {
         if (user.user != null) {
@@ -144,30 +145,29 @@ const ProfilePage = (user) => {
         "11:45 PM",
     ]
 
-    let myAvailability = [];
-
     const addTime = () => {
         console.log(day + ", " + startTime + "-" + endTime);
         if (startTime < endTime){
             console.log("Valid time");
             myAvailability.push(Object.freeze({day: day, startTime: startTime, endTime: endTime}));
         }
-        showAvailability();
+        console.log(myAvailability);
     }
 
     const removeTime = (index) => {
         myAvailability.splice(index, 1);
     }
 
-    function showAvailability(){
-        if (myAvailability.length != 0){
-            let availcards = [];
-            for (let i = 0; i < myAvailability.length; i++){
-                console.log(myAvailability[i]);
+    function showAvailability(availabil){
+        console.log(availabil.length);
+        let availcards = [];
+        if (availabil.length != 0){
+            for (let i = 0; i < availabil.length; i++){
+                console.log(availabil[i]);
             }
-            myAvailability.forEach (avail =>
+            availabil.forEach (avail =>
                 availcards.push(
-                    <div>
+                    <Stack direction="row">
                         <Card>
                             <CardContent>
                                 {avail.day} from {avail.startTime} to {avail.endTime}
@@ -181,10 +181,17 @@ const ProfilePage = (user) => {
                             onClick={removeTime(myAvailability.indexOf(avail))}>
                             <DeleteIcon />
                         </Button>
-                    </div>
+                    </Stack>
                 )
             );
             return availcards;
+        }
+        else{
+            return(
+                <div>
+                    No availability given
+                </div>
+            )
         }
     }
 
@@ -350,7 +357,14 @@ const ProfilePage = (user) => {
                             <AddIcon />
                         </Button>
                     </Stack>
-                    {showAvailability()}
+                </Box>
+                <Box
+                    display="flex" 
+                    alignItems="center"
+                    justifyContent="center" 
+                    sx={{mt: 2}}
+                >
+                    {showAvailability(myAvailability)}
                 </Box>
             </div>
         )
