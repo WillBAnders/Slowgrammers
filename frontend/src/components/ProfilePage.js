@@ -7,7 +7,10 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import AddIcon from '@mui/icons-material/Add';
-import Stack from '@mui/material/Stack'
+import DeleteIcon from '@mui/icons-material/Delete';
+import Stack from '@mui/material/Stack';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 import { ThreeDots } from 'react-loader-spinner';
 import Autocomplete from '@mui/material/Autocomplete';
 
@@ -143,33 +146,48 @@ const ProfilePage = (user) => {
 
     let myAvailability = [];
 
-    const handleChangeDay = (event) => {
-        setDay(event.target.value);
-    };
-
-    const handleChangeStartTime = (event) => {
-        setStartTime(event.target.value);
-    };
-
-    const handleChangeEndTime = (event) => {
-        setStartTime(event.target.value);
-    };
-
     const addTime = () => {
         console.log(day + ", " + startTime + "-" + endTime);
-        console.log(times.indexOf(startTime) + " vs " + times.indexOf(endTime));
-        myAvailability.push(new Item(day, startTime, endTime));
+        if (startTime < endTime){
+            console.log("Valid time");
+            myAvailability.push(Object.freeze({day: day, startTime: startTime, endTime: endTime}));
+        }
+        showAvailability();
     }
-/*
-    const showAvailability = () => {
+
+    const removeTime = (index) => {
+        myAvailability.splice(index, 1);
+    }
+
+    function showAvailability(){
         if (myAvailability.length != 0){
             let availcards = [];
-            foreach (avail in myAvailability){
-
+            for (let i = 0; i < myAvailability.length; i++){
+                console.log(myAvailability[i]);
             }
+            myAvailability.forEach (avail =>
+                availcards.push(
+                    <div>
+                        <Card>
+                            <CardContent>
+                                {avail.day} from {avail.startTime} to {avail.endTime}
+                            </CardContent>
+                        </Card>
+                        <Button 
+                            aria-label='DeleteIcon' 
+                            variant="contained" 
+                            color="error"
+                            title="removebutton"
+                            onClick={removeTime(myAvailability.indexOf(avail))}>
+                            <DeleteIcon />
+                        </Button>
+                    </div>
+                )
+            );
+            return availcards;
         }
     }
-*/
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -332,6 +350,7 @@ const ProfilePage = (user) => {
                             <AddIcon />
                         </Button>
                     </Stack>
+                    {showAvailability()}
                 </Box>
             </div>
         )
