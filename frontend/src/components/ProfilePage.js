@@ -13,6 +13,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { ThreeDots } from 'react-loader-spinner';
 import Autocomplete from '@mui/material/Autocomplete';
+import {days, times} from '../styles/TableData'
 
 
 const ProfilePage = (user) => {
@@ -36,126 +37,37 @@ const ProfilePage = (user) => {
         }
     }, [user, _user])
 
-    const days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday"
-    ]
+    /*useEffect(() => {
+        ;
+    }, [myAvailability])*/
 
-    const times = [
-        "12:00 AM",
-        "12:15 AM",
-        "12:30 AM",
-        "12:45 AM",
-        "1:00 AM",
-        "1:15 AM",
-        "1:30 AM",
-        "1:45 AM",
-        "2:00 AM",
-        "2:15 AM",
-        "2:30 AM",
-        "2:45 AM",
-        "3:00 AM",
-        "3:15 AM",
-        "3:30 AM",
-        "3:45 AM",
-        "4:00 AM",
-        "4:15 AM",
-        "4:30 AM",
-        "4:45 AM", 
-        "5:00 AM",
-        "5:15 AM",
-        "5:30 AM",
-        "5:45 AM",
-        "6:00 AM",
-        "6:15 AM",
-        "6:30 AM",
-        "6:45 AM",
-        "7:00 AM",
-        "7:15 AM",
-        "7:30 AM",
-        "7:45 AM",
-        "8:00 AM",
-        "8:15 AM",
-        "8:30 AM",
-        "8:45 AM",
-        "9:00 AM",
-        "9:15 AM",
-        "9:30 AM",
-        "9:45 AM",
-        "10:00 AM",
-        "10:15 AM",
-        "10:30 AM",
-        "10:45 AM",
-        "11:00 AM",
-        "11:15 AM",
-        "11:30 AM",
-        "11:45 AM",
-        "12:00 PM",
-        "12:15 PM",
-        "12:30 PM",
-        "12:45 PM",
-        "1:00 PM",
-        "1:15 PM",
-        "1:30 PM",
-        "1:45 PM",
-        "2:00 PM",
-        "2:15 PM",
-        "2:30 PM",
-        "2:45 PM",
-        "3:00 PM",
-        "3:15 PM",
-        "3:30 PM",
-        "3:45 PM",
-        "4:00 PM",
-        "4:15 PM",
-        "4:30 PM",
-        "4:45 PM", 
-        "5:00 PM",
-        "5:15 PM",
-        "5:30 PM",
-        "5:45 PM",
-        "6:00 PM",
-        "6:15 PM",
-        "6:30 PM",
-        "6:45 PM",
-        "7:00 PM",
-        "7:15 PM",
-        "7:30 PM",
-        "7:45 PM",
-        "8:00 PM",
-        "8:15 PM",
-        "8:30 PM",
-        "8:45 PM",
-        "9:00 PM",
-        "9:15 PM",
-        "9:30 PM",
-        "9:45 PM",
-        "10:00 PM",
-        "10:15 PM",
-        "10:30 PM",
-        "10:45 PM",
-        "11:00 PM",
-        "11:15 PM",
-        "11:30 PM",
-        "11:45 PM",
-    ]
+    var TotalAvailability = [];
+
+    const confirm = (ava) => {
+        TotalAvailability.push(ava);
+        console.log(TotalAvailability);
+        //setMyAvailability([]);
+    }
 
     const addTime = () => {
         console.log(day + ", " + startTime + "-" + endTime);
-        if (startTime < endTime){
+        if (startTime < endTime && (startTime != myAvailability.startTime || endTime != myAvailability.endTime || day != myAvailability.day) && day && startTime && endTime){
             console.log("Valid time");
-            myAvailability.push(Object.freeze({day: day, startTime: startTime, endTime: endTime}));
+            //setMyAvailability([...myAvailability, Object.freeze({day: day, startTime: startTime, endTime: endTime})])
+            let newday = Object.freeze({day: day, startTime: startTime, endTime: endTime});
+            //setMyAvailability([...myAvailability, newday]);
+            setMyAvailability(newday);
+            TotalAvailability.push(myAvailability);
+            console.log(TotalAvailability);
+            //setMyAvailability(myAvailability);
         }
-        console.log(myAvailability);
     }
 
     const removeTime = (index) => {
-        myAvailability.splice(index, 1);
+        if (TotalAvailability.length === 0){
+            TotalAvailability = [];
+        }
+        else TotalAvailability.splice(index, 1);
     }
 
     function showAvailability(availabil){
@@ -167,10 +79,13 @@ const ProfilePage = (user) => {
             }
             availabil.forEach (avail =>
                 availcards.push(
-                    <Stack direction="row">
-                        <Card>
+                    <Stack 
+                        direction="row"
+                        key={avail.data + " " + avail.startTime + " " + avail.endTime}
+                    >
+                        <Card >
                             <CardContent>
-                                {avail.day} from {avail.startTime} to {avail.endTime}
+                                {avail.day}: {avail.startTime} - {avail.endTime}
                             </CardContent>
                         </Card>
                         <Button 
@@ -178,7 +93,7 @@ const ProfilePage = (user) => {
                             variant="contained" 
                             color="error"
                             title="removebutton"
-                            onClick={removeTime(myAvailability.indexOf(avail))}>
+                            onClick={removeTime(availabil.indexOf(avail))}>
                             <DeleteIcon />
                         </Button>
                     </Stack>
@@ -317,8 +232,10 @@ const ProfilePage = (user) => {
                     alignItems="center"
                     justifyContent="center" 
                     sx={{mt: 2}}
+                    onSubmit={addTime()}
+                    noValidate
                 >
-                    <Stack direction="row">
+                    <Stack direction="row" onSubmit={confirm(myAvailability)}>
                         <Autocomplete
                             disablePortal
                             id="DaySelector"
@@ -348,14 +265,21 @@ const ProfilePage = (user) => {
                             sx={{ width: {xs: 100, md: 300} }}
                             renderInput={(params) => <TextField {...params} label="End Time" />}
                         />
+                        
                         <Button 
                             aria-label='AddIcon' 
                             variant="contained" 
                             color="success"
                             title="addbutton"
-                            onClick={addTime}>
+                            onClick={(e) => {
+                                e.persist();
+                                // e.stopPropagation();
+                                // various callbacks
+                            }}
+                            >
                             <AddIcon />
                         </Button>
+                        
                     </Stack>
                 </Box>
                 <Box
@@ -364,7 +288,7 @@ const ProfilePage = (user) => {
                     justifyContent="center" 
                     sx={{mt: 2}}
                 >
-                    {showAvailability(myAvailability)}
+                    {showAvailability(TotalAvailability)}
                 </Box>
             </div>
         )
