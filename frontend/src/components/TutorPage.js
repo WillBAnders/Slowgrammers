@@ -6,7 +6,7 @@ import {ThreeDots} from 'react-loader-spinner';
 
 export default function TutorPage() {
   const params = useParams();
-  const [data, setData] = React.useState();
+  const [data, setData] = React.useState({});
   const [isLoading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -119,7 +119,7 @@ export default function TutorPage() {
             }}
             color="gray"
           >
-            @{params.username}
+            @{data.tutor.user.username}
           </Typography>
           {<Rating title="Rating" value={data.tutor.rating} readOnly />}
         </Stack>

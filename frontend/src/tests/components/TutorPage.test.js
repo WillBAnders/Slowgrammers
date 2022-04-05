@@ -3,11 +3,11 @@
  */
 
 import "@testing-library/jest-dom";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import React from "react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import "regenerator-runtime/runtime";
-import CoursePage from "../../components/CoursePage.js";
+import TutorPage from "../../components/TutorPage.js";
 
 beforeAll(() => {
   global.fetch = jest.fn();
@@ -25,7 +25,7 @@ describe("TutorPage", () => {
       tutors: [],
     });
     await waitFor(async () => {
-      const component = render(<CoursePage />, { wrapper: MemoryRouter });
+      const component = render(<TutorPage />, { wrapper: MemoryRouter });
       const loadingContainer =
         component.container.querySelector(".loadingContainer");
       expect(loadingContainer).not.toBe(null);
@@ -38,17 +38,17 @@ describe("TutorPage", () => {
       courses: [],
     });
     const component = await waitFor(async () => {
-      return render(<CoursePage />, { wrapper: MemoryRouter });
+      return render(<TutorPage />, { wrapper: MemoryRouter });
     });
-    expect(component).toHaveTextContent("@Username");
+    expect(component.container).toHaveTextContent("@Username");
   });
 
   test("error", async () => {
-    fetch.mockRejectedValue(new Error("Expected"));
+    fetch.mockResponseValue({ error: "Expected" });
     const component = await waitFor(async () => {
-      return render(<CoursePage />, { wrapper: MemoryRouter });
+      return render(<TutorPage />, { wrapper: MemoryRouter });
     });
-    expect(component).toHaveTextContent("Error: Expected");
+    expect(component.container).toHaveTextContent("Error:Expected");
   });
 });
 
