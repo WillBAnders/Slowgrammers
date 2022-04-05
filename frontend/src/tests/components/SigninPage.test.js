@@ -23,30 +23,41 @@ describe("SigninPage", () => {
     fetch.mockResponseValue({});
 
     const component = await waitFor(async () => {
-      return render(<SigninPage setName={jest.fn()} />, { wrapper: MemoryRouter });
+      return render(<SigninPage setName={jest.fn()} />, {
+        wrapper: MemoryRouter,
+      });
     });
 
     await waitFor(async () => {
-      fireEvent.change(component.getByLabelText("Username", { exact: false }), { target: { value: "Username" } });
-      fireEvent.change(component.getByLabelText("Password", { exact: false }), { target: { value: "Password" } });
+      fireEvent.change(component.getByLabelText("Username", { exact: false }), {
+        target: { value: "Username" },
+      });
+      fireEvent.change(component.getByLabelText("Password", { exact: false }), {
+        target: { value: "Password" },
+      });
     });
 
     await waitFor(async () => {
       fireEvent.submit(component.getByTitle("submit"));
     });
 
-    expect(fetch).toHaveBeenCalledWith("/signin", expect.objectContaining({
-      method: "POST",
-      body: JSON.stringify({ username: "Username", password: "Password" }),
-    }));
-  })
+    expect(fetch).toHaveBeenCalledWith(
+      "/signin",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ username: "Username", password: "Password" }),
+      })
+    );
+  });
 
   test("fetch resolved", async () => {
     fetch.mockResponseValue({});
     const mockSetName = jest.fn();
 
     const component = await waitFor(async () => {
-      return render(<SigninPage setName={mockSetName} />, { wrapper: MemoryRouter });
+      return render(<SigninPage setName={mockSetName} />, {
+        wrapper: MemoryRouter,
+      });
     });
 
     await waitFor(async () => {
@@ -63,7 +74,9 @@ describe("SigninPage", () => {
     const mockSetName = jest.fn();
 
     const component = await waitFor(async () => {
-      return render(<SigninPage setName={mockSetName} />, { wrapper: MemoryRouter });
+      return render(<SigninPage setName={mockSetName} />, {
+        wrapper: MemoryRouter,
+      });
     });
 
     await waitFor(async () => {
