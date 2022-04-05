@@ -37,38 +37,25 @@ const ProfilePage = (user) => {
         }
     }, [user, _user])
 
-    /*useEffect(() => {
-        ;
-    }, [myAvailability])*/
+    
 
     let TotalAvailability = [];
-
-    const confirm = (ava) => {
-        TotalAvailability.push(ava);
-        console.log(TotalAvailability);
-        //setMyAvailability([]);
-    }
 
     const addTime = (event) => {
         event.preventDefault();
         console.log(day + ", " + startTime + "-" + endTime);
         if (startTime < endTime){
             console.log("Valid time");
-            //setMyAvailability([...myAvailability, Object.freeze({day: day, startTime: startTime, endTime: endTime})])
-            const newday = [{day, startTime, endTime}];
-            //setMyAvailability([...myAvailability, newday]);
+            const newday = [{day: day, startTime: startTime, endTime: endTime}];
             setAvailability((availability) => {
                 return [...availability, newday]
             });
-            console.log("Availability", availability)
-            console.log(availability.length);
-            //TotalAvailability.push(myAvailability);
-            //console.log(TotalAvailability);
-            //setMyAvailability(myAvailability);
         }
     }
 
-    const removeTime = (index) => {
+    const removeTime = (index, event) => {
+        //event.preventDefault();
+        console.log("delete " + index);
         if (TotalAvailability.length === 0){
             TotalAvailability = [];
         }
@@ -76,34 +63,32 @@ const ProfilePage = (user) => {
     }
 
     function showAvailability(availabil){
-        console.log(availabil.length);
         let availcards = [];
         if (availabil.length != 0){
             for (let i = 0; i < availabil.length; i++){
-                console.log(availabil[i]);
-            }
-            availabil.forEach (avail =>
                 availcards.push(
                     <Stack 
                         direction="row"
-                        key={avail.data + " " + avail.startTime + " " + avail.endTime}
+                        key={availabil[i][0]}
+                        onSubmit={removeTime(i)}
                     >
                         <Card >
                             <CardContent>
-                                {avail.day}: {avail.startTime} - {avail.endTime}
+                                {availabil[i][0].day}: {availabil[i][0].startTime} - {availabil[i][0].endTime}
                             </CardContent>
                         </Card>
                         <Button 
                             aria-label='DeleteIcon' 
                             variant="contained" 
                             color="error"
+                            type="submit"
                             title="removebutton"
-                            onClick={removeTime(availabil.indexOf(avail))}>
+                        >
                             <DeleteIcon />
                         </Button>
                     </Stack>
-                )
-            );
+                );
+            }
             return availcards;
         }
         else{
@@ -290,7 +275,9 @@ const ProfilePage = (user) => {
                     justifyContent="center" 
                     sx={{mt: 2}}
                 >
-                    {showAvailability(availability)}
+                    <Stack>
+                        {showAvailability(availability)}
+                    </Stack>
                 </Box>
             </div>
         )
