@@ -41,19 +41,37 @@ const ProfilePage = (user) => {
 
     let TotalAvailability = [];
 
+    const checkTimeValidity = () => {
+        if (availability.length === 0) return true;
+        for (let i = 0; i < availability.length; i++){
+            const startBeforeStart = (times.indexOf(startTime) < times.indexOf(availability[i][0].startTime));
+            const startAfterEnd = (times.indexOf(startTime) > times.indexOf(availability[i][0].endTime));
+            const endAfterEnd = (times.indexOf(endTime) > times.indexOf(availability[i][0].endTime));
+            const endBeforeStart = (times.indexOf(endTime) < times.indexOf(availability[i][0].startTime));
+            if (!(day != availability[i][0].day || (startBeforeStart && endBeforeStart) || (startAfterEnd && endAfterEnd))){
+                return false;
+            }
+        }
+        return true;
+    }
+
     const addTime = (event) => {
         event.preventDefault();
         console.log(day + ", " + startTime + "-" + endTime);
-        if (startTime < endTime){
+        if (times.indexOf(startTime) < times.indexOf(endTime) && checkTimeValidity()){
             console.log("Valid time");
             const newday = [{day: day, startTime: startTime, endTime: endTime}];
             setAvailability((availability) => {
                 return [...availability, newday]
             });
         }
+        else{ 
+            console.log("Invalid time");
+            alert("Invalid time chosen"); 
+        }
     }
 
-    const removeTime = (index, event) => {
+    const removeTime = (index) => {
         //event.preventDefault();
         console.log("delete " + index);
         if (TotalAvailability.length === 0){
@@ -70,6 +88,7 @@ const ProfilePage = (user) => {
                     <Stack 
                         direction="row"
                         key={availabil[i][0]}
+                        component="form"
                         onSubmit={removeTime(i)}
                     >
                         <Card >
