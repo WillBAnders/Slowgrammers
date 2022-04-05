@@ -128,10 +128,14 @@ const CoursePage = ({username}) => {
             console.log(_tutors.at(i));
             let title = _tutors.at(i).user.firstname + " " + _tutors.at(i).user.lastname;
             console.log(title);
+            /*let courses = _tutors.at(i).courses;
+            console.log(courses);
+            let coursesuppercased = courses.map(courses => courses.toUpperCase());*/
             let avail = _tutors.at(i).availability;
             console.log(avail);
             let availuppercased = avail.map(avail => avail.toUpperCase());
-            if (title.toUpperCase().includes(filter.toUpperCase()) || availuppercased.find(element => element.includes(filter.toUpperCase()))) {
+            //let availuppercased = avail => avail.toUpperCase();
+            if (title.toUpperCase().includes(filter.toUpperCase()) /*|| coursesuppercased.find(element => element.includes(filter.toUpperCase()))*/ || availuppercased.find(element => element.includes(filter.toUpperCase()))) {
                 const link = "/tutors/" + _tutors.at(i).user.username;
                 tutorList.push(
                     <Link to={link} style={{ textDecoration: 'none', color: "blue" }}>
@@ -141,6 +145,13 @@ const CoursePage = ({username}) => {
                                 subheader={<Rating name="read-only" precision={0.1} size="small" value={_tutors.at(i).rating} readOnly />}
                             />
                             <CardContent>
+                                {/*<Typography
+                                    component="div"
+                                    sx={{marginBottom: "10px"}}
+                                >
+                                    Classes:
+                                    {writeOutClasses(courses)}
+                                </Typography>*/}
                                 <Typography 
                                     sx={{marginBottom: "10px"}}
                                     component="div"

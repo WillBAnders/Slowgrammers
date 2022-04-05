@@ -25,7 +25,7 @@ const ProfilePage = (user) => {
     const [day, setDay] = React.useState('');
     const [startTime, setStartTime] = React.useState('');
     const [endTime, setEndTime] = React.useState('');
-    const [myAvailability, setMyAvailability] = React.useState([]);
+    const [availability, setAvailability] = React.useState([]);
 
     useEffect(() => {
         if (user.user != null) {
@@ -41,7 +41,7 @@ const ProfilePage = (user) => {
         ;
     }, [myAvailability])*/
 
-    var TotalAvailability = [];
+    let TotalAvailability = [];
 
     const confirm = (ava) => {
         TotalAvailability.push(ava);
@@ -49,16 +49,21 @@ const ProfilePage = (user) => {
         //setMyAvailability([]);
     }
 
-    const addTime = () => {
+    const addTime = (event) => {
+        event.preventDefault();
         console.log(day + ", " + startTime + "-" + endTime);
-        if (startTime < endTime && (startTime != myAvailability.startTime || endTime != myAvailability.endTime || day != myAvailability.day) && day && startTime && endTime){
+        if (startTime < endTime){
             console.log("Valid time");
             //setMyAvailability([...myAvailability, Object.freeze({day: day, startTime: startTime, endTime: endTime})])
-            let newday = Object.freeze({day: day, startTime: startTime, endTime: endTime});
+            const newday = [{day, startTime, endTime}];
             //setMyAvailability([...myAvailability, newday]);
-            setMyAvailability(newday);
-            TotalAvailability.push(myAvailability);
-            console.log(TotalAvailability);
+            setAvailability((availability) => {
+                return [...availability, newday]
+            });
+            console.log("Availability", availability)
+            console.log(availability.length);
+            //TotalAvailability.push(myAvailability);
+            //console.log(TotalAvailability);
             //setMyAvailability(myAvailability);
         }
     }
@@ -232,10 +237,11 @@ const ProfilePage = (user) => {
                     alignItems="center"
                     justifyContent="center" 
                     sx={{mt: 2}}
-                    onSubmit={addTime()}
+                    component="form"
+                    onSubmit={addTime}
                     noValidate
                 >
-                    <Stack direction="row" onSubmit={confirm(myAvailability)}>
+                    <Stack direction="row" >
                         <Autocomplete
                             disablePortal
                             id="DaySelector"
@@ -267,15 +273,11 @@ const ProfilePage = (user) => {
                         />
                         
                         <Button 
+                            type="submit"
                             aria-label='AddIcon' 
                             variant="contained" 
                             color="success"
                             title="addbutton"
-                            onClick={(e) => {
-                                e.persist();
-                                // e.stopPropagation();
-                                // various callbacks
-                            }}
                             >
                             <AddIcon />
                         </Button>
@@ -288,7 +290,7 @@ const ProfilePage = (user) => {
                     justifyContent="center" 
                     sx={{mt: 2}}
                 >
-                    {showAvailability(TotalAvailability)}
+                    {showAvailability(availability)}
                 </Box>
             </div>
         )
