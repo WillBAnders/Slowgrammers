@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  Avatar,
-  TextField,
-  Box,
-  Paper,
-  Stack,
-  Button,
-  CardHeader,
-  Card,
-  CardContent,
-  Typography,
-  Rating,
-} from "@mui/material";
+import { Avatar, Box, Stack, Typography, Rating } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import { useParams } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";

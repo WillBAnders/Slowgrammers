@@ -258,13 +258,7 @@ const CoursePage = ({ username }) => {
   if (isLoading) {
     return (
       <div className="loadingContainer">
-        <ThreeDots
-          type="ThreeDots"
-          color="#00b22d"
-          height={100}
-          width={100}
-          //3 secs
-        />
+        <ThreeDots type="ThreeDots" color="#00b22d" height={100} width={100} />
       </div>
     );
   } else {

@@ -1,18 +1,6 @@
 import React from "react";
-import {
-  Button,
-  Stack,
-  CardHeader,
-  CardContent,
-  Rating,
-  Card,
-  Typography,
-  Grid,
-  TextField,
-  Paper,
-  Box,
-} from "@mui/material";
-import { useParams, Link } from "react-router-dom";
+import { Button, Stack, Typography, Box } from "@mui/material";
+import { Link } from "react-router-dom";
 
 export default function ErrorPage() {
   return (
