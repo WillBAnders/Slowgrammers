@@ -29,9 +29,7 @@ export default function SignupPage({ setName }) {
     //console.log(username + password)
 
     const usernameRegex = new RegExp("[a-zA-Z0-9_]{5,20}");
-    const passwordRegex = new RegExp(
-      "[a-zA-Z0-9-_\\!\\@\\#\\$\\%\\^&\\*\\.]{7,30}"
-    );
+    const passwordRegex = new RegExp("[a-zA-Z0-9-_\\!\\@\\#\\$\\%\\^&\\*\\.]{7,30}");
 
     let u = usernameRegex.test(username);
     let p = passwordRegex.test(password);
@@ -44,16 +42,17 @@ export default function SignupPage({ setName }) {
           username,
           password,
         }),
-      }).then((res) => {
-        if (res.status === 200) {
-          setName(username);
-          navigate("/");
-        } else if (res.status === 401) {
-          setUsernameTaken(true);
-          setIncorrectUsername(false);
-          setIncorrectPassword(false);
-        }
-      });
+      })
+        .then(res => {
+          if (res.status === 200) {
+            setName(username);
+            navigate("/");
+          } else if (res.status === 401) {
+            setUsernameTaken(true);
+            setIncorrectUsername(false);
+            setIncorrectPassword(false);
+          }
+        });
     } else if (u === false && p === false) {
       setUsernameTaken(false);
       setIncorrectUsername(true);
@@ -72,11 +71,7 @@ export default function SignupPage({ setName }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container
-        component="main"
-        maxWidth="xs"
-        sx={{ pt: { xs: "30px", md: "40px" } }}
-      >
+      <Container component="main" maxWidth="xs" sx={{ pt: { xs: "30px", md: "40px" } }}>
         <CssBaseline />
         <Box
           sx={{
@@ -87,28 +82,9 @@ export default function SignupPage({ setName }) {
           }}
         >
           <div>
-            {usernameTaken ? (
-              <Alert severity="error" sx={{ mb: 1 }}>
-                Username already taken!
-              </Alert>
-            ) : (
-              <div />
-            )}
-            {incorrectUsername ? (
-              <Alert severity="error" sx={{ mb: 1 }}>
-                Username should contain 5-20 alphanumeric or _ characters.
-              </Alert>
-            ) : (
-              <div />
-            )}
-            {incorrectPassword ? (
-              <Alert severity="error">
-                Password should contain 7-30 alphanumeric or -_!@#$%^&*.
-                characters.
-              </Alert>
-            ) : (
-              <div />
-            )}
+            {usernameTaken ? <Alert severity="error" sx={{ mb: 1 }}>Username already taken!</Alert> : <div />}
+            {incorrectUsername ? <Alert severity="error" sx={{ mb: 1 }}>Username should contain 5-20 alphanumeric or _ characters.</Alert> : <div />}
+            {incorrectPassword ? <Alert severity="error">Password should contain 7-30 alphanumeric or -_!@#$%^&*. characters.</Alert> : <div />}
           </div>
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
@@ -125,7 +101,7 @@ export default function SignupPage({ setName }) {
                   fullWidth
                   label="Username"
                   autoComplete="username"
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={e => setUsername(e.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -136,7 +112,7 @@ export default function SignupPage({ setName }) {
                   label="Password"
                   type="password"
                   autoComplete="new-password"
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                 />
               </Grid>
             </Grid>
@@ -151,10 +127,7 @@ export default function SignupPage({ setName }) {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link
-                  to="/signin"
-                  style={{ textDecoration: "none", color: "blue" }}
-                >
+                <Link to="/signin" style={{ textDecoration: "none", color: "blue" }}>
                   Already have an account? Sign in
                 </Link>
               </Grid>

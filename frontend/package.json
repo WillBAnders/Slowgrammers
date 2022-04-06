@@ -31,21 +31,13 @@
     "test": "npm run test:jest && npm run test:cypress",
     "test:jest": "jest",
     "test:cypress": "cypress run",
-    "eject": "react-scripts eject",
-    "lint": "eslint .",
-    "lint-fix": "eslint --fix",
-    "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\""
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run format"
-    }
   },
   "browserslist": {
     "production": [
@@ -63,11 +55,6 @@
   "devDependencies": {
     "@testing-library/cypress": "^8.0.2",
     "cypress": "^9.5.1",
-    "eslint": "^8.12.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-prettier": "^4.0.0",
-    "husky": "^7.0.4",
     "jest": "^27.4.7",
     "mini-css-extract-plugin": "2.4.5"
   },
