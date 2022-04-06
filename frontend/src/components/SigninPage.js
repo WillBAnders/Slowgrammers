@@ -28,7 +28,7 @@ export default function SigninPage({ setName }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     })
-      .then((res) => {
+      .then(res => {
         if (res.status === 200) {
           setName(username);
           navigate("/");
@@ -36,7 +36,7 @@ export default function SigninPage({ setName }) {
           setInvalid(true);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         //TODO: error page
         console.error(error.message);
       });
@@ -58,16 +58,7 @@ export default function SigninPage({ setName }) {
             backgroundPosition: "center",
           }}
         />
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={5}
-          component={Paper}
-          elevation={6}
-          square
-          sx={{ pt: { xs: "30px", md: "40px" } }}
-        >
+        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square sx={{ pt: { xs: "30px", md: "40px" } }}>
           <Box
             sx={{
               my: 8,
@@ -78,11 +69,7 @@ export default function SigninPage({ setName }) {
             }}
           >
             <div>
-              {invalid ? (
-                <Alert severity="error">Invalid username or password.</Alert>
-              ) : (
-                <div />
-              )}
+              {invalid ? <Alert severity="error">Invalid username or password.</Alert> : <div />}
             </div>
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
               <LockOutlinedIcon />
@@ -99,7 +86,7 @@ export default function SigninPage({ setName }) {
                 label="Username"
                 autoComplete="username"
                 autoFocus
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={e => setUsername(e.target.value)}
               />
               <TextField
                 margin="normal"
@@ -109,7 +96,7 @@ export default function SigninPage({ setName }) {
                 type="password"
                 autoComplete="current-password"
                 title="password"
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
               />
               <Button
                 type="submit"
@@ -122,10 +109,7 @@ export default function SigninPage({ setName }) {
               </Button>
               <Grid container>
                 <Grid item>
-                  <Link
-                    to="/signup"
-                    style={{ textDecoration: "none", color: "blue" }}
-                  >
+                  <Link to="/signup" style={{ textDecoration: "none", color: "blue" }}>
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>
