@@ -37,18 +37,14 @@ const ProfilePage = (user) => {
         }
     }, [user, _user])
 
-    
-
-    let TotalAvailability = [];
-
     const checkTimeValidity = () => {
         if (availability.length === 0) return true;
         for (let i = 0; i < availability.length; i++){
-            const startBeforeStart = (times.indexOf(startTime) < times.indexOf(availability[i][0].startTime));
-            const startAfterEnd = (times.indexOf(startTime) > times.indexOf(availability[i][0].endTime));
-            const endAfterEnd = (times.indexOf(endTime) > times.indexOf(availability[i][0].endTime));
-            const endBeforeStart = (times.indexOf(endTime) < times.indexOf(availability[i][0].startTime));
-            if (!(day != availability[i][0].day || (startBeforeStart && endBeforeStart) || (startAfterEnd && endAfterEnd))){
+            const startBeforeStart = (times.indexOf(startTime) < times.indexOf(availability[i].startTime));
+            const startAfterEnd = (times.indexOf(startTime) > times.indexOf(availability[i].endTime));
+            const endAfterEnd = (times.indexOf(endTime) > times.indexOf(availability[i].endTime));
+            const endBeforeStart = (times.indexOf(endTime) < times.indexOf(availability[i].startTime));
+            if (!(day != availability[i].day || (startBeforeStart && endBeforeStart) || (startAfterEnd && endAfterEnd))){
                 return false;
             }
         }
@@ -60,7 +56,7 @@ const ProfilePage = (user) => {
         console.log(day + ", " + startTime + "-" + endTime);
         if (times.indexOf(startTime) < times.indexOf(endTime) && checkTimeValidity()){
             console.log("Valid time");
-            const newday = [{day: day, startTime: startTime, endTime: endTime}];
+            const newday = {day: day, startTime: startTime, endTime: endTime};
             setAvailability((availability) => {
                 return [...availability, newday]
             });
@@ -71,13 +67,11 @@ const ProfilePage = (user) => {
         }
     }
 
-    const removeTime = (index) => {
-        //event.preventDefault();
-        console.log("delete " + index);
-        if (TotalAvailability.length === 0){
-            TotalAvailability = [];
-        }
-        else TotalAvailability.splice(index, 1);
+    const removeTime = (event, index) => {
+        event.preventDefault();
+        console.log("Availabilty", availability);
+        const temparray = [...availability]
+        setAvailability(temparray.splice(index, 1));
     }
 
     function showAvailability(availabil){
@@ -87,13 +81,13 @@ const ProfilePage = (user) => {
                 availcards.push(
                     <Stack 
                         direction="row"
-                        key={availabil[i][0]}
+                        key={i}
                         component="form"
-                        onSubmit={removeTime(i)}
+                        onSubmit={e => removeTime(e, i)}
                     >
                         <Card >
                             <CardContent>
-                                {availabil[i][0].day}: {availabil[i][0].startTime} - {availabil[i][0].endTime}
+                                {availabil[i].day}: {availabil[i].startTime} - {availabil[i].endTime}
                             </CardContent>
                         </Card>
                         <Button 
