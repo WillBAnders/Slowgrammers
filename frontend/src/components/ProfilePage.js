@@ -58,7 +58,11 @@ const ProfilePage = (user) => {
             console.log("Valid time");
             const newday = {day: day, startTime: startTime, endTime: endTime};
             setAvailability((availability) => {
-                return [...availability, newday]
+                return [...availability, newday].sort((a, b) => {
+                    return a.day === b.day
+                        ? times.indexOf(a.startTime) - times.indexOf(b.startTime)
+                        : days.indexOf(a.day) - days.indexOf(b.day)
+                })
             });
         }
         else{ 
@@ -69,9 +73,9 @@ const ProfilePage = (user) => {
 
     const removeTime = (event, index) => {
         event.preventDefault();
-        console.log("Availabilty", availability);
         const temparray = [...availability]
-        setAvailability(temparray.splice(index, 1));
+        temparray.splice(index, 1)
+        setAvailability(temparray);
     }
 
     function showAvailability(availabil){
