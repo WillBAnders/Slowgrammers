@@ -45,42 +45,44 @@ const ProfilePage = (user) => {
             .every(a => start > times.indexOf(a.endTime) || end < times.indexOf(a.startTime));
     }
 
-    const merge = (start, end) => {
-        const stIndex = times.indexOf(start);
-        const etIndex = times.indexOf(end);
+    const merge = () => {
+        const stIndex = times.indexOf(startTime);
+        const etIndex = times.indexOf(endTime);
         for (let i = 0; i < availability.length; i++){
-            const avsIndex = times.indexOf(availability[i].startTime);
-            const aveIndex = times.indexOf(availability[i].endTime);
-            if(stIndex < avsIndex && etIndex < aveIndex){
-                availability[i].startTime = start;
-                console.log("Changing Start");
-                if (merge(start, availability[i].endTime)){ 
-                    const temparray = [...availability]
-                    temparray.splice(i, 1)
-                    setAvailability(temparray); 
+            if (day !== availability[i].day){
+                const avsIndex = times.indexOf(availability[i].startTime);
+                const aveIndex = times.indexOf(availability[i].endTime);
+                if(stIndex < avsIndex && etIndex < aveIndex){
+                    availability[i].startTime = startTime;
+                    console.log("Changing Start");
+                    if (merge(start, availability[i].endTime)){ 
+                        const temparray = [...availability]
+                        temparray.splice(i, 1)
+                        setAvailability(temparray); 
+                    }
+                    return true;
                 }
-                return true;
-            }
-            else if (stIndex > avsIndex && etIndex > aveIndex){
-                availability[i].endTime = end;
-                console.log("Changing End");
-                if (merge(availability[i].startTime, end)){ 
-                    const temparray = [...availability]
-                    temparray.splice(i, 1)
-                    setAvailability(temparray); 
+                else if (stIndex > avsIndex && etIndex > aveIndex){
+                    availability[i].endTime = endTime;
+                    console.log("Changing End");
+                    if (merge(availability[i].startTime, end)){ 
+                        const temparray = [...availability]
+                        temparray.splice(i, 1)
+                        setAvailability(temparray); 
+                    }
+                    return true;
                 }
-                return true;
-            }
-            else if (stIndex < avsIndex && etIndex > aveIndex){
-                console.log("Changing Both");
-                availability[i].startTime = start;
-                availability[i].endTime = end;
-                if (merge(availability[i].startTime, availability[i].endTime)){ 
-                    const temparray = [...availability]
-                    temparray.splice(i, 1)
-                    setAvailability(temparray); 
+                else if (stIndex < avsIndex && etIndex > aveIndex){
+                    console.log("Changing Both");
+                    availability[i].startTime = startTime;
+                    availability[i].endTime = endTime;
+                    if (merge(availability[i].startTime, availability[i].endTime)){ 
+                        const temparray = [...availability]
+                        temparray.splice(i, 1)
+                        setAvailability(temparray); 
+                    }
+                    return true;
                 }
-                return true;
             }
         }
         return false;
@@ -105,7 +107,7 @@ const ProfilePage = (user) => {
             });
         }
         else{
-            if (!merge(startTime, endTime)){
+            if (!merge()){
                 console.log("Invalid time");
                 alert("Invalid time chosen"); 
             }
