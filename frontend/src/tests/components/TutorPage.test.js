@@ -21,8 +21,8 @@ beforeAll(() => {
 describe("TutorPage", () => {
   test("loading", async () => {
     fetch.mockResponseValue({
-      course: { code: "code", name: "Name" },
-      tutors: [],
+      tutor: createTutor({ username: "Username" }),
+      courses: [],
     });
     await waitFor(async () => {
       const component = render(<TutorPage />, { wrapper: MemoryRouter });

@@ -21,6 +21,8 @@ beforeAll(() => {
       json: jest.fn().mockResolvedValue(value),
     });
   };
+  delete window.location; //TODO: https://remarkablemark.org/blog/2018/11/17/mock-window-location/
+  window.location = { reload: jest.fn() };
 });
 
 describe("CoursePage", () => {
@@ -98,6 +100,7 @@ describe("CoursePage", () => {
           body: JSON.stringify({ tutoring: [{ code: "code", action: add }] }),
         })
       );
+      expect(window.location.reload).toHaveBeenCalled();
     });
   });
 });
