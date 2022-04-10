@@ -49,7 +49,7 @@ const ProfilePage = (user) => {
         const stIndex = times.indexOf(startTime);
         const etIndex = times.indexOf(endTime);
         for (let i = 0; i < availability.length; i++){
-            if (day !== availability[i].day){
+            if (day === availability[i].day){
                 const avsIndex = times.indexOf(availability[i].startTime);
                 const aveIndex = times.indexOf(availability[i].endTime);
                 if(stIndex < avsIndex && etIndex < aveIndex){
@@ -67,7 +67,7 @@ const ProfilePage = (user) => {
                     console.log("Changing End");
                     if (merge(availability[i].startTime, endTime)){ 
                         const temparray = [...availability]
-                        temparray.splice(i, 1)
+                        temparray.splice(i+1, 1)
                         setAvailability(temparray); 
                     }
                     return true;
