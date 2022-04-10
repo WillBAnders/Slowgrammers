@@ -412,7 +412,7 @@ func (suite *RouterSuite) TestSignout() {
 }
 
 func (suite *RouterSuite) TestGetProfile() {
-	suite.Run("Success", manualSetupTest(func() {
+	suite.Run("User", manualSetupTest(func() {
 		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
 		DB.Create(&User{Username: "Username", Password: string(hash)})
 
@@ -429,7 +429,24 @@ func (suite *RouterSuite) TestGetProfile() {
 		suite.JSONEq(`{
 			"profile": `+stringify(User{Username: "Username"})+`
 		}`, w.Body.String())
+	}))
 
+	suite.Run("Tutor", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&Tutor{User: User{Username: "Username", Password: string(hash)}})
+
+		w := POST("/signin", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+		suite.Equal(200, w.Code)
+		cookies := w.Result().Cookies()
+
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"profile": `+stringify(Tutor{User: User{Username: "Username"}})+`
+		}`, w.Body.String())
 	}))
 
 	suite.Run("Unauthenticated", manualSetupTest(func() {

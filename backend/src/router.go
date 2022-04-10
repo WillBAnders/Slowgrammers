@@ -335,12 +335,13 @@ func getProfile(c *gin.Context) {
 	}
 
 	var tutors []Tutor
-	DB.Limit(1).Find(&tutors, "id = ?", users[0].ID)
+	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
 	if len(tutors) != 1 {
 		c.JSON(200, gin.H{
 			"profile": users[0],
 		})
 	}
+	tutors[0].User = users[0]
 
 	c.JSON(200, gin.H{
 		"profile": tutors[0],
