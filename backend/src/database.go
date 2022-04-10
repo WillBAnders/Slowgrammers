@@ -1,8 +1,10 @@
 package src
 
 import (
+	"encoding/json"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"strings"
 )
 
 var DB *gorm.DB
@@ -30,12 +32,26 @@ type Course struct {
 }
 
 type Tutor struct {
-	UserID       uint    `gorm:"primaryKey" json:"-"`
-	User         User    `gorm:"foreignKey:UserID" json:"user"`
-	Rating       float32 `gorm:"not null" json:"rating"`
-	Bio          string  `gorm:"not null" json:"bio"`
-	Availability string  `gorm:"not null" json:"availability"`
+	UserID       uint    `gorm:"primaryKey"`
+	User         User    `gorm:"foreignKey:UserID"`
+	Rating       float32 `gorm:"not null"`
+	Bio          string  `gorm:"not null"`
+	Availability string  `gorm:"not null"`
 	//TODO: Courses via many2many join table?
+}
+
+func (tutor Tutor) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		*User
+		Rating       float32  `json:"rating"`
+		Bio          string   `json:"bio"`
+		Availability []string `json:"availability"`
+	}{
+		User:         &tutor.User,
+		Rating:       tutor.Rating,
+		Bio:          tutor.Bio,
+		Availability: strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }),
+	})
 }
 
 /*type Availability struct {
