@@ -46,46 +46,47 @@ export default function ProfilePage(user) {
     }
 
     const merge = () => {
-        const stIndex = times.indexOf(startTime);
-        const etIndex = times.indexOf(endTime);
+        let stIndex = times.indexOf(startTime);
+        let etIndex = times.indexOf(endTime);
+        let st = startTime;
+        let et = endTime;
+        let didMerge = false;
         for (let i = 0; i < availability.length; i++){
             if (day === availability[i].day){
                 const avsIndex = times.indexOf(availability[i].startTime);
                 const aveIndex = times.indexOf(availability[i].endTime);
                 if(stIndex < avsIndex && etIndex < aveIndex){
-                    availability[i].startTime = startTime;
-                    console.log("Changing Start");
-                    if (merge(startTime, availability[i].endTime)){ 
-                        const temparray = [...availability]
-                        temparray.splice(i, 1)
-                        setAvailability(temparray); 
-                    }
-                    return true;
+                    console.log("Changing start");
+                    availability[i].startTime = st;
+                    et = availability[i].endTime;
+                    didMerge = true;
+                    stIndex = times.indexOf(st);
+                    etIndex = times.indexOf(et);
                 }
                 else if (stIndex > avsIndex && etIndex > aveIndex){
-                    availability[i].endTime = endTime;
-                    console.log("Changing End");
-                    if (merge(availability[i].startTime, endTime)){ 
-                        const temparray = [...availability]
-                        temparray.splice(i+1, 1)
-                        setAvailability(temparray); 
-                    }
-                    return true;
+                    console.log("Changing end");
+                    availability[i].endTime = et;
+                    st = availability[i].startTime;
+                    didMerge = true;
+                    stIndex = times.indexOf(st);
+                    etIndex = times.indexOf(et);
                 }
-                else if (stIndex < avsIndex && etIndex > aveIndex){
-                    console.log("Changing Both");
-                    availability[i].startTime = startTime;
-                    availability[i].endTime = endTime;
-                    if (merge(availability[i].startTime, availability[i].endTime)){ 
-                        const temparray = [...availability]
-                        temparray.splice(i, 1)
-                        setAvailability(temparray); 
-                    }
-                    return true;
+                else if (stIndex <= avsIndex && etIndex >= aveIndex && !(stIndex === avsIndex && etIndex === aveIndex)){
+                    console.log("Changing Both or adjusting time available");
+                    console.log ("Before", st + "-" + et + " vs " + availability[i].startTime + "-" + availability[i].endTime);
+                    availability[i].startTime = st;
+                    availability[i].endTime = et;
+                    st = availability[i].startTime;
+                    et = availability[i].endTime;
+                    console.log ("After", st + "-" + et + " vs " + availability[i].startTime + "-" + availability[i].endTime);
+                    didMerge = true;
+                    console.log("Availability after both merge", availability);
+                    stIndex = times.indexOf(st);
+                    etIndex = times.indexOf(et);
                 }
             }
         }
-        return false;
+        return didMerge;
     }
 
     const addTime = (event) => {
@@ -123,6 +124,7 @@ export default function ProfilePage(user) {
 
     function showAvailability(availabil){
         let availcards = [];
+        console.log("Availability", availabil);
         if (availabil.length != 0){
             for (let i = 0; i < availabil.length; i++){
                 availcards.push(
