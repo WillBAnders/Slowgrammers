@@ -50,7 +50,7 @@ export default function ProfilePage(user) {
         let etIndex = times.indexOf(endTime);
         let st = startTime;
         let et = endTime;
-        let didMerge = false;
+        let mergecount = 0;
         for (let i = 0; i < availability.length; i++){
             if (day === availability[i].day){
                 const avsIndex = times.indexOf(availability[i].startTime);
@@ -59,7 +59,12 @@ export default function ProfilePage(user) {
                     console.log("Changing start");
                     availability[i].startTime = st;
                     et = availability[i].endTime;
-                    didMerge = true;
+                    if(mergecount > 0){
+                        const temparray = [...availability]
+                        temparray.splice(i-1, 1)
+                        setAvailability(temparray);
+                    }
+                    mergecount++;
                     stIndex = times.indexOf(st);
                     etIndex = times.indexOf(et);
                 }
@@ -67,26 +72,32 @@ export default function ProfilePage(user) {
                     console.log("Changing end");
                     availability[i].endTime = et;
                     st = availability[i].startTime;
-                    didMerge = true;
+                    if(mergecount > 0){
+                        const temparray = [...availability]
+                        temparray.splice(i, 1)
+                        setAvailability(temparray);
+                    }
+                    mergecount++;
                     stIndex = times.indexOf(st);
                     etIndex = times.indexOf(et);
                 }
                 else if (stIndex <= avsIndex && etIndex >= aveIndex && !(stIndex === avsIndex && etIndex === aveIndex)){
-                    console.log("Changing Both or adjusting time available");
-                    console.log ("Before", st + "-" + et + " vs " + availability[i].startTime + "-" + availability[i].endTime);
                     availability[i].startTime = st;
                     availability[i].endTime = et;
                     st = availability[i].startTime;
                     et = availability[i].endTime;
-                    console.log ("After", st + "-" + et + " vs " + availability[i].startTime + "-" + availability[i].endTime);
-                    didMerge = true;
-                    console.log("Availability after both merge", availability);
+                    if(mergecount > 0){
+                        const temparray = [...availability]
+                        temparray.splice(i, 1)
+                        setAvailability(temparray);
+                    }
+                    mergecount++;
                     stIndex = times.indexOf(st);
                     etIndex = times.indexOf(et);
                 }
             }
         }
-        return didMerge;
+        return mergecount > 0;
     }
 
     const addTime = (event) => {
