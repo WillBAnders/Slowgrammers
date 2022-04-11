@@ -5,7 +5,7 @@ import {ThreeDots} from 'react-loader-spinner';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-export default function CoursePage({ username }) {
+export default function CoursePage({ profile }) {
   const params = useParams();
   const [isLoading, setLoading] = React.useState(true);
   const [data, setData] = React.useState(null);
@@ -98,8 +98,8 @@ export default function CoursePage({ username }) {
                   title: "SearchBarInput",
                 }}
               />
-              {username !== null &&
-                (data.tutors.every((t) => t.user.username !== username) ? (
+              {profile !== null &&
+                (data.tutors.every((t) => t.username !== profile.username) ? (
                   <Button
                     aria-label="AddIcon"
                     variant="contained"
@@ -167,20 +167,20 @@ export default function CoursePage({ username }) {
               data.tutors
                 .filter(
                   (t) =>
-                    (t.user.firstname + " " + t.user.lastname)
+                    (t.firstname + " " + t.lastname)
                       .toUpperCase()
                       .includes(filter) ||
                     t.availability.some((a) => a.toUpperCase().includes(filter))
                 )
                 .map((t) => (
                   <Link
-                    key={t.user.username}
-                    to={`/tutors/${t.user.username}`}
+                    key={t.username}
+                    to={`/tutors/${t.username}`}
                     style={{ textDecoration: "none", color: "blue" }}
                   >
                     <Card>
                       <CardHeader
-                        title={t.user.firstname + " " + t.user.lastname}
+                        title={t.firstname + " " + t.lastname}
                         subheader={
                           <Rating
                             name="read-only"

@@ -21,7 +21,7 @@ beforeAll(() => {
 describe("ProfilePage", () => {
   test("loading", async () => {
     const component = await waitFor(async () => {
-      return render(<ProfilePage user={null} />, { wrapper: MemoryRouter });
+      return render(<ProfilePage profile={null} />, { wrapper: MemoryRouter });
     });
     const loadingContainer =
       component.container.querySelector(".loadingContainer");
@@ -32,7 +32,7 @@ describe("ProfilePage", () => {
     fetch.mockResponseValue({});
     const component = await waitFor(async () => {
       return render(
-        <ProfilePage user={createUser({ username: "Username" })} />,
+        <ProfilePage profile={createUser({ username: "Username" })} />,
         { wrapper: MemoryRouter }
       );
     });
@@ -51,7 +51,7 @@ describe("ProfilePage", () => {
 
       const component = await waitFor(async () => {
         return render(
-          <ProfilePage user={createUser({ username: "Username" })} />,
+          <ProfilePage profile={createUser({ username: "Username" })} />,
           { wrapper: MemoryRouter }
         );
       });
@@ -81,7 +81,7 @@ describe("ProfilePage", () => {
 
       const component = await waitFor(async () => {
         return render(
-          <ProfilePage user={createUser({ username: "Username" })} />,
+          <ProfilePage profile={createUser({ username: "Username" })} />,
           { wrapper: MemoryRouter }
         );
       });
@@ -115,9 +115,7 @@ describe("ProfilePage", () => {
 
       const component = await waitFor(async () => {
         return render(
-          <ProfilePage
-            user={createUser({ username: "Username", firstname: "First" })}
-          />,
+          <ProfilePage profile={createUser({ username: "Username", firstname: "First" })} />,
           { wrapper: MemoryRouter }
         );
       });

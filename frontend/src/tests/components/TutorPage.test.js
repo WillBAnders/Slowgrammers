@@ -62,10 +62,5 @@ function createTutor({
   rating = 0.0,
   availability = [],
 }) {
-  return {
-    user: { username, firstname, lastname, email, phone },
-    bio,
-    rating,
-    availability,
-  };
+  return {username, firstname, lastname, email, phone, bio, rating, availability};
 }
