@@ -52,35 +52,32 @@ const ProfilePage = (user) => {
             if (day === availability[i].day){
                 const avsIndex = times.indexOf(availability[i].startTime);
                 const aveIndex = times.indexOf(availability[i].endTime);
-                if(stIndex < avsIndex && etIndex < aveIndex){
+                if(stIndex <= avsIndex && etIndex <= aveIndex){
                     availability[i].startTime = startTime;
                     console.log("Changing Start");
-                    if (merge(startTime, availability[i].endTime)){ 
-                        const temparray = [...availability]
+                    (merge(startTime, availability[i].endTime))
+                    const temparray = [...availability]
                         temparray.splice(i, 1)
                         setAvailability(temparray); 
-                    }
                     return true;
                 }
-                else if (stIndex > avsIndex && etIndex > aveIndex){
+                else if (stIndex >= avsIndex && etIndex >= aveIndex){
                     availability[i].endTime = endTime;
                     console.log("Changing End");
-                    if (merge(availability[i].startTime, endTime)){ 
-                        const temparray = [...availability]
-                        temparray.splice(i+1, 1)
+                    (merge(availability[i].startTime, endTime));
+                    const temparray = [...availability]
+                        temparray.splice(i, 1)
                         setAvailability(temparray); 
-                    }
                     return true;
                 }
-                else if (stIndex < avsIndex && etIndex > aveIndex){
+                else if (stIndex <= avsIndex && etIndex >= aveIndex){
                     console.log("Changing Both");
                     availability[i].startTime = startTime;
                     availability[i].endTime = endTime;
-                    if (merge(availability[i].startTime, availability[i].endTime)){ 
-                        const temparray = [...availability]
+                    (merge(availability[i].startTime, availability[i].endTime));
+                    const temparray = [...availability]
                         temparray.splice(i, 1)
                         setAvailability(temparray); 
-                    }
                     return true;
                 }
             }
