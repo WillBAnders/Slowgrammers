@@ -10,6 +10,7 @@ import ProfilePage from "./components/ProfilePage";
 import ErrorPage from "./components/ErrorPage";
 import TutorPage from "./components/TutorPage";
 import Footer from "./components/Footer"
+import './styles/Footer.css'
 
 function App() {
   const [name, setName] = useState(null);
@@ -35,7 +36,7 @@ function App() {
   //console.log("Re-render App.js, name = " + name)
 
   return (
-    <div>
+    <div className="flex-wrapper">
       <BrowserRouter>
         <Navbar name={name} setName={setName} />
         <Routes>
