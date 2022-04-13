@@ -1,8 +1,9 @@
 import React from 'react'
 import { Avatar, TextField, Box, Paper, Stack, Button, CardHeader, Card, CardContent, Typography, Rating } from "@mui/material";
-import {blue} from '@mui/material/colors'
+import { blue } from '@mui/material/colors'
 import { useParams } from "react-router-dom";
-import {ThreeDots} from 'react-loader-spinner';
+import { ThreeDots } from 'react-loader-spinner';
+import md5 from 'md5'
 
 export default function TutorPage() {
   const params = useParams();
@@ -30,7 +31,7 @@ export default function TutorPage() {
           color="#00b22d"
           height={100}
           width={100}
-           //3 secs
+        //3 secs
         />
       </div>
     );
@@ -81,15 +82,11 @@ export default function TutorPage() {
             },
           }}
         >
-          <Avatar
-            sx={{
-              mt: { md: "5px" },
-              bgcolor: blue[500],
-              width: { xs: 50, md: 100 },
-              height: { xs: 50, md: 100 },
-            }}
-            alt={data.tutor.firstname + " " + data.tutor.lastname}
-          />
+          <div className="gravatar">
+            <img
+              src={'https://www.gravatar.com/avatar/' + md5((data.tutor.username).toLowerCase()) + '?f=y&d=robohash'}
+            />
+          </div>
           <Typography
             sx={{
               fontSize: {
