@@ -255,6 +255,19 @@ export default function ProfilePage(user) {
                     />
                   </Grid>
                 </Grid>
+                <TextField
+                    required
+                    fullWidth
+                    title="bio"
+                    id="bio"
+                    label="Biography"
+                    defaultValue={user.bio ?? ""}
+                    onChange={(e) => update("bio", e.target.value)}
+                    multiline
+                    rows={5}
+                    maxRows={8}
+                    sx={{ m: 1, pl: 1 }}
+                />
                 <Button type="submit" title="submit" variant="contained">
                   Update
                 </Button>
