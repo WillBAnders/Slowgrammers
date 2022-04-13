@@ -45,6 +45,64 @@ export default function ProfilePage(user) {
             .every(a => start > times.indexOf(a.endTime) || end < times.indexOf(a.startTime));
     }
 
+    const addTime = (event) => {
+        event.preventDefault();
+        if (!day || !startTime || !endTime) {
+            alert("Incomplete time inputed");
+            return;
+        }
+        const stIndex = times.indexOf(startTime);
+        const etIndex = times.indexOf(endTime);
+        if (etIndex <= stIndex || availability.some(a => day === a.day && stIndex < times.indexOf(a.endTime) && etIndex > times.indexOf(a.startTime))) {
+            alert("Invalid time inputed");
+            return;
+        }
+        const index = availability.findIndex(a =>
+            day === a.day &&
+            (stIndex === times.indexOf(a.endTime) || etIndex === times.indexOf(a.startTime))
+        );
+        const temp = [...availability];
+        if (index !== -1) {
+            if (index + 1 < temp.length && temp[index + 1].day === day && times.indexOf(temp[index + 1].startTime) === etIndex) {
+                temp.splice(index, 2, {
+                    day,
+                    startTime: times[Math.min(stIndex, times.indexOf(temp[index].startTime))],
+                    endTime: times[Math.max(etIndex, times.indexOf(temp[index + 1].endTime))],
+                });
+            } else {
+                temp[index] = {
+                    day,
+                    startTime: times[Math.min(stIndex, times.indexOf(availability[index].startTime))],
+                    endTime: times[Math.max(etIndex, times.indexOf(availability[index].endTime))]
+                };
+            }
+        } else {
+            temp.push({day, startTime, endTime});
+            temp.sort((a, b) => {
+                return a.day === b.day
+                    ? times.indexOf(a.startTime) - times.indexOf(b.startTime)
+                    : days.indexOf(a.day) - days.indexOf(b.day)
+            });
+        }
+        setAvailability(temp);
+        // [12am-3am, 7am-9am]
+        // Case 1: [6am-8am] (good)
+        // Case 2: [3am-7am] (not done)
+        // Case 3: [7am-10am] (good)
+
+        //const astIndex = times.indexOf(availability[index].startTime);
+        //const aetIndex = times.indexOf(availability[index].endTime);
+        /*
+        if (sstIndex >= astIndex) {
+            availability[index].endTime = endTime;
+        } else if (etIndex <= aetIndex) {
+            availability[index].startTime = startTime;
+        } else {
+            availability.splice()
+        }
+        */
+    }
+
     const merge = () => {
         let stIndex = times.indexOf(startTime);
         let etIndex = times.indexOf(endTime);
@@ -100,7 +158,7 @@ export default function ProfilePage(user) {
         return mergecount > 0;
     }
 
-    const addTime = (event) => {
+    const addTimeOld = (event) => {
         event.preventDefault();
         console.log(day + ", " + startTime + "-" + endTime);
         if (!day || ! startTime || !endTime){
@@ -117,11 +175,19 @@ export default function ProfilePage(user) {
                         : days.indexOf(a.day) - days.indexOf(b.day)
                 })
             });
+            setDay("");
+            setStartTime("");
+            setEndTime("");
         }
         else{
             if (!merge()){
                 console.log("Invalid time");
                 alert("Invalid time chosen"); 
+            }
+            else{
+                setDay("");
+                setStartTime("");
+                setEndTime("");
             }
         }
     }
