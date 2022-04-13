@@ -98,7 +98,7 @@ export default function CoursePage({ profile }) {
                   title: "SearchBarInput",
                 }}
               />
-              {profile !== null &&
+              {profile?.hasOwnProperty("bio") &&
                 (data.tutors.every((t) => t.username !== profile.username) ? (
                   <Button
                     aria-label="AddIcon"
