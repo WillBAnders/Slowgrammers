@@ -27,7 +27,7 @@ function App() {
   return (
     <div>
       <BrowserRouter>
-        <Navbar profile={profile} setProfile={profile} />
+        <Navbar profile={profile} setProfile={setProfile} />
         <Routes>
           <Route path="/" exact element={<LandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />
