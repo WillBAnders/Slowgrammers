@@ -5,7 +5,6 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"strings"
-	"fmt"
 )
 
 var DB *gorm.DB
@@ -49,32 +48,23 @@ type TimeSlot struct {
 
 func (tutor Tutor) MarshalJSON() ([]byte, error) {
 	foundAvailability := []TimeSlot{}
-	fmt.Println("We are all mad here")
-	fmt.Println(tutor.Availability)
 	days := strings.Split(tutor.Availability, ",")
-	fmt.Println(days)
 	for i := 0; i < len(days); i ++ {
-		
-		fmt.Println("|" + days[i] + "|")
 		parts := strings.Split(strings.TrimSpace(days[i]), " ")
-		fmt.Println(parts[0])
-		fmt.Println(parts[1] + parts[2])
-		fmt.Println(parts[3] + parts[4])
 		curr := TimeSlot{parts[0], parts[1] + " " + parts[2], parts[3] + " " + parts[4]}
 		foundAvailability = append(foundAvailability, curr)
 	}
-	fmt.Println("the dark arts better be worried oh boy!")
-	fmt.Println(foundAvailability)
 	return json.Marshal(&struct {
 		*User
 		Rating       float32  `json:"rating"`
 		Bio          string   `json:"bio"`
-		Availability []string `json:"availability"`
+		Availability []TimeSlot `json:"availability"`
 	}{
 		User:         &tutor.User,
 		Rating:       tutor.Rating,
 		Bio:          tutor.Bio,
-		Availability: strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }),
+		Availability: foundAvailability,
+		//Availability: strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }),
 	})
 }
 

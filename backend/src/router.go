@@ -6,6 +6,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	
+	"fmt"
 )
 
 var Router *gin.Engine
@@ -24,6 +26,7 @@ func InitRouter() {
 	Router.POST("/signout", postSignout)
 	Router.GET("/profile", getProfile)
 	Router.PATCH("/profile", patchProfile)
+	Router.PATCH("/availability", patchAvailability)
 }
 
 // Handler for /courses. Returns all courses ordered by code.
@@ -271,7 +274,7 @@ func postSignin(c *gin.Context) {
 		})
 		return
 	}
-	c.SetCookie("jwt", token, int(24*time.Hour.Seconds()), "", "", true, true)
+	c.SetCookie("jwt", token, int(24*time.Hour.Seconds()), "", "", false, true)  //FIX THIS
 
 	c.JSON(200, gin.H{})
 }
@@ -466,5 +469,107 @@ func patchProfile(c *gin.Context) {
 	DB.Save(&users)
 	//DB.Model(&users[0]).Updates(edits)
 
+	c.JSON(200, gin.H{})
+}
+
+
+/*
+type AvailabilityUpdateData struct {
+	ID           uint        `json:"-"`
+	FirstName    string      `json:"firstname"`
+	LastName     string      `json:"lastname"`
+	Email        string      `json:"email"`
+	Phone        string      `json:"phone"`
+	Bio          string      `json:"bio"`
+	Availability string      `json:"availability"`
+	Tutoring     []ClassItem `json:"tutoring"`
+} 
+*/
+type AvailabilityUpdateData struct {
+	Availability []TimeSlot `json:"availability"`
+} 
+
+func patchAvailability(c *gin.Context) {
+
+	token, err := c.Cookie("jwt")
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Requires an authenticated user.",
+		})
+		return
+	}
+
+	claims, err := ParseJWT(token)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to parse JWT: " + err.Error() + ".",
+		})
+		return
+	}
+
+	var edits AvailabilityUpdateData
+	if err := c.ShouldBindJSON(&edits); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	fmt.Println(edits)
+	fmt.Println(claims.Username)
+	
+	//for each item
+	//if action is true, add them
+	//if ation is false, remove them
+	//merge points together if needed
+	//assumes time stamps are valid
+	/*
+	var tutors []Tutor
+	DB.Joins("User").Find(&tutors, "User__username = ?", claims.Username)
+
+	if len(tutors) > 0 {
+		if edits.Bio != "" {
+			tutors[0].Bio = edits.Bio
+		}
+		if edits.Availability != "" {
+			tutors[0].Availability = edits.Availability
+		}
+		DB.Save(&tutors)
+	}
+
+	if len(tutors) > 0 && len(edits.Tutoring) > 0 {
+		for i := 0; i < len(edits.Tutoring); i++ {
+			var courses []Course
+			DB.Find(&courses, "code = ?", edits.Tutoring[i].Code)
+			if edits.Tutoring[i].Action {
+				//add class
+				newClass := Tutoring{Tutor: tutors[0], Course: courses[0]}
+				DB.Create(&newClass)
+			} else {
+				//remove class
+				DB.Where("tutor_id = ? AND course_id = ?", tutors[0].UserID, courses[0].ID).Delete(&Tutoring{})
+			}
+		}
+	}
+
+	//It's angry at me, so I'm doing it this less pretty way, even though the nice way used to work. Tutor class stuff put it to flames
+	//So long, old way. Rest in reeses pieces. You will be missed.
+	var users []User
+	DB.Find(&users, "username = ?", claims.Username)
+	if edits.FirstName != "" {
+		users[0].FirstName = edits.FirstName
+	}
+	if edits.LastName != "" {
+		users[0].LastName = edits.LastName
+	}
+	if edits.Email != "" {
+		users[0].Email = edits.Email
+	}
+	if edits.Phone != "" {
+		users[0].Phone = edits.Phone
+	}
+	DB.Save(&users)
+	//DB.Model(&users[0]).Updates(edits)
+	*/
 	c.JSON(200, gin.H{})
 }
