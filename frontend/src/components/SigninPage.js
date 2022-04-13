@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 const theme = createTheme();
 
-export default function SigninPage({ setName }) {
+export default function SigninPage() {
   const navigate = useNavigate();
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -30,7 +30,6 @@ export default function SigninPage({ setName }) {
     })
       .then(res => {
         if (res.status === 200) {
-          setName(username);
           navigate("/");
         } else if (res.status === 401) {
           setInvalid(true);

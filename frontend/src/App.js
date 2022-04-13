@@ -11,23 +11,14 @@ import ErrorPage from "./components/ErrorPage";
 import TutorPage from "./components/TutorPage";
 
 function App() {
-  const [name, setName] = useState(null);
-  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     fetch("/profile", {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     }).then(r => r.json()).then(r => {
-      //console.log("setName ", r.user?.username)
-      setName(r.user?.username)
-      setUser({
-        username: r.user.username,
-        firstname: r.user.firstname,
-        lastname: r.user.lastname,
-        email: r.user.email,
-        phone: r.user.phone
-      })
+      setProfile(r.profile)
     })
   }, []);
 
@@ -36,14 +27,14 @@ function App() {
   return (
     <div>
       <BrowserRouter>
-        <Navbar name={name} setName={setName} />
+        <Navbar profile={profile} setProfile={profile} />
         <Routes>
           <Route path="/" exact element={<LandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:code" element={<CoursePage username={name} />} />
-          <Route path="/signup" element={<SignupPage setName={setName} />} />
-          <Route path="/signin" element={<SigninPage setName={setName} />} />
-          <Route path="/profile" element={<ProfilePage user={user} />} />
+          <Route path="/courses/:code" element={<CoursePage profile={profile} />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/signin" element={<SigninPage />} />
+          <Route path="/profile" element={<ProfilePage profile={profile} />} />
           <Route path="/tutors/:username" element={<TutorPage />} />
           <Route path= "*" element={<ErrorPage />} />
         </Routes>

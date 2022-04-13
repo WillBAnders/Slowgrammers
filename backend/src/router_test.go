@@ -8,7 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
@@ -119,7 +118,7 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				{"user": `+stringify(User{Username: "Username"})+`, "rating": 0.0, "bio": "", "availability": []}
+				`+stringify(Tutor{User: User{Username: "Username"}})+`
 			]
 		}`,
 	))
@@ -133,9 +132,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				{"user": `+stringify(User{Username: "Alice"})+`, "rating": 0.0, "bio": "", "availability": []},
-				{"user": `+stringify(User{Username: "Bob"})+`, "rating": 0.0, "bio": "", "availability": []},
-				{"user": `+stringify(User{Username: "Clair"})+`, "rating": 0.0, "bio": "", "availability": []}
+				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
+				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
+				`+stringify(Tutor{User: User{Username: "Clair"}})+`
 			]
 		}`,
 	))
@@ -149,9 +148,9 @@ func (suite *RouterSuite) TestGetCoursesCode() {
 		`{
 			"course": {"code": "code", "name": "Name"},
 			"tutors": [
-				{"user": `+stringify(User{Username: "Alice"})+`, "rating": 0.0, "bio": "", "availability": []},
-				{"user": `+stringify(User{Username: "Bob"})+`, "rating": 0.0, "bio": "", "availability": []},
-				{"user": `+stringify(User{Username: "Clair"})+`, "rating": 0.0, "bio": "", "availability": []}
+				`+stringify(Tutor{User: User{Username: "Alice"}})+`,
+				`+stringify(Tutor{User: User{Username: "Bob"}})+`,
+				`+stringify(Tutor{User: User{Username: "Clair"}})+`
 			]
 		}`,
 	))
@@ -238,12 +237,7 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 	suite.Run("Empty Courses", test(
 		[]Tutoring{},
 		`{
-			"tutor": {
-				"user": `+stringify(tutor.User)+`,
-				"rating": `+stringify(tutor.Rating)+`,
-				"bio": `+stringify(tutor.Bio)+`,
-				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
-            },
+			"tutor": `+stringify(tutor)+`,
 			"courses": []
 		}`,
 	))
@@ -253,12 +247,7 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "code", Name: "Name"}, Tutor: tutor},
 		},
 		`{
-			"tutor": {
-				"user": `+stringify(tutor.User)+`,
-				"rating": `+stringify(tutor.Rating)+`,
-				"bio": `+stringify(tutor.Bio)+`,
-				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
-            },
+			"tutor": `+stringify(tutor)+`,
 			"courses": [
 				{"code": "code", "name": "Name"}
 			]
@@ -272,12 +261,7 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "3", Name: "Third"}, Tutor: tutor},
 		},
 		`{
-			"tutor": {
-				"user": `+stringify(tutor.User)+`,
-				"rating": `+stringify(tutor.Rating)+`,
-				"bio": `+stringify(tutor.Bio)+`,
-				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
-            },
+			"tutor": `+stringify(tutor)+`,
 			"courses": [
 				{"code": "1", "name": "First"},
 				{"code": "2", "name": "Second"},
@@ -293,12 +277,7 @@ func (suite *RouterSuite) TestGetTutorsUsername() {
 			{Course: Course{Code: "1", Name: "First"}, Tutor: tutor},
 		},
 		`{
-			"tutor": {
-				"user": `+stringify(tutor.User)+`,
-				"rating": `+stringify(tutor.Rating)+`,
-				"bio": `+stringify(tutor.Bio)+`,
-				"availability": `+stringify(strings.FieldsFunc(tutor.Availability, func(r rune) bool { return r == ',' }))+`
-            },
+			"tutor": `+stringify(tutor)+`,
 			"courses": [
 				{"code": "1", "name": "First"},
 				{"code": "2", "name": "Second"},
@@ -433,7 +412,7 @@ func (suite *RouterSuite) TestSignout() {
 }
 
 func (suite *RouterSuite) TestGetProfile() {
-	suite.Run("Success", manualSetupTest(func() {
+	suite.Run("User", manualSetupTest(func() {
 		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
 		DB.Create(&User{Username: "Username", Password: string(hash)})
 
@@ -448,9 +427,26 @@ func (suite *RouterSuite) TestGetProfile() {
 		w = GET("/profile", cookies...)
 		suite.Equal(200, w.Code)
 		suite.JSONEq(`{
-			"user": `+stringify(User{Username: "Username"})+`
+			"profile": `+stringify(User{Username: "Username"})+`
 		}`, w.Body.String())
-		
+	}))
+
+	suite.Run("Tutor", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&Tutor{User: User{Username: "Username", Password: string(hash)}})
+
+		w := POST("/signin", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+		suite.Equal(200, w.Code)
+		cookies := w.Result().Cookies()
+
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"profile": `+stringify(Tutor{User: User{Username: "Username"}})+`
+		}`, w.Body.String())
 	}))
 
 	suite.Run("Unauthenticated", manualSetupTest(func() {
@@ -475,42 +471,42 @@ func (suite *RouterSuite) TestPatchProfile() {
 		w = GET("/profile", cookies...)
 		suite.Equal(200, w.Code)
 		suite.JSONEq(`{
-			"user": `+stringify(User{Username: "Username"})+`
+			"profile": `+stringify(User{Username: "Username"})+`
 		}`, w.Body.String())
-		
-		w = PATCH("/profile", gin.H{"firstname": "Elk","lastname": "Cloner",}, cookies...)
+
+		w = PATCH("/profile", gin.H{"firstname": "Elk", "lastname": "Cloner"}, cookies...)
 		suite.Equal(200, w.Code)
-		
+
 		w = GET("/profile", cookies...)
 		suite.Equal(200, w.Code)
 		suite.JSONEq(`{
-			"user": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner"})+`
+			"profile": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner"})+`
 		}`, w.Body.String())
-		
+
 		w = PATCH("/profile", gin.H{"email": "coolbeans@aol.com"}, cookies...)
 		suite.Equal(200, w.Code)
-		
+
 		w = GET("/profile", cookies...)
 		suite.Equal(200, w.Code)
 		suite.JSONEq(`{
-			"user": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner", Email: "coolbeans@aol.com"})+`
+			"profile": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner", Email: "coolbeans@aol.com"})+`
 		}`, w.Body.String())
-		
+
 		w = PATCH("/profile", gin.H{"phone": "1234567890"}, cookies...)
 		suite.Equal(200, w.Code)
-		
+
 		w = GET("/profile", cookies...)
 		suite.Equal(200, w.Code)
 		suite.JSONEq(`{
-			"user": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner", Email: "coolbeans@aol.com", Phone: "1234567890"})+`
+			"profile": `+stringify(User{Username: "Username", FirstName: "Elk", LastName: "Cloner", Email: "coolbeans@aol.com", Phone: "1234567890"})+`
 		}`, w.Body.String())
 	}))
 
 	suite.Run("Unauthenticated", manualSetupTest(func() {
 		//w := GET("/profile")
 		//suite.Equal(401, w.Code)
-		
-		w := PATCH("/profile", gin.H{"firstname": "Elk","lastname": "Cloner",})
+
+		w := PATCH("/profile", gin.H{"firstname": "Elk", "lastname": "Cloner"})
 		suite.Equal(401, w.Code)
 	}))
 }

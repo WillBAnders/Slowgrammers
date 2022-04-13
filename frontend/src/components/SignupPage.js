@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 const theme = createTheme();
 
-export default function SignupPage({ setName }) {
+export default function SignupPage() {
   const navigate = useNavigate();
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -45,7 +45,6 @@ export default function SignupPage({ setName }) {
       })
         .then(res => {
           if (res.status === 200) {
-            setName(username);
             navigate("/");
           } else if (res.status === 401) {
             setUsernameTaken(true);

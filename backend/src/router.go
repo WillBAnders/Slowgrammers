@@ -1,7 +1,6 @@
 package src
 
 import (
-	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -55,13 +54,11 @@ func getCourses(c *gin.Context) {
 //     name: String
 //   }
 //   tutors: []Tutor {
-//     user: User {
-//       username: String
-//       firstname: String
-//       lastname: String
-//       email: String
-//       phone: String
-//     }
+//     username: String
+//     firstname: String
+//     lastname: String
+//     email: String
+//     phone: String
 //     rating: Float
 //     bio: String
 //     availability: []String
@@ -85,15 +82,10 @@ func getCoursesCode(c *gin.Context) {
 	//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 	var tutorings []Tutoring
 	DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
-	tutors := make([]gin.H, len(tutorings))
+	tutors := make([]Tutor, len(tutorings))
 	for i, tutoring := range tutorings {
 		//TODO: Limit the amount of data being returned
-		tutors[i] = gin.H{
-			"user":         tutoring.Tutor.User,
-			"rating":       tutoring.Tutor.Rating,
-			"bio":          tutoring.Tutor.Bio,
-			"availability": strings.FieldsFunc(tutoring.Tutor.Availability, func(r rune) bool { return r == ',' }), //TODO
-		}
+		tutors[i] = tutoring.Tutor
 	}
 
 	c.JSON(200, gin.H{
@@ -125,13 +117,11 @@ func getTutors(c *gin.Context) {
 //
 // Response Schema: {
 //   tutor: Tutor {
-//     user: User {
-//       username: String
-//       firstname: String
-//       lastname: String
-//       email: String
-//       phone: String
-//     }
+//     username: String
+//     firstname: String
+//     lastname: String
+//     email: String
+//     phone: String
 //     rating: Float
 //     bio: String
 //     availability: []String
@@ -166,12 +156,7 @@ func getTutorsUsername(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"tutor": gin.H{
-			"user":         tutors[0].User,
-			"rating":       tutors[0].Rating,
-			"bio":          tutors[0].Bio,
-			"availability": strings.FieldsFunc(tutors[0].Availability, func(r rune) bool { return r == ',' }), //TODO
-		},
+		"tutor":   tutors[0],
 		"courses": courses,
 	})
 }
@@ -309,12 +294,15 @@ func postSignout(c *gin.Context) {
 //  - The user does not exist in the database (500)
 //
 // Response Schema: {
-//   user: User {
+//   profile: User | Tutor {
 //     username: String
 //     firstname: String
 //     lastname: String
 //     email: String
 //     phone: String
+//     rating?: Float
+//     bio?: String
+//     availability?: []String
 //   }
 // }
 // Error Schema: {
@@ -346,32 +334,39 @@ func getProfile(c *gin.Context) {
 		return
 	}
 
+	var tutors []Tutor
+	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
+	if len(tutors) != 1 {
+		c.JSON(200, gin.H{
+			"profile": users[0],
+		})
+	}
+	tutors[0].User = users[0]
+
 	c.JSON(200, gin.H{
-		"user": users[0],
+		"profile": tutors[0],
 	})
 }
-
 
 // JSON Schema for updating the profile
 // None or all of these attributes (accept for ID) can be used when send to PATCH /profile
 // for updating of the profile
 // Submit as { "attr": "val", "attr": "val" }
 type ClassItem struct {
-	Code string `json:"code"`
-	Action bool `json:"action"`
+	Code   string `json:"code"`
+	Action bool   `json:"action"`
 }
 
-type ProfileUpdateData struct { 
-	ID           uint    `json:"-"`
-	FirstName    string  `json:"firstname"`
-	LastName     string  `json:"lastname"`
-	Email        string  `json:"email"`
-	Phone        string  `json:"phone"`
-	Bio          string  `json:"bio"`
-	Availability string  `json:"availability"`
-	Tutoring     []ClassItem  `json:"tutoring"`
+type ProfileUpdateData struct {
+	ID           uint        `json:"-"`
+	FirstName    string      `json:"firstname"`
+	LastName     string      `json:"lastname"`
+	Email        string      `json:"email"`
+	Phone        string      `json:"phone"`
+	Bio          string      `json:"bio"`
+	Availability string      `json:"availability"`
+	Tutoring     []ClassItem `json:"tutoring"`
 }
-
 
 // Handler for PATCH /profile. Returns a success string if update operation is complete.
 // Errors if:
@@ -398,9 +393,8 @@ Check for sending extra json data that is not used (ie tutor stuff for nontutor)
 Currently assumes class actions are correct and frontend is telling the truth
 */
 
-
 func patchProfile(c *gin.Context) {
-	
+
 	token, err := c.Cookie("jwt")
 	if err != nil {
 		c.JSON(401, gin.H{
@@ -408,7 +402,7 @@ func patchProfile(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	claims, err := ParseJWT(token)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -416,7 +410,7 @@ func patchProfile(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	var edits ProfileUpdateData
 	if err := c.ShouldBindJSON(&edits); err != nil {
 		c.JSON(400, gin.H{
@@ -424,22 +418,22 @@ func patchProfile(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	var tutors []Tutor
 	DB.Joins("User").Find(&tutors, "User__username = ?", claims.Username)
-	
-	if len(tutors) > 0 { 
+
+	if len(tutors) > 0 {
 		if edits.Bio != "" {
-			tutors[0].Bio =  edits.Bio
+			tutors[0].Bio = edits.Bio
 		}
 		if edits.Availability != "" {
-			tutors[0].Availability =  edits.Availability
-		} 
+			tutors[0].Availability = edits.Availability
+		}
 		DB.Save(&tutors)
 	}
-	
+
 	if len(tutors) > 0 && len(edits.Tutoring) > 0 {
-		for i := 0; i < len(edits.Tutoring); i ++ {
+		for i := 0; i < len(edits.Tutoring); i++ {
 			var courses []Course
 			DB.Find(&courses, "code = ?", edits.Tutoring[i].Code)
 			if edits.Tutoring[i].Action {
@@ -452,25 +446,25 @@ func patchProfile(c *gin.Context) {
 			}
 		}
 	}
-	
+
 	//It's angry at me, so I'm doing it this less pretty way, even though the nice way used to work. Tutor class stuff put it to flames
 	//So long, old way. Rest in reeses pieces. You will be missed.
 	var users []User
 	DB.Find(&users, "username = ?", claims.Username)
 	if edits.FirstName != "" {
-		users[0].FirstName =  edits.FirstName
+		users[0].FirstName = edits.FirstName
 	}
 	if edits.LastName != "" {
-		users[0].LastName =  edits.LastName
+		users[0].LastName = edits.LastName
 	}
 	if edits.Email != "" {
-		users[0].Email =  edits.Email
+		users[0].Email = edits.Email
 	}
 	if edits.Phone != "" {
-		users[0].Phone =  edits.Phone
+		users[0].Phone = edits.Phone
 	}
 	DB.Save(&users)
 	//DB.Model(&users[0]).Updates(edits)
-	
+
 	c.JSON(200, gin.H{})
 }

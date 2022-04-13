@@ -23,7 +23,7 @@ describe("SignupPage", () => {
     fetch.mockResponseValue({});
 
     const component = await waitFor(async () => {
-      return render(<SignupPage setName={jest.fn()} />, { wrapper: MemoryRouter });
+      return render(<SignupPage />, { wrapper: MemoryRouter });
     });
 
     await waitFor(async () => {
@@ -43,27 +43,25 @@ describe("SignupPage", () => {
 
   test("fetch resolved", async () => {
     fetch.mockResponseValue({});
-    const mockSetName = jest.fn();
 
     const component = await waitFor(async () => {
-      return render(<SignupPage setName={mockSetName} />, { wrapper: MemoryRouter });
+      return render(<SignupPage />, { wrapper: MemoryRouter });
     });
 
     await waitFor(async () => {
       fireEvent.submit(component.getByTitle("submit"));
     });
 
-    expect(mockSetName).not.toHaveBeenCalled();
+    //TODO: Assert result
     //expect(window.location.pathname).toBe("/");
   });
 
   test("fetch rejected", async () => {
     console.error = jest.fn(); //TODO: State management
     fetch.mockRejectedValue(new Error("expected"));
-    const mockSetName = jest.fn();
 
     const component = await waitFor(async () => {
-      return render(<SignupPage setName={mockSetName} />, { wrapper: MemoryRouter });
+      return render(<SignupPage />, { wrapper: MemoryRouter });
     });
 
     await waitFor(async () => {
@@ -71,7 +69,6 @@ describe("SignupPage", () => {
     });
 
     // expect(console.error).toHaveBeenCalledWith("expected");
-    expect(mockSetName).not.toHaveBeenCalled();
     //expect(window.location.pathname).toBe("/signin");
   });
 });

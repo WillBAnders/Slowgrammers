@@ -88,7 +88,7 @@ export default function TutorPage() {
               width: { xs: 50, md: 100 },
               height: { xs: 50, md: 100 },
             }}
-            alt={data.tutor.user.firstname + " " + data.tutor.user.lastname}
+            alt={data.tutor.firstname + " " + data.tutor.lastname}
           />
           <Typography
             sx={{
@@ -98,7 +98,7 @@ export default function TutorPage() {
               },
             }}
           >
-            {data.tutor.user.firstname + " " + data.tutor.user.lastname}
+            {data.tutor.firstname + " " + data.tutor.lastname}
           </Typography>
         </Stack>
         <Stack
@@ -119,7 +119,7 @@ export default function TutorPage() {
             }}
             color="gray"
           >
-            @{data.tutor.user.username}
+            @{data.tutor.username}
           </Typography>
           {<Rating title="Rating" value={data.tutor.rating} readOnly />}
         </Stack>
@@ -136,7 +136,7 @@ export default function TutorPage() {
             },
           }}
         >
-          {data.tutor.user.email}
+          {data.tutor.email}
         </Typography>
         <Typography
           title="Phone_Number"
@@ -151,7 +151,7 @@ export default function TutorPage() {
             },
           }}
         >
-          {data.tutor.user.phone}
+          {data.tutor.phone}
         </Typography>
         <Box
           title="Bio"

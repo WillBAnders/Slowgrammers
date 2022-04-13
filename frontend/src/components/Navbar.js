@@ -17,7 +17,7 @@ import { Link as ScrollLink } from 'react-scroll'
 const pages = ['About Us', 'Service', 'Contact Us'];
 //const settings = ['Profile', 'Finance', 'Logout'];
 
-const Navbar = ({ name, setName }) => {
+const Navbar = ({ profile, setProfile }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -43,12 +43,12 @@ const Navbar = ({ name, setName }) => {
       credentials: 'include',
     });
 
-    setName(null);
+    setProfile(null);
     handleCloseUserMenu()
   }
 
   let buttons;
-  if (name) {
+  if (profile !== null) {
 
     buttons = (
       <Box sx={{ flexGrow: 0 }}>

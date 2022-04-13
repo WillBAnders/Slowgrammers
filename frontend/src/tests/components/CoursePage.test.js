@@ -32,7 +32,7 @@ describe("CoursePage", () => {
       tutors: [],
     });
     await waitFor(async () => {
-      const component = render(<CoursePage />, { wrapper: MemoryRouter });
+      const component = render(<CoursePage profile={null} />, { wrapper: MemoryRouter });
       const loadingContainer =
         component.container.querySelector(".loadingContainer");
       expect(loadingContainer).not.toBe(null);
@@ -51,7 +51,7 @@ describe("CoursePage", () => {
         tutors: tutors.map((t) => createTutor(t)),
       });
       const component = await waitFor(async () => {
-        return render(<CoursePage />, { wrapper: MemoryRouter });
+        return render(<CoursePage profile={null} />, { wrapper: MemoryRouter });
       });
       const tutorlist = component.queryByTitle("tutorlist");
       if (tutors.length === 0) {
@@ -81,7 +81,7 @@ describe("CoursePage", () => {
             <Routes>
               <Route
                 path={"/courses/:code"}
-                element={<CoursePage username="Username" />}
+                element={<CoursePage profile={createTutor({username: "Username"})} />}
               />
             </Routes>
           </MemoryRouter>
@@ -115,10 +115,5 @@ function createTutor({
   rating = 0.0,
   availability = [],
 }) {
-  return {
-    user: { username, firstname, lastname, email, phone },
-    bio,
-    rating,
-    availability,
-  };
+  return {username, firstname, lastname, email, phone, bio, rating, availability};
 }

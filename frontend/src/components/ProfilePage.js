@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { ThreeDots } from "react-loader-spinner";
 
-export default function ProfilePage({ user }) {
+export default function ProfilePage({ profile }) {
   const [updated, setUpdated] = React.useState({});
 
   function onSubmit(event) {
@@ -28,7 +28,7 @@ export default function ProfilePage({ user }) {
     setUpdated((fields) => ({ ...fields, [field]: value }));
   }
 
-  if (user === null) {
+  if (profile === null) {
     return (
       <div className="loadingContainer">
         <ThreeDots type="ThreeDots" color="#00b22d" height={100} width={100} />
@@ -67,7 +67,7 @@ export default function ProfilePage({ user }) {
                   title="firstname"
                   id="firstname"
                   label="First Name"
-                  defaultValue={user.firstname ?? ""}
+                  defaultValue={profile.firstname ?? ""}
                   onChange={(e) => update("firstname", e.target.value)}
                   sx={{ m: 1 }}
                 />
@@ -77,7 +77,7 @@ export default function ProfilePage({ user }) {
                   title="email"
                   id="email"
                   label="Email Address"
-                  defaultValue={user.email ?? ""}
+                  defaultValue={profile.email ?? ""}
                   onChange={(e) => update("email", e.target.value)}
                   sx={{ m: 1 }}
                 />
@@ -89,7 +89,7 @@ export default function ProfilePage({ user }) {
                   title="lastname"
                   id="lastname"
                   label="Last Name"
-                  defaultValue={user.lastname ?? ""}
+                  defaultValue={profile.lastname ?? ""}
                   onChange={(e) => update("lastname", e.target.value)}
                   sx={{ m: 1, pl: 1 }}
                 />
@@ -100,7 +100,7 @@ export default function ProfilePage({ user }) {
                   title="phone"
                   id="phone"
                   label="Phone Number"
-                  defaultValue={user.phone ?? ""}
+                  defaultValue={profile.phone ?? ""}
                   onChange={(e) => update("phone", e.target.value)}
                   sx={{ m: 1, pl: 1 }}
                 />
