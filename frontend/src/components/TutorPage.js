@@ -84,7 +84,7 @@ export default function TutorPage() {
         >
           <div className="gravatar">
             <img
-              src={'https://www.gravatar.com/avatar/' + md5((data.tutor.username).toLowerCase()) + '?f=y&d=robohash'}
+              src={'https://www.gravatar.com/avatar/' + md5(data.tutor.username)) + '?f=y&d=identicon'}
             />
           </div>
           <Typography
