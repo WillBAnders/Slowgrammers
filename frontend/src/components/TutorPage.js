@@ -83,8 +83,10 @@ export default function TutorPage() {
           }}
         >
           <div className="gravatar">
-            <img
-              src={'https://www.gravatar.com/avatar/' + md5(data.tutor.username)) + '?f=y&d=identicon'}
+            <Avatar
+              src={'https://www.gravatar.com/avatar/' + md5(data.tutor.username) + '?f=y&d=identicon'}
+              alt={data.tutor.username + ' avatar'}
+              sx={{ height: '80px', width: '80px' }}
             />
           </div>
           <Typography
