@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	
+	"strings"
+	"strconv"
 	"fmt"
 )
 
@@ -473,22 +475,69 @@ func patchProfile(c *gin.Context) {
 }
 
 
-/*
-type AvailabilityUpdateData struct {
-	ID           uint        `json:"-"`
-	FirstName    string      `json:"firstname"`
-	LastName     string      `json:"lastname"`
-	Email        string      `json:"email"`
-	Phone        string      `json:"phone"`
-	Bio          string      `json:"bio"`
-	Availability string      `json:"availability"`
-	Tutoring     []ClassItem `json:"tutoring"`
-} 
-*/
-type AvailabilityUpdateData struct {
-	Availability []TimeSlot `json:"availability"`
-} 
+type EntryTimeSlot struct {
+	Day        string  `json:"day"`
+	StartTime  string  `json:"starttime"`
+	EndTime    string  `json:"endtime"`
+	Action	   bool    `json:"action"`
+}
 
+type AvailabilityUpdateData struct {
+	Availability []EntryTimeSlot `json:"availability"`
+} 
+//yeah yeah, I know this is ugly, but that's all my brain can come with at this time at night
+type CalculationEntry struct {
+	Day        string  `json:"day"`
+	StartTime  int     `json:"starttime"`
+	EndTime    int     `json:"endtime"`
+}
+
+func translateTime(time string) int {
+	time = strings.ToLower(strings.ReplaceAll(time, ":", ""))
+	if strings.Contains(time, "am") {
+		time = strings.TrimSpace(strings.ReplaceAll(time, "am", ""))
+		result, err := strconv.Atoi(time)
+		if err != nil {
+			return -1 //error: not a valid time number
+		}
+		return result
+	} else if strings.Contains(time, "pm") {
+		time = strings.TrimSpace(strings.ReplaceAll(time, "pm", ""))
+		result, err := strconv.Atoi(time)
+		if err != nil {
+			return -1 //error: not a valid time number
+		}
+		if result < 1200 {
+			result = result + 1200
+		}
+		return result
+	}
+	return -1 //error: not a valid am/pm
+}
+
+func detranslateTime(time int) string {
+	var result string
+	if time >= 1300 {
+		time = time - 1200
+	} 
+	var timeOfDay string
+	if time < 1200 {
+		timeOfDay = "AM"
+	} else {
+		timeOfDay = "PM"
+	}
+	result = strconv.Itoa(time)
+	front := result[:len(result)/2]
+	back := result[len(result)/2:len(result)]
+	result = front + ":" + back + " " + timeOfDay
+	return result
+}
+
+func removeTime(list []CalculationEntry, index int) []CalculationEntry {
+    return append(list[:index], list[index+1:]...)
+}
+
+//This func is under the assumption that time stamps are already valid, aka, no 12:00 PM - 8:00 AM in the same day. 
 func patchAvailability(c *gin.Context) {
 
 	token, err := c.Cookie("jwt")
@@ -514,62 +563,78 @@ func patchAvailability(c *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println(edits)
-	fmt.Println(claims.Username)
 	
-	//for each item
-	//if action is true, add them
-	//if ation is false, remove them
-	//merge points together if needed
-	//assumes time stamps are valid
-	/*
 	var tutors []Tutor
-	DB.Joins("User").Find(&tutors, "User__username = ?", claims.Username)
-
-	if len(tutors) > 0 {
-		if edits.Bio != "" {
-			tutors[0].Bio = edits.Bio
+	DB.Limit(1).Joins("User").Find(&tutors, "User__username = ?", claims.Username)
+	
+	if len(tutors) != 1 {
+		c.JSON(400, gin.H{
+			"error": "Tutor " + claims.Username + " does not exist.",
+		})
+		return
+	}
+	
+	currentList := []CalculationEntry{}
+	days := strings.Split(tutors[0].Availability, ",")
+	for i := 0; i < len(days); i ++ {
+		parts := strings.Split(strings.TrimSpace(days[i]), " ")
+		curr := CalculationEntry{parts[0], translateTime(parts[1] + " " + parts[2]), translateTime(parts[3] + " " + parts[4])}
+		if curr.StartTime == -1 || curr.EndTime == -1 {
+			c.JSON(400, gin.H{
+				"error": "Invalid time stamp: " +  parts[0] + " " + parts[1] + " " + parts[2] + " " + parts[3] + " " + parts[4],
+			})
+			return
 		}
-		if edits.Availability != "" {
-			tutors[0].Availability = edits.Availability
-		}
-		DB.Save(&tutors)
+		currentList = append(currentList, curr)
 	}
 
-	if len(tutors) > 0 && len(edits.Tutoring) > 0 {
-		for i := 0; i < len(edits.Tutoring); i++ {
-			var courses []Course
-			DB.Find(&courses, "code = ?", edits.Tutoring[i].Code)
-			if edits.Tutoring[i].Action {
-				//add class
-				newClass := Tutoring{Tutor: tutors[0], Course: courses[0]}
-				DB.Create(&newClass)
-			} else {
-				//remove class
-				DB.Where("tutor_id = ? AND course_id = ?", tutors[0].UserID, courses[0].ID).Delete(&Tutoring{})
+	fmt.Println(currentList)
+	
+	//loop through and remove 
+	for i := 0; i < len(edits.Availability); i++ {
+		if !edits.Availability[i].Action {
+			for j := 0; j < len(currentList); j ++ {
+				if currentList[j].Day == edits.Availability[i].Day && currentList[j].StartTime == translateTime(edits.Availability[i].StartTime) && currentList[j].EndTime == translateTime(edits.Availability[i].EndTime) {
+					//as a draft version, I am assuming that the times match up with current listing (AKA, has 2-4, removing 2-4. No frankenstein)
+					currentList = removeTime(currentList, j)
+				}
 			}
 		}
 	}
-
-	//It's angry at me, so I'm doing it this less pretty way, even though the nice way used to work. Tutor class stuff put it to flames
-	//So long, old way. Rest in reeses pieces. You will be missed.
-	var users []User
-	DB.Find(&users, "username = ?", claims.Username)
-	if edits.FirstName != "" {
-		users[0].FirstName = edits.FirstName
+	
+	fmt.Println(currentList)
+	
+	//calculate new things to add, currently under the assumption that new things are unique and can not be murged with current entries
+	
+	
+	//add those things
+	for i := 0; i < len(edits.Availability); i++ {
+		if edits.Availability[i].Action {
+			curr := CalculationEntry{edits.Availability[i].Day, translateTime(edits.Availability[i].StartTime), translateTime(edits.Availability[i].EndTime)}
+			if curr.StartTime == -1 || curr.EndTime == -1 {
+				c.JSON(400, gin.H{
+					"error": "Invalid time stamp: " +  edits.Availability[i].Day + " " + edits.Availability[i].StartTime + " " + edits.Availability[i].EndTime,
+				})
+				return
+			}
+			currentList = append(currentList, curr)
+		}
 	}
-	if edits.LastName != "" {
-		users[0].LastName = edits.LastName
+	
+	fmt.Println(currentList)
+	
+	//edit db
+	//do the ava need to be in day-of-the-week order? Need to add that if so
+	var giantString string
+	for i := 0; i < len(currentList); i ++ {
+		giantString = giantString + currentList[i].Day + " " + detranslateTime(currentList[i].StartTime) + " " + detranslateTime(currentList[i].EndTime) 
+		if i + 1 != len(currentList) {
+			giantString = giantString + ", "
+		}
 	}
-	if edits.Email != "" {
-		users[0].Email = edits.Email
-	}
-	if edits.Phone != "" {
-		users[0].Phone = edits.Phone
-	}
-	DB.Save(&users)
-	//DB.Model(&users[0]).Updates(edits)
-	*/
+	fmt.Println(giantString)
+	tutors[0].Availability = giantString
+	DB.Save(&tutors)
+	
 	c.JSON(200, gin.H{})
 }
