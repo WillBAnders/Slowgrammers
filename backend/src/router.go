@@ -340,6 +340,7 @@ func getProfile(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"profile": users[0],
 		})
+		return
 	}
 	tutors[0].User = users[0]
 
