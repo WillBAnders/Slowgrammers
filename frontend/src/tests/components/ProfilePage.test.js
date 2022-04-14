@@ -115,7 +115,9 @@ describe("ProfilePage", () => {
 
       const component = await waitFor(async () => {
         return render(
-          <ProfilePage profile={createUser({ username: "Username", firstname: "First" })} />,
+          <ProfilePage
+            profile={createUser({ username: "Username", firstname: "First" })}
+          />,
           { wrapper: MemoryRouter }
         );
       });

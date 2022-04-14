@@ -1,6 +1,6 @@
-.gravatar{
-    object-fit: cover;
-    height: 80px;
-    width: 80px;
-    aspect-ratio: 1/1;
+.gravatar {
+  object-fit: cover;
+  height: 80px;
+  width: 80px;
+  aspect-ratio: 1/1;
 }

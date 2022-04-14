@@ -27,18 +27,25 @@ describe("SignupPage", () => {
     });
 
     await waitFor(async () => {
-      fireEvent.change(component.getByLabelText("Username", { exact: false }), { target: { value: "Username" } });
-      fireEvent.change(component.getByLabelText("Password", { exact: false }), { target: { value: "Password" } });
+      fireEvent.change(component.getByLabelText("Username", { exact: false }), {
+        target: { value: "Username" },
+      });
+      fireEvent.change(component.getByLabelText("Password", { exact: false }), {
+        target: { value: "Password" },
+      });
     });
 
     await waitFor(async () => {
       fireEvent.submit(component.getByTitle("submit"));
     });
 
-    expect(fetch).toHaveBeenCalledWith("/signup", expect.objectContaining({
-      method: "POST",
-      body: JSON.stringify({ username: "Username", password: "Password" }),
-    }));
+    expect(fetch).toHaveBeenCalledWith(
+      "/signup",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ username: "Username", password: "Password" }),
+      })
+    );
   });
 
   test("fetch resolved", async () => {

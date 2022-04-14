@@ -32,7 +32,9 @@ describe("CoursePage", () => {
       tutors: [],
     });
     await waitFor(async () => {
-      const component = render(<CoursePage profile={null} />, { wrapper: MemoryRouter });
+      const component = render(<CoursePage profile={null} />, {
+        wrapper: MemoryRouter,
+      });
       const loadingContainer =
         component.container.querySelector(".loadingContainer");
       expect(loadingContainer).not.toBe(null);
@@ -81,7 +83,9 @@ describe("CoursePage", () => {
             <Routes>
               <Route
                 path={"/courses/:code"}
-                element={<CoursePage profile={createTutor({username: "Username"})} />}
+                element={
+                  <CoursePage profile={createTutor({ username: "Username" })} />
+                }
               />
             </Routes>
           </MemoryRouter>
@@ -115,5 +119,14 @@ function createTutor({
   rating = 0.0,
   availability = [],
 }) {
-  return {username, firstname, lastname, email, phone, bio, rating, availability};
+  return {
+    username,
+    firstname,
+    lastname,
+    email,
+    phone,
+    bio,
+    rating,
+    availability,
+  };
 }
