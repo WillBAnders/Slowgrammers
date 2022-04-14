@@ -1,6 +1,6 @@
-import React from 'react';
-import {Box, Card, CardHeader, Paper, Stack, TextField} from "@mui/material";
-import {Link} from "react-router-dom";
+import React from "react";
+import { Box, Card, CardHeader, Paper, Stack, TextField } from "@mui/material";
+import { Link } from "react-router-dom";
 
 export default function CoursesPage() {
   const [courses, setCourses] = React.useState([]);
@@ -8,9 +8,9 @@ export default function CoursesPage() {
 
   React.useEffect(() => {
     fetch("/courses")
-      .then(r => r.json())
-      .then(data => setCourses(data.courses))
-      .catch(error => {
+      .then((r) => r.json())
+      .then((data) => setCourses(data.courses))
+      .catch((error) => {
         //TODO: error page
         console.error(error.message);
       });
@@ -29,7 +29,7 @@ export default function CoursesPage() {
           sx={{
             width: "400px",
             margin: "10px",
-            maxWidth: "750px"
+            maxWidth: "750px",
           }}
         >
           <TextField
@@ -41,10 +41,10 @@ export default function CoursesPage() {
             label="SearchBar"
             variant="outlined"
             name="SearchBar"
-            onChange={e => setFilter(e.target.value.toUpperCase())}
+            onChange={(e) => setFilter(e.target.value.toUpperCase())}
             inputProps={{
               "data-testid": "SearchBarin",
-              "title": "SearchBarInput"
+              title: "SearchBarInput",
             }}
           />
         </Paper>
@@ -59,29 +59,31 @@ export default function CoursesPage() {
         <Paper
           elevation={0}
           sx={{
-            width: {xs: '95%', md: '28%'}
+            width: { xs: "95%", md: "28%" },
           }}
         >
           <Stack
             direction="column"
-            spacing={{xs: 1, sm: 2, md: 2.5}}
+            spacing={{ xs: 1, sm: 2, md: 2.5 }}
             data-testid="buttonStack"
             title="buttonStack"
           >
             {courses
-              .filter(c => (c.code + c.name).toUpperCase().includes(filter))
-              .map(c => (
+              .filter((c) => (c.code + c.name).toUpperCase().includes(filter))
+              .map((c) => (
                 <Link
                   key={c.code}
                   to={`/courses/${c.code}`}
-                  style={{textDecoration: 'none', color: "blue"}}
+                  style={{ textDecoration: "none", color: "blue" }}
                 >
                   <Card>
-                    <CardHeader title={c.code.toUpperCase()} subheader={c.name}/>
+                    <CardHeader
+                      title={c.code.toUpperCase()}
+                      subheader={c.name}
+                    />
                   </Card>
                 </Link>
-              ))
-            }
+              ))}
           </Stack>
         </Paper>
       </Box>

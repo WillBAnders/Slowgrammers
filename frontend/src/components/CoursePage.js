@@ -1,9 +1,21 @@
-import React from 'react'
-import { Button, Stack, CardHeader, CardContent, Rating, Card, Typography, Grid, TextField, Paper, Box } from '@mui/material'
+import React from "react";
+import {
+  Button,
+  Stack,
+  CardHeader,
+  CardContent,
+  Rating,
+  Card,
+  Typography,
+  Grid,
+  TextField,
+  Paper,
+  Box,
+} from "@mui/material";
 import { useParams, Link } from "react-router-dom";
-import {ThreeDots} from 'react-loader-spinner';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { ThreeDots } from "react-loader-spinner";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function CoursePage({ profile }) {
   const params = useParams();

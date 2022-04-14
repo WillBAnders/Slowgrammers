@@ -1,9 +1,21 @@
-import React from 'react'
-import { Avatar, TextField, Box, Paper, Stack, Button, CardHeader, Card, CardContent, Typography, Rating } from "@mui/material";
-import { blue } from '@mui/material/colors'
+import React from "react";
+import {
+  Avatar,
+  TextField,
+  Box,
+  Paper,
+  Stack,
+  Button,
+  CardHeader,
+  Card,
+  CardContent,
+  Typography,
+  Rating,
+} from "@mui/material";
+import { blue } from "@mui/material/colors";
 import { useParams } from "react-router-dom";
-import { ThreeDots } from 'react-loader-spinner';
-import md5 from 'md5'
+import { ThreeDots } from "react-loader-spinner";
+import md5 from "md5";
 
 export default function TutorPage() {
   const params = useParams();
@@ -31,7 +43,7 @@ export default function TutorPage() {
           color="#00b22d"
           height={100}
           width={100}
-        //3 secs
+          //3 secs
         />
       </div>
     );
@@ -84,9 +96,13 @@ export default function TutorPage() {
         >
           <div className="gravatar">
             <Avatar
-              src={'https://www.gravatar.com/avatar/' + md5(data.tutor.username) + '?f=y&d=identicon'}
-              alt={data.tutor.username + ' avatar'}
-              sx={{ height: '80px', width: '80px' }}
+              src={
+                "https://www.gravatar.com/avatar/" +
+                md5(data.tutor.username) +
+                "?f=y&d=identicon"
+              }
+              alt={data.tutor.username + " avatar"}
+              sx={{ height: "80px", width: "80px" }}
             />
           </div>
           <Typography
