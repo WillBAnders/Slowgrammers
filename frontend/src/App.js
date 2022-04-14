@@ -9,6 +9,8 @@ import Navbar from './components/Navbar';
 import ProfilePage from "./components/ProfilePage";
 import ErrorPage from "./components/ErrorPage";
 import TutorPage from "./components/TutorPage";
+import Footer from "./components/Footer"
+import './styles/Footer.css'
 
 function App() {
   const [profile, setProfile] = useState(null);
@@ -25,7 +27,7 @@ function App() {
   //console.log("Re-render App.js, name = " + name)
 
   return (
-    <div>
+    <div className="flex-wrapper">
       <BrowserRouter>
         <Navbar profile={profile} setProfile={setProfile} />
         <Routes>
@@ -36,8 +38,9 @@ function App() {
           <Route path="/signin" element={<SigninPage />} />
           <Route path="/profile" element={<ProfilePage profile={profile} />} />
           <Route path="/tutors/:username" element={<TutorPage />} />
-          <Route path= "*" element={<ErrorPage />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
+        <Footer />
       </BrowserRouter>
     </div>
   );
