@@ -137,6 +137,9 @@ export default function ProfilePage({ profile, setProfile }) {
           justifyContent="center"
           display="flex"
           width="100%"
+          sx={{
+              ml: "60px"
+          }}
         >
           <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 1 }}>
             <Grid container>
