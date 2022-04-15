@@ -1,87 +1,20 @@
 import React from "react";
-import {
-  Avatar,
-  TextField,
-  Box,
-  Paper,
-  Stack,
-  Button,
-  CardHeader,
-  Card,
-  CardContent,
-  Typography,
-  Rating,
-} from "@mui/material";
-import { blue } from "@mui/material/colors";
+import { Avatar, Box, Stack, Typography, Rating } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { ThreeDots } from "react-loader-spinner";
 import md5 from "md5";
+import AsyncWrapper from "./AsyncWrapper";
+import Utils from "../Utils";
 
 export default function TutorPage() {
   const params = useParams();
-  const [data, setData] = React.useState({});
-  const [isLoading, setLoading] = React.useState(true);
+  const [data, setData] = React.useState(null);
 
-  React.useEffect(() => {
-    fetch(`/tutors/${params.username}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setData(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        //TODO: error page
-        console.error(error.message);
-      });
-  }, []);
+  async function loadData() {
+    const response = await Utils.fetchJson(`/tutors/${params.username}`);
+    setData(response.body);
+  }
 
-  if (isLoading) {
-    return (
-      <div className="loadingContainer">
-        <ThreeDots
-          type="ThreeDots"
-          color="#00b22d"
-          height={100}
-          width={100}
-          //3 secs
-        />
-      </div>
-    );
-  } else if (data.error !== undefined) {
-    return (
-      <Box
-        mt={20}
-        sx={{
-          display: "flex",
-          alignContent: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Stack direction="column" justifyContent="center" alignItems="center">
-          <Typography
-            sx={{
-              fontSize: {
-                md: 60,
-                xs: 30,
-              },
-            }}
-          >
-            Error:
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: {
-                md: 60,
-                xs: 30,
-              },
-            }}
-          >
-            {data.error}
-          </Typography>
-        </Stack>
-      </Box>
-    );
-  } else {
+  function Component() {
     return (
       <div>
         <Stack
@@ -195,4 +128,6 @@ export default function TutorPage() {
       </div>
     );
   }
+
+  return <AsyncWrapper handler={loadData} component={Component} />;
 }
