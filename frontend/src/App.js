@@ -7,7 +7,7 @@ import SignupPage from "./components/SignupPage";
 import SigninPage from "./components/SigninPage";
 import Navbar from "./components/Navbar";
 import ProfilePage from "./components/ProfilePage";
-import ErrorPage from "./components/ErrorPage";
+import ErrorContainer from "./components/ErrorContainer";
 import TutorPage from "./components/TutorPage";
 import Footer from "./components/Footer";
 import "./styles/Footer.css";
@@ -43,7 +43,10 @@ function App() {
           <Route path="/signin" element={<SigninPage />} />
           <Route path="/profile" element={<ProfilePage profile={profile} />} />
           <Route path="/tutors/:username" element={<TutorPage />} />
-          <Route path="*" element={<ErrorPage />} />
+          <Route
+            path="*"
+            element={<ErrorContainer status={404} message={"Unknown page."} />}
+          />
         </Routes>
         <Footer />
       </BrowserRouter>
