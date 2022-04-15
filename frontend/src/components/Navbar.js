@@ -14,7 +14,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Link as ScrollLink } from "react-scroll";
 
-const pages = ["About Us", "Service", "Contact Us"];
+const pages = ['About Us', 'Service', 'Courses'];
 //const settings = ['Profile', 'Finance', 'Logout'];
 
 const Navbar = ({ profile, setProfile }) => {
@@ -167,19 +167,19 @@ const Navbar = ({ profile, setProfile }) => {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <ScrollLink
-                      activeClass="active"
-                      to={page}
-                      spy={true}
-                      smooth={true}
-                      duration={500}
-                    >
+                {pages.map((page) => (page !== "Courses" ?
+                  <MenuItem key={page}>
+                    <ScrollLink activeClass="active" to={page} spy={true} smooth={true} duration={500} onClick={handleCloseNavMenu}>
                       <Typography textAlign="right">{page}</Typography>
                     </ScrollLink>
+                  </MenuItem> :
+                  <MenuItem key={page}>
+                    <Link key={page} to={'/courses'} style={{ textDecoration: 'none', color: "black" }} onClick={handleCloseNavMenu}>
+                      <Typography textAlign="right">{page}</Typography>
+                    </Link>
                   </MenuItem>
                 ))}
+
               </Menu>
             </Box>
             <Typography
@@ -192,8 +192,8 @@ const Navbar = ({ profile, setProfile }) => {
                 TutorsVILLE
               </Link>
             </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {pages.map((page) => (
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              {pages.map((page) => (page !== "Courses" ?
                 <ScrollLink
                   key={page}
                   activeClass="active"
@@ -209,14 +209,23 @@ const Navbar = ({ profile, setProfile }) => {
                   >
                     {page}
                   </Button>
-                </ScrollLink>
+                </ScrollLink> :
+                < Link to="/courses" key={"courses"} style={{ textDecoration: 'none', color: "white" }}>
+                  <Button
+                    key="courses"
+                    onClick={handleCloseNavMenu}
+                    sx={{ my: 2, color: 'white', display: 'block' }}
+                  >
+                    Courses
+                </Button>
+                </Link>
               ))}
             </Box>
             {buttons}
           </Toolbar>
         </Container>
       </AppBar>
-    </div>
+    </div >
   );
 };
 export default Navbar;
