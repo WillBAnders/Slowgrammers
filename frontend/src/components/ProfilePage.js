@@ -138,7 +138,10 @@ export default function ProfilePage({ profile, setProfile }) {
           display="flex"
           width="100%"
           sx={{
-              ml: "60px"
+              ml: {
+                  xs: "30px",
+                  md: "60px",
+              }
           }}
         >
           <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 1 }}>
