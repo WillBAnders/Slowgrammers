@@ -315,6 +315,16 @@ func (suite *RouterSuite) TestSignup() {
 		suite.Equal(400, w.Code)
 	}))
 
+	suite.Run("Invalid Request (Invalid Username)", manualSetupTest(func() {
+		w := test("!@#$%^&*()", "Password")
+		suite.Equal(400, w.Code)
+	}))
+
+	suite.Run("Invalid Request (Invalid Username)", manualSetupTest(func() {
+		w := test("Username", "short")
+		suite.Equal(400, w.Code)
+	}))
+
 	/*
 		//TODO: Error on unknown fields
 		suite.Run("Invalid Request (Unknown Field)", manualSetupTest(func() {
