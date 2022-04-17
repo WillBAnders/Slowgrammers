@@ -113,6 +113,58 @@ func getTutors(c *gin.Context) {
 	})
 }
 
+// Handler for POST /tutors. Registers the authenticated user as a tutor.
+// Returns an empty json if successful. Errors if:
+//
+//  - There is no authenticated user (401)
+//  - A server issue prevents parsing the JWT (500)
+//  - The user does not exist in the database (500)
+//  - The user is already a tutor (409)
+//
+// Response Schema: {}
+// Error Schema: {
+//   error: String
+// }
+func postTutors(c *gin.Context) {
+	token, err := c.Cookie("jwt")
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Requires an authenticated user.",
+		})
+		return
+	}
+
+	claims, err := ParseJWT(token)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to parse JWT: " + err.Error() + ".",
+		})
+		return
+	}
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", claims.Username)
+	if len(users) != 1 {
+		c.JSON(500, gin.H{
+			"error": "User " + claims.Username + " is authenticated but does not exist in the database.",
+		})
+		return
+	}
+
+	var tutors []Tutor
+	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
+	if len(tutors) != 0 {
+		c.JSON(409, gin.H{
+			"error": "User " + claims.Username + " is already a tutor.",
+		})
+		return
+	}
+
+	DB.Create(&Tutor{UserID: users[0].ID})
+
+	c.JSON(200, gin.H{})
+}
+
 // Handler for /tutors/:username. Returns the tutor identified by :username
 // along with all courses tutored ordered by code. If the tutor :username is
 // not defined, returns a 404 with an error message.
@@ -161,64 +213,6 @@ func getTutorsUsername(c *gin.Context) {
 		"tutor":   tutors[0],
 		"courses": courses,
 	})
-}
-
-// Handler for PUT /tutors/:username. Returns an empty json if sucessful.
-// Errors if:
-//
-//  - There is no authenticated user (401)
-//  - A server issue prevents parsing the JWT (500)
-//  - Path username is different than logged in user (500)
-//  - The user is already a tutor (409)
-//
-// Response Schema: {
-//   200
-// }
-// Error Schema: {
-//   error: String
-// }
-
-func postTutors(c *gin.Context) {
-
-	token, err := c.Cookie("jwt")
-	if err != nil {
-		c.JSON(401, gin.H{
-			"error": "Requires an authenticated user.",
-		})
-		return
-	}
-
-	claims, err := ParseJWT(token)
-	if err != nil {
-		c.JSON(500, gin.H{
-			"error": "Unable to parse JWT: " + err.Error() + ".",
-		})
-		return
-	}
-
-	var users []User
-	DB.Limit(1).Find(&users, "username = ?", claims.Username)
-
-	if len(users) != 1 {
-		c.JSON(500, gin.H{
-			"error": "User " + claims.Username + " is authenticated but does not exist in the database.",
-		})
-		return
-	}
-
-	var tutors []Tutor
-	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
-
-	if len(tutors) > 0 {
-		c.JSON(409, gin.H{
-			"error": "User " + claims.Username + " is already a tutor.",
-		})
-		return
-	}
-
-	DB.Create(&Tutor{UserID: users[0].ID})
-
-	c.JSON(200, gin.H{})
 }
 
 type AuthBody struct {

@@ -533,10 +533,10 @@ func (suite *RouterSuite) TestPostTutors() {
 
 		w = POST("/tutors", gin.H{}, cookies...)
 		suite.Equal(200, w.Code)
-		
+
 		w = GET("/tutors/Username")
 		suite.Equal(200, w.Code)
-		
+
 	}))
 
 	suite.Run("Unauthenticated", manualSetupTest(func() {
@@ -572,16 +572,6 @@ func PATCH(path string, body gin.H, cookies ...*http.Cookie) *httptest.ResponseR
 	data, _ := json.Marshal(body)
 	req, _ := http.NewRequest("PATCH", path, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
-	for _, cookie := range cookies {
-		req.AddCookie(cookie)
-	}
-	Router.ServeHTTP(w, req)
-	return w
-}
-
-func PUT(path string, cookies ...*http.Cookie) *httptest.ResponseRecorder {
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("PUT", path, nil)
 	for _, cookie := range cookies {
 		req.AddCookie(cookie)
 	}
