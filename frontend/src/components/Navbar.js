@@ -98,7 +98,7 @@ const Navbar = ({ profile, setProfile }) => {
   } else {
     buttons = (
       <Box sx={{ flexGrow: 0 }}>
-        <Link to="/SignUp" style={{ textDecoration: "none", color: "white" }}>
+        <Link to="/signup" style={{ textDecoration: "none", color: "white" }}>
           <Button
             title="signupbutton"
             variant="contained"
@@ -108,7 +108,7 @@ const Navbar = ({ profile, setProfile }) => {
             Sign Up
           </Button>
         </Link>
-        <Link to="/SignIn" style={{ textDecoration: "none", color: "white" }}>
+        <Link to="/signin" style={{ textDecoration: "none", color: "white" }}>
           <Button
             title="signinbutton"
             variant="contained"

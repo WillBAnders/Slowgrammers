@@ -49,7 +49,7 @@ export default function Join() {
         >
           <Typography className="main-text" variant="h2">
             Join TutorsVILLE today! <br />
-            <Link to="/SignUp" style={{ textDecoration: "none" }}>
+            <Link to="/signup" style={{ textDecoration: "none" }}>
               <Button variant="contained">Sign Up</Button>
             </Link>
           </Typography>
