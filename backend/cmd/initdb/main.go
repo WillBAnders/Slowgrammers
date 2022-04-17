@@ -35,10 +35,36 @@ func main() {
 	src.DB.Create(courses)
 
 	tutors := []src.Tutor{
-		{User: users[0], Availability: "Friday", Rating: 5.0, Bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."},
-		{User: users[1], Availability: "Monday", Rating: 4.5, Bio: "Once upon a midnight dreary, while I pondered, weak and weary, Over many a quaint and curious volume of forgotten lore—While I nodded, nearly napping, suddenly there came a tapping, As of some one gently rapping, rapping at my chamber door. `Tis some visitor,` I muttered, `tapping at my chamber door—Only this and nothing more.`"},
-		{User: users[2], Availability: "Tuesday, Thursday", Rating: 2.0, Bio: "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way--in short, the period was so far like the present period that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only."},
-		{User: users[3], Availability: "Monday, Wednesday, Friday", Rating: 0.0, Bio: "There once was a ship that put to sea. The name of the ship was the Billy of Tea. The winds blew up, her bow dipped down. O blow, my bully boys, blow. Soon may the Wellerman come. To bring us sugar and tea and rum. One day, when the tonguin' is done. We'll take our leave and go."},
+		{
+			User:         users[0],
+			Rating:       5.0,
+			Bio:          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+			Availability: []src.Availability{},
+		}, {
+			User:   users[1],
+			Rating: 4.5,
+			Bio:    "Once upon a midnight dreary, while I pondered, weak and weary, Over many a quaint and curious volume of forgotten lore—While I nodded, nearly napping, suddenly there came a tapping, As of some one gently rapping, rapping at my chamber door. `Tis some visitor,` I muttered, `tapping at my chamber door—Only this and nothing more.`",
+			Availability: []src.Availability{
+				{Day: "Monday"},
+			},
+		}, {
+			User:   users[2],
+			Rating: 2.0,
+			Bio:    "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way--in short, the period was so far like the present period that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only.",
+			Availability: []src.Availability{
+				{Day: "Tuesday"},
+				{Day: "Thursday"},
+			},
+		}, {
+			User:   users[3],
+			Rating: 0.0,
+			Bio:    "There once was a ship that put to sea. The name of the ship was the Billy of Tea. The winds blew up, her bow dipped down. O blow, my bully boys, blow. Soon may the Wellerman come. To bring us sugar and tea and rum. One day, when the tonguin' is done. We'll take our leave and go.",
+			Availability: []src.Availability{
+				{Day: "Monday"},
+				{Day: "Wednesday"},
+				{Day: "Friday"},
+			},
+		},
 	}
 	src.DB.Create(tutors)
 
