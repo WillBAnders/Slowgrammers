@@ -19,6 +19,7 @@ func InitRouter() {
 	Router.GET("/courses", getCourses)
 	Router.GET("/courses/:code", getCoursesCode)
 	Router.GET("/tutors", getTutors)
+	Router.POST("/tutors", postTutors)
 	Router.GET("/tutors/:username", getTutorsUsername)
 	Router.POST("/signup", postSignup)
 	Router.POST("/signin", postSignin)
@@ -110,6 +111,58 @@ func getTutors(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"tutors": tutors,
 	})
+}
+
+// Handler for POST /tutors. Registers the authenticated user as a tutor.
+// Returns an empty json if successful. Errors if:
+//
+//  - There is no authenticated user (401)
+//  - A server issue prevents parsing the JWT (500)
+//  - The user does not exist in the database (500)
+//  - The user is already a tutor (409)
+//
+// Response Schema: {}
+// Error Schema: {
+//   error: String
+// }
+func postTutors(c *gin.Context) {
+	token, err := c.Cookie("jwt")
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Requires an authenticated user.",
+		})
+		return
+	}
+
+	claims, err := ParseJWT(token)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to parse JWT: " + err.Error() + ".",
+		})
+		return
+	}
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", claims.Username)
+	if len(users) != 1 {
+		c.JSON(500, gin.H{
+			"error": "User " + claims.Username + " is authenticated but does not exist in the database.",
+		})
+		return
+	}
+
+	var tutors []Tutor
+	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
+	if len(tutors) != 0 {
+		c.JSON(409, gin.H{
+			"error": "User " + claims.Username + " is already a tutor.",
+		})
+		return
+	}
+
+	DB.Create(&Tutor{UserID: users[0].ID})
+
+	c.JSON(200, gin.H{})
 }
 
 // Handler for /tutors/:username. Returns the tutor identified by :username
