@@ -11,18 +11,20 @@ import ErrorContainer from "./components/ErrorContainer";
 import TutorPage from "./components/TutorPage";
 import Footer from "./components/Footer";
 import "./styles/Footer.css";
+import Utils from "./Utils";
 
 function App() {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    fetch("/profile", {
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    })
-      .then((r) => r.json())
+    Utils.fetchJson("/profile")
       .then((r) => {
-        setProfile(r.profile);
+        setProfile(r.body.profile);
+      })
+      .catch((error) => {
+        if (error.status !== 401) {
+          alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
+        }
       });
   }, []);
 
