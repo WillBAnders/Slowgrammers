@@ -1,6 +1,7 @@
 package src
 
 import (
+	"regexp"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -171,6 +172,7 @@ type AuthBody struct {
 // object. Errors if:
 //
 //  - The body has missing/unknown fields (400)
+//  - The username/password is invalid (400)
 //  - The username already exists (401)
 //  - A server issue prevents creating a JWT (500)
 //     - The user is still successfully created
@@ -193,7 +195,19 @@ func postSignup(c *gin.Context) {
 		return
 	}
 
-	//TODO: Validate username/password
+	if !regexp.MustCompile("[A-Za-z][A-Za-z0-9_\\-.]{0,71}").MatchString(body.Username) {
+		c.JSON(400, gin.H{
+			"error": "Username must start with a letter, can only contain alphanumeric characters and '_', '-', or '.', and cannot exceed 72 characters.",
+		})
+		return
+	}
+
+	if len(body.Password) < 8 || len(body.Password) > 72 {
+		c.JSON(400, gin.H{
+			"error": "Password must contain 8-72 characters.",
+		})
+		return
+	}
 
 	var users []User
 	DB.Limit(1).Find(&users, "username = ?", body.Username)
@@ -246,8 +260,6 @@ func postSignin(c *gin.Context) {
 		})
 		return
 	}
-
-	//TODO: Validate username/password
 
 	var users []User
 	DB.Limit(1).Find(&users, "username = ?", body.Username)

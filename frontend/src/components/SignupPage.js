@@ -26,18 +26,9 @@ export default function SignupPage() {
 
   function onSubmit(event) {
     event.preventDefault();
-
-    //console.log(username + password)
-
-    const usernameRegex = new RegExp("[a-zA-Z0-9_]{5,20}");
-    const passwordRegex = new RegExp(
-      "[a-zA-Z0-9-_\\!\\@\\#\\$\\%\\^&\\*\\.]{7,30}"
-    );
-
-    let u = usernameRegex.test(username);
-    let p = passwordRegex.test(password);
-
-    if (u === true && p === true) {
+    const u = /^[A-Za-z][A-Za-z0-9_\-.]{0,71}$/.test(username);
+    const p = /^.{8,72}$/.test(password);
+    if (u && p) {
       Utils.fetchJson("/signup", {
         method: "POST",
         body: JSON.stringify({ username, password }),
@@ -48,26 +39,14 @@ export default function SignupPage() {
         .catch((error) => {
           if (error.status === 401) {
             setUsernameTaken(true);
-            setIncorrectUsername(false);
-            setIncorrectPassword(false);
           } else {
             alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
           }
         });
-    } else if (u === false && p === false) {
-      setUsernameTaken(false);
-      setIncorrectUsername(true);
-      setIncorrectPassword(true);
-    } else if (u === false) {
-      setUsernameTaken(false);
-      setIncorrectUsername(true);
-      setIncorrectPassword(false);
     } else {
-      setUsernameTaken(false);
-      setIncorrectUsername(false);
-      setIncorrectPassword(true);
+      setIncorrectUsername(!u);
+      setIncorrectPassword(!p);
     }
-    //console.log(res)
   }
 
   return (
@@ -87,27 +66,22 @@ export default function SignupPage() {
           }}
         >
           <div>
-            {usernameTaken ? (
+            {usernameTaken && (
               <Alert severity="error" sx={{ mb: 1 }}>
-                Username already taken!
+                Username already exists.
               </Alert>
-            ) : (
-              <div />
             )}
-            {incorrectUsername ? (
+            {incorrectUsername && (
               <Alert severity="error" sx={{ mb: 1 }}>
-                Username should contain 5-20 alphanumeric or _ characters.
-              </Alert>
-            ) : (
-              <div />
-            )}
-            {incorrectPassword ? (
-              <Alert severity="error">
-                Password should contain 7-30 alphanumeric or -_!@#$%^&*.
+                Username must start with a letter, can only contain alphanumeric
+                characters and '_', '-', or '.', and cannot exceed 72
                 characters.
               </Alert>
-            ) : (
-              <div />
+            )}
+            {incorrectPassword && (
+              <Alert severity="error">
+                Password must contain 8-72 characters.
+              </Alert>
             )}
           </div>
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
