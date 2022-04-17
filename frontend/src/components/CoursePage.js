@@ -13,61 +13,38 @@ import {
   Box,
 } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
-import { ThreeDots } from "react-loader-spinner";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Utils from "../Utils";
+import AsyncWrapper from "./AsyncWrapper";
 
 export default function CoursePage({ profile }) {
   const params = useParams();
-  const [isLoading, setLoading] = React.useState(true);
-  const [data, setData] = React.useState(null);
-  const [filter, setFilter] = React.useState("");
 
-  React.useEffect(() => {
-    fetch(`/courses/${params.code}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setData(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        //TODO: error page
-        console.error(error.message);
-      });
-  }, []);
+  async function loadData() {
+    const response = await Utils.fetchJson(`/courses/${params.code}`);
+    return response.body;
+  }
 
   function patchTutoringCourse(event, add) {
     event.preventDefault();
-    fetch("/profile", {
+    Utils.fetchJson("/profile", {
       method: "PATCH",
-      headers: { "Content-type": "application/json" },
       body: JSON.stringify({
         tutoring: [{ code: params.code, action: add }],
       }),
     })
-      .then((r) => r.json())
-      .then((_data) => {
-        window.location.reload();
+      .then((r) => {
+        window.location.reload(false);
       })
       .catch((error) => {
-        //TODO: error page
-        console.error(error.message);
+        alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
       });
   }
 
-  if (isLoading) {
-    return (
-      <div className="loadingContainer">
-        <ThreeDots
-          type="ThreeDots"
-          color="#00b22d"
-          height={100}
-          width={100}
-          //3 secs
-        />
-      </div>
-    );
-  } else {
+  function Component({ data }) {
+    const [filter, setFilter] = React.useState("");
+
     return (
       <div>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -241,4 +218,6 @@ export default function CoursePage({ profile }) {
       </div>
     );
   }
+
+  return <AsyncWrapper handler={loadData} component={Component} />;
 }

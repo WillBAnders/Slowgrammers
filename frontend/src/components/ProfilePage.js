@@ -5,22 +5,22 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { ThreeDots } from "react-loader-spinner";
+import Utils from "../Utils";
 
 export default function ProfilePage({ profile }) {
   const [updated, setUpdated] = React.useState({});
 
   function onSubmit(event) {
     event.preventDefault();
-    fetch("/profile", {
+    Utils.fetchJson("/profile", {
       method: "PATCH",
-      headers: { "Content-type": "application/json" },
       body: JSON.stringify(updated),
     })
-      .then((r) => r.json())
-      .then((_data) => {})
+      .then((r) => {
+        //TODO: Refresh/confirm?
+      })
       .catch((error) => {
-        //TODO: error page
-        console.error(error.message);
+        alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
       });
   }
 

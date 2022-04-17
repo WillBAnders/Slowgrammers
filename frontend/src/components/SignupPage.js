@@ -12,6 +12,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import Utils from "../Utils";
 
 const theme = createTheme();
 
@@ -37,22 +38,22 @@ export default function SignupPage() {
     let p = passwordRegex.test(password);
 
     if (u === true && p === true) {
-      fetch("/signup", {
+      Utils.fetchJson("/signup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      }).then((res) => {
-        if (res.status === 200) {
+        body: JSON.stringify({ username, password }),
+      })
+        .then((r) => {
           navigate("/");
-        } else if (res.status === 401) {
-          setUsernameTaken(true);
-          setIncorrectUsername(false);
-          setIncorrectPassword(false);
-        }
-      });
+        })
+        .catch((error) => {
+          if (error.status === 401) {
+            setUsernameTaken(true);
+            setIncorrectUsername(false);
+            setIncorrectPassword(false);
+          } else {
+            alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
+          }
+        });
     } else if (u === false && p === false) {
       setUsernameTaken(false);
       setIncorrectUsername(true);

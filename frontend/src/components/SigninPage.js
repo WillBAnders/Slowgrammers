@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import Utils from "../Utils";
 
 const theme = createTheme();
 
@@ -23,21 +24,19 @@ export default function SigninPage() {
 
   function onSubmit(event) {
     event.preventDefault();
-    fetch("/signin", {
+    Utils.fetchJson("/signin", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     })
-      .then((res) => {
-        if (res.status === 200) {
-          navigate("/");
-        } else if (res.status === 401) {
-          setInvalid(true);
-        }
+      .then((r) => {
+        navigate("/");
       })
       .catch((error) => {
-        //TODO: error page
-        console.error(error.message);
+        if (error.status === 401) {
+          setInvalid(true);
+        } else {
+          alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
+        }
       });
   }
 
