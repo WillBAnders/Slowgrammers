@@ -281,7 +281,7 @@ func postSignin(c *gin.Context) {
 //
 // Response Schema: {}
 func postSignout(c *gin.Context) {
-	c.SetCookie("jwt", "", 0, "", "", true, true)
+	c.SetCookie("jwt", "", -1, "", "", true, true)
 
 	c.JSON(200, gin.H{})
 }
