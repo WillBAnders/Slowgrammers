@@ -10,11 +10,25 @@ import "regenerator-runtime/runtime";
 import TutorPage from "../../components/TutorPage.js";
 
 beforeAll(() => {
+  function mockResponseValue(value) {
+    return {
+      headers: {
+        get: jest.fn().mockImplementation(name => {
+          return name === "Content-Type" ? "application/json" : "";
+        }),
+      },
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue(value),
+    };
+  }
+
   global.fetch = jest.fn();
   global.fetch.mockResponseValue = function (value) {
-    this.mockResolvedValue({
-      json: jest.fn().mockResolvedValue(value),
-    });
+    this.mockResolvedValue(mockResponseValue(value));
+  };
+  global.fetch.mockResponseValueOnce = function (value) {
+    this.mockResolvedValueOnce(mockResponseValue(value));
   };
 });
 
@@ -43,12 +57,13 @@ describe("TutorPage", () => {
     expect(component.container).toHaveTextContent("@Username");
   });
 
-  test("error", async () => {
-    fetch.mockResponseValue({ error: "Expected" });
+  test("fetch reject", async () => {
+    fetch.mockRejectedValue(new Error("Expected"));
     const component = await waitFor(async () => {
       return render(<TutorPage />, { wrapper: MemoryRouter });
     });
-    expect(component.container).toHaveTextContent("Error:Expected");
+    const errorContainer = component.container.querySelector(".errorContainer");
+    expect(errorContainer).not.toBe(null);
   });
 });
 

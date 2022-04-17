@@ -1,6 +1,7 @@
 package src
 
 import (
+	"regexp"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -18,6 +19,7 @@ func InitRouter() {
 	Router.GET("/courses", getCourses)
 	Router.GET("/courses/:code", getCoursesCode)
 	Router.GET("/tutors", getTutors)
+	Router.POST("/tutors", postTutors)
 	Router.GET("/tutors/:username", getTutorsUsername)
 	Router.POST("/signup", postSignup)
 	Router.POST("/signin", postSignin)
@@ -111,6 +113,58 @@ func getTutors(c *gin.Context) {
 	})
 }
 
+// Handler for POST /tutors. Registers the authenticated user as a tutor.
+// Returns an empty json if successful. Errors if:
+//
+//  - There is no authenticated user (401)
+//  - A server issue prevents parsing the JWT (500)
+//  - The user does not exist in the database (500)
+//  - The user is already a tutor (409)
+//
+// Response Schema: {}
+// Error Schema: {
+//   error: String
+// }
+func postTutors(c *gin.Context) {
+	token, err := c.Cookie("jwt")
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": "Requires an authenticated user.",
+		})
+		return
+	}
+
+	claims, err := ParseJWT(token)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Unable to parse JWT: " + err.Error() + ".",
+		})
+		return
+	}
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", claims.Username)
+	if len(users) != 1 {
+		c.JSON(500, gin.H{
+			"error": "User " + claims.Username + " is authenticated but does not exist in the database.",
+		})
+		return
+	}
+
+	var tutors []Tutor
+	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
+	if len(tutors) != 0 {
+		c.JSON(409, gin.H{
+			"error": "User " + claims.Username + " is already a tutor.",
+		})
+		return
+	}
+
+	DB.Create(&Tutor{UserID: users[0].ID})
+
+	c.JSON(200, gin.H{})
+}
+
 // Handler for /tutors/:username. Returns the tutor identified by :username
 // along with all courses tutored ordered by code. If the tutor :username is
 // not defined, returns a 404 with an error message.
@@ -171,6 +225,7 @@ type AuthBody struct {
 // object. Errors if:
 //
 //  - The body has missing/unknown fields (400)
+//  - The username/password is invalid (400)
 //  - The username already exists (401)
 //  - A server issue prevents creating a JWT (500)
 //     - The user is still successfully created
@@ -193,7 +248,19 @@ func postSignup(c *gin.Context) {
 		return
 	}
 
-	//TODO: Validate username/password
+	if !regexp.MustCompile("[A-Za-z][A-Za-z0-9_\\-.]{0,71}").MatchString(body.Username) {
+		c.JSON(400, gin.H{
+			"error": "Username must start with a letter, can only contain alphanumeric characters and '_', '-', or '.', and cannot exceed 72 characters.",
+		})
+		return
+	}
+
+	if len(body.Password) < 8 || len(body.Password) > 72 {
+		c.JSON(400, gin.H{
+			"error": "Password must contain 8-72 characters.",
+		})
+		return
+	}
 
 	var users []User
 	DB.Limit(1).Find(&users, "username = ?", body.Username)
@@ -247,8 +314,6 @@ func postSignin(c *gin.Context) {
 		return
 	}
 
-	//TODO: Validate username/password
-
 	var users []User
 	DB.Limit(1).Find(&users, "username = ?", body.Username)
 	if len(users) != 1 {
@@ -281,7 +346,7 @@ func postSignin(c *gin.Context) {
 //
 // Response Schema: {}
 func postSignout(c *gin.Context) {
-	c.SetCookie("jwt", "", 0, "", "", true, true)
+	c.SetCookie("jwt", "", -1, "", "", true, true)
 
 	c.JSON(200, gin.H{})
 }

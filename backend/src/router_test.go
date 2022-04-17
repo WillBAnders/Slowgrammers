@@ -315,6 +315,16 @@ func (suite *RouterSuite) TestSignup() {
 		suite.Equal(400, w.Code)
 	}))
 
+	suite.Run("Invalid Request (Invalid Username)", manualSetupTest(func() {
+		w := test("!@#$%^&*()", "Password")
+		suite.Equal(400, w.Code)
+	}))
+
+	suite.Run("Invalid Request (Invalid Username)", manualSetupTest(func() {
+		w := test("Username", "short")
+		suite.Equal(400, w.Code)
+	}))
+
 	/*
 		//TODO: Error on unknown fields
 		suite.Run("Invalid Request (Unknown Field)", manualSetupTest(func() {
@@ -511,6 +521,30 @@ func (suite *RouterSuite) TestPatchProfile() {
 	}))
 }
 
+func (suite *RouterSuite) TestPostTutors() {
+	suite.Run("Success", manualSetupTest(func() {
+		w := POST("/signup", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+
+		suite.Equal(200, w.Code)
+		cookies := w.Result().Cookies()
+
+		w = POST("/tutors", gin.H{}, cookies...)
+		suite.Equal(200, w.Code)
+
+		w = GET("/tutors/Username")
+		suite.Equal(200, w.Code)
+
+	}))
+
+	suite.Run("Unauthenticated", manualSetupTest(func() {
+		w := POST("/tutors", gin.H{})
+		suite.Equal(401, w.Code)
+	}))
+}
+
 func GET(path string, cookies ...*http.Cookie) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", path, nil)
@@ -521,11 +555,14 @@ func GET(path string, cookies ...*http.Cookie) *httptest.ResponseRecorder {
 	return w
 }
 
-func POST(path string, body gin.H) *httptest.ResponseRecorder {
+func POST(path string, body gin.H, cookies ...*http.Cookie) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 	data, _ := json.Marshal(body)
 	req, _ := http.NewRequest("POST", path, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
 	Router.ServeHTTP(w, req)
 	return w
 }

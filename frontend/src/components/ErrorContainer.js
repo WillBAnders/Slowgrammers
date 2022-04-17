@@ -1,23 +1,11 @@
 import React from "react";
-import {
-  Button,
-  Stack,
-  CardHeader,
-  CardContent,
-  Rating,
-  Card,
-  Typography,
-  Grid,
-  TextField,
-  Paper,
-  Box,
-} from "@mui/material";
-import { useParams, Link } from "react-router-dom";
+import { Button, Stack, Typography, Box } from "@mui/material";
+import { Link } from "react-router-dom";
 
-export default function ErrorPage() {
+export default function ErrorContainer({ status = null, message }) {
   return (
     <Box
-      mt={20}
+      className="errorContainer"
       sx={{
         display: "flex",
         alignContent: "center",
@@ -33,7 +21,7 @@ export default function ErrorPage() {
             },
           }}
         >
-          Error 404
+          Error {status ?? "(Unexpected)"}
         </Typography>
         <Typography
           sx={{
@@ -43,7 +31,7 @@ export default function ErrorPage() {
             },
           }}
         >
-          Page not found.
+          {message}
         </Typography>
         <Link to="/" style={{ textDecoration: "none", color: "blue" }}>
           <Button variant="contained" size="large" color="error">

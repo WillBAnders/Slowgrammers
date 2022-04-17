@@ -13,6 +13,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { useLocation } from "react-router-dom";
+import Utils from "../Utils";
 
 const pages = ["About Us", "Service", "Courses"];
 //const settings = ['Profile', 'Finance', 'Logout'];
@@ -48,15 +49,17 @@ const Navbar = ({ profile, setProfile }) => {
     setAnchorElUser(null);
   };
 
-  const signout = async () => {
-    await fetch("/signout", {
+  const signout = () => {
+    Utils.fetchJson("/signout", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
-
-    setProfile(null);
-    handleCloseUserMenu();
+    })
+      .then((r) => {
+        setProfile(null);
+        handleCloseUserMenu();
+      })
+      .catch((error) => {
+        alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
+      });
   };
 
   let buttons;
@@ -110,7 +113,7 @@ const Navbar = ({ profile, setProfile }) => {
   } else {
     buttons = (
       <Box sx={{ flexGrow: 0 }}>
-        <Link to="/SignUp" style={{ textDecoration: "none", color: "white" }}>
+        <Link to="/signup" style={{ textDecoration: "none", color: "white" }}>
           <Button
             title="signupbutton"
             variant="contained"
@@ -120,7 +123,7 @@ const Navbar = ({ profile, setProfile }) => {
             Sign Up
           </Button>
         </Link>
-        <Link to="/SignIn" style={{ textDecoration: "none", color: "white" }}>
+        <Link to="/signin" style={{ textDecoration: "none", color: "white" }}>
           <Button
             title="signinbutton"
             variant="contained"
