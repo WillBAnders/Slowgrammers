@@ -12,14 +12,26 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { Link as ScrollLink } from "react-scroll";
+import { useLocation } from "react-router-dom";
 
-const pages = ['About Us', 'Service', 'Courses'];
+const pages = ["About Us", "Service", "Courses"];
 //const settings = ['Profile', 'Finance', 'Logout'];
 
 const Navbar = ({ profile, setProfile }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const location = useLocation();
+
+  React.useEffect(() => {
+    if (location.hash) {
+      let elem = document.getElementById(location.hash.slice(1));
+      if (elem) {
+        elem.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [location]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -167,19 +179,31 @@ const Navbar = ({ profile, setProfile }) => {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                {pages.map((page) => (page !== "Courses" ?
-                  <MenuItem key={page}>
-                    <ScrollLink activeClass="active" to={page} spy={true} smooth={true} duration={500} onClick={handleCloseNavMenu}>
-                      <Typography textAlign="right">{page}</Typography>
-                    </ScrollLink>
-                  </MenuItem> :
-                  <MenuItem key={page}>
-                    <Link key={page} to={'/courses'} style={{ textDecoration: 'none', color: "black" }} onClick={handleCloseNavMenu}>
-                      <Typography textAlign="right">{page}</Typography>
-                    </Link>
-                  </MenuItem>
-                ))}
-
+                {pages.map((page) =>
+                  page !== "Courses" ? (
+                    <MenuItem key={page}>
+                      <Link
+                        activeClass="active"
+                        to={"/#" + page}
+                        onClick={handleCloseNavMenu}
+                        style={{ textDecoration: "none", color: "black" }}
+                      >
+                        <Typography textAlign="right">{page}</Typography>
+                      </Link>
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key={page}>
+                      <Link
+                        key={page}
+                        to={"/courses"}
+                        style={{ textDecoration: "none", color: "black" }}
+                        onClick={handleCloseNavMenu}
+                      >
+                        <Typography textAlign="right">{page}</Typography>
+                      </Link>
+                    </MenuItem>
+                  )
+                )}
               </Menu>
             </Box>
             <Typography
@@ -192,40 +216,45 @@ const Navbar = ({ profile, setProfile }) => {
                 TutorsVILLE
               </Link>
             </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (page !== "Courses" ?
-                <ScrollLink
-                  key={page}
-                  activeClass="active"
-                  to={page}
-                  spy={true}
-                  smooth={true}
-                  duration={500}
-                >
-                  <Button
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+              {pages.map((page) =>
+                page !== "Courses" ? (
+                  <Link
                     key={page}
-                    onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: "white", display: "block" }}
+                    activeClass="active"
+                    to={"/#" + page}
+                    style={{ textDecoration: "none", color: "white" }}
                   >
-                    {page}
-                  </Button>
-                </ScrollLink> :
-                < Link to="/courses" key={"courses"} style={{ textDecoration: 'none', color: "white" }}>
-                  <Button
-                    key="courses"
-                    onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: 'white', display: 'block' }}
+                    <Button
+                      key={page}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: "white", display: "block" }}
+                    >
+                      {page}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/courses"
+                    key={"courses"}
+                    style={{ textDecoration: "none", color: "white" }}
                   >
-                    Courses
-                </Button>
-                </Link>
-              ))}
+                    <Button
+                      key="courses"
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: "white", display: "block" }}
+                    >
+                      Courses
+                    </Button>
+                  </Link>
+                )
+              )}
             </Box>
             {buttons}
           </Toolbar>
         </Container>
       </AppBar>
-    </div >
+    </div>
   );
 };
 export default Navbar;
