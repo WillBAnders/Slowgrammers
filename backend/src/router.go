@@ -83,7 +83,7 @@ func getCoursesCode(c *gin.Context) {
 
 	//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 	var tutorings []Tutoring
-	DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
+	DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.Availability").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
 	tutors := make([]Tutor, len(tutorings))
 	for i, tutoring := range tutorings {
 		//TODO: Limit the amount of data being returned
@@ -192,7 +192,7 @@ func getTutorsUsername(c *gin.Context) {
 	username := c.Params.ByName("username")
 
 	var tutors []Tutor
-	DB.Joins("User").Limit(1).Find(&tutors, "User__username = ?", username)
+	DB.Limit(1).Joins("User").Preload("Availability").Find(&tutors, "User__username = ?", username)
 	if len(tutors) != 1 {
 		c.JSON(404, gin.H{
 			"error": "Tutor " + username + " not found.",
@@ -400,7 +400,7 @@ func getProfile(c *gin.Context) {
 	}
 
 	var tutors []Tutor
-	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
+	DB.Limit(1).Preload("Availability").Find(&tutors, "user_id = ?", users[0].ID)
 	if len(tutors) != 1 {
 		c.JSON(200, gin.H{
 			"profile": users[0],
@@ -486,14 +486,14 @@ func patchProfile(c *gin.Context) {
 	}
 
 	var tutors []Tutor
-	DB.Joins("User").Find(&tutors, "User__username = ?", claims.Username)
+	DB.Joins("User").Preload("Availability").Find(&tutors, "User__username = ?", claims.Username)
 
 	if len(tutors) > 0 {
 		if edits.Bio != "" {
 			tutors[0].Bio = edits.Bio
 		}
 		if edits.Availability != "" {
-			tutors[0].Availability = edits.Availability
+			//tutors[0].Availability = edits.Availability
 		}
 		DB.Save(&tutors)
 	}
