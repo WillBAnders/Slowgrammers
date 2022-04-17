@@ -7,14 +7,13 @@ import Utils from "../Utils";
 
 export default function TutorPage() {
   const params = useParams();
-  const [data, setData] = React.useState(null);
 
   async function loadData() {
     const response = await Utils.fetchJson(`/tutors/${params.username}`);
-    setData(response.body);
+    return response.body;
   }
 
-  function Component() {
+  function Component({ data }) {
     return (
       <div>
         <Stack

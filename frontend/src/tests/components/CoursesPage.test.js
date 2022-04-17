@@ -10,11 +10,25 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import CoursesPage from "../../components/CoursesPage.js";
 
 beforeAll(() => {
+  function mockResponseValue(value) {
+    return {
+      headers: {
+        get: jest.fn().mockImplementation(name => {
+          return name === "Content-Type" ? "application/json" : "";
+        }),
+      },
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue(value),
+    };
+  }
+
   global.fetch = jest.fn();
   global.fetch.mockResponseValue = function (value) {
-    this.mockResolvedValue({
-      json: jest.fn().mockResolvedValue(value),
-    });
+    this.mockResolvedValue(mockResponseValue(value));
+  };
+  global.fetch.mockResponseValueOnce = function (value) {
+    this.mockResolvedValueOnce(mockResponseValue(value));
   };
 });
 
@@ -23,8 +37,9 @@ describe("CoursesPage", () => {
     fetch.mockResponseValue({ courses: [{ code: "code", name: "Name" }] });
     await waitFor(async () => {
       const component = render(<CoursesPage />, { wrapper: MemoryRouter });
-      const cards = component.queryByTestId(/buttonStack/i);
-      expect(cards.children.length).toBe(0);
+      const loadingContainer =
+        component.container.querySelector(".loadingContainer");
+      expect(loadingContainer).not.toBe(null);
     });
   });
 
@@ -33,7 +48,7 @@ describe("CoursesPage", () => {
     const component = await waitFor(async () => {
       return render(<CoursesPage />, { wrapper: MemoryRouter });
     });
-    expect(fetch).toHaveBeenCalledWith("/courses");
+    expect(fetch).toHaveBeenCalledWith("/courses", expect.objectContaining({}));
   });
 
   describe("courses", () => {
@@ -81,8 +96,7 @@ describe("CoursesPage", () => {
     const component = await waitFor(async () => {
       return render(<CoursesPage />, { wrapper: MemoryRouter });
     });
-    const cards = component.queryByTestId(/buttonStack/i);
-    expect(cards.children.length).toBe(0);
-    expect(console.error).toHaveBeenCalledWith("expected");
+    const errorContainer = component.container.querySelector(".errorContainer");
+    expect(errorContainer).not.toBe(null);
   });
 });

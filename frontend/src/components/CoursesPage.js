@@ -5,15 +5,15 @@ import AsyncWrapper from "./AsyncWrapper";
 import Utils from "../Utils";
 
 export default function CoursesPage() {
-  const [data, setData] = React.useState(null);
-  const [filter, setFilter] = React.useState("");
 
-  async function loadCourses() {
+  async function loadData() {
     const response = await Utils.fetchJson("/courses");
-    setData(response.body);
+    return response.body;
   }
 
-  function Component() {
+  function Component({ data }) {
+    const [filter, setFilter] = React.useState("");
+
     return (
       <div className="Courses">
         <Box
@@ -89,5 +89,5 @@ export default function CoursesPage() {
     );
   }
 
-  return <AsyncWrapper handler={loadCourses} component={Component} />;
+  return <AsyncWrapper handler={loadData} component={Component} />;
 }

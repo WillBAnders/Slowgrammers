@@ -20,12 +20,10 @@ import AsyncWrapper from "./AsyncWrapper";
 
 export default function CoursePage({ profile }) {
   const params = useParams();
-  const [data, setData] = React.useState(null);
-  const [filter, setFilter] = React.useState("");
 
-  async function fetchData() {
+  async function loadData() {
     const response = await Utils.fetchJson(`/courses/${params.code}`);
-    setData(response.body);
+    return response.body;
   }
 
   function patchTutoringCourse(event, add) {
@@ -44,7 +42,9 @@ export default function CoursePage({ profile }) {
       });
   }
 
-  function Component() {
+  function Component({ data }) {
+    const [filter, setFilter] = React.useState("");
+
     return (
       <div>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -219,5 +219,5 @@ export default function CoursePage({ profile }) {
     );
   }
 
-  return <AsyncWrapper handler={fetchData} component={Component} />;
+  return <AsyncWrapper handler={loadData} component={Component} />;
 }

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 export default function ErrorContainer({ status = null, message }) {
   return (
     <Box
+      className="errorContainer"
       sx={{
         display: "flex",
         alignContent: "center",
@@ -20,7 +21,7 @@ export default function ErrorContainer({ status = null, message }) {
             },
           }}
         >
-          Error {status ?? "(Unknown)"}
+          Error {status ?? "(Unexpected)"}
         </Typography>
         <Typography
           sx={{
