@@ -9,9 +9,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Stack from "@mui/material/Stack";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { ThreeDots } from "react-loader-spinner";
 import Autocomplete from "@mui/material/Autocomplete";
-import { days, times } from "../styles/TableData";
+import LoadingContainer from "./LoadingContainer";
+import { DAYS, TIMES } from "../styles/TableData";
 import Utils from "../Utils";
 
 export default function ProfilePage({ profile }) {
@@ -39,67 +39,58 @@ export default function ProfilePage({ profile }) {
     setUpdated((fields) => ({ ...fields, [field]: value }));
   }
 
-  const checkTimeValidity = () => {
-    const start = times.indexOf(startTime);
-    const end = times.indexOf(endTime);
-    return availability
-      .filter((a) => day === a.day)
-      .every(
-        (a) =>
-          start > times.indexOf(a.endTime) || end < times.indexOf(a.startTime)
-      );
-  };
-
-  const addTime = (event) => {
+  function addTime(event) {
     event.preventDefault();
-    if (!day || !startTime || !endTime) {
-      alert("Incomplete time inputed");
+    if (day === "" || startTime === "" || endTime === "") {
+      alert("The provided availability is missing values.");
       return;
     }
-    const stIndex = times.indexOf(startTime);
-    const etIndex = times.indexOf(endTime);
-    if (
-      etIndex <= stIndex ||
+    const stIndex = TIMES.indexOf(startTime);
+    const etIndex = TIMES.indexOf(endTime);
+    if (stIndex >= endTime) {
+      alert("The provided time range is invalid.");
+      return;
+    } else if (
       availability.some(
         (a) =>
           day === a.day &&
-          stIndex < times.indexOf(a.endTime) &&
-          etIndex > times.indexOf(a.startTime)
+          stIndex < TIMES.indexOf(a.endTime) &&
+          etIndex > TIMES.indexOf(a.startTime)
       )
     ) {
-      alert("Invalid time inputed");
+      alert("The provided time range overlaps with an existing entry.");
       return;
     }
     const index = availability.findIndex(
       (a) =>
         day === a.day &&
-        (stIndex === times.indexOf(a.endTime) ||
-          etIndex === times.indexOf(a.startTime))
+        (stIndex === TIMES.indexOf(a.endTime) ||
+          etIndex === TIMES.indexOf(a.startTime))
     );
     const temp = [...availability];
     if (index !== -1) {
       if (
         index + 1 < temp.length &&
         temp[index + 1].day === day &&
-        times.indexOf(temp[index + 1].startTime) === etIndex
+        TIMES.indexOf(temp[index + 1].startTime) === etIndex
       ) {
         temp.splice(index, 2, {
           day,
           startTime:
-            times[Math.min(stIndex, times.indexOf(temp[index].startTime))],
+            TIMES[Math.min(stIndex, TIMES.indexOf(temp[index].startTime))],
           endTime:
-            times[Math.max(etIndex, times.indexOf(temp[index + 1].endTime))],
+            TIMES[Math.max(etIndex, TIMES.indexOf(temp[index + 1].endTime))],
         });
       } else {
         temp[index] = {
           day,
           startTime:
-            times[
-              Math.min(stIndex, times.indexOf(availability[index].startTime))
+            TIMES[
+              Math.min(stIndex, TIMES.indexOf(temp[index].startTime))
             ],
           endTime:
-            times[
-              Math.max(etIndex, times.indexOf(availability[index].endTime))
+            TIMES[
+              Math.max(etIndex, TIMES.indexOf(temp[index].endTime))
             ],
         };
       }
@@ -107,169 +98,22 @@ export default function ProfilePage({ profile }) {
       temp.push({ day, startTime, endTime });
       temp.sort((a, b) => {
         return a.day === b.day
-          ? times.indexOf(a.startTime) - times.indexOf(b.startTime)
-          : days.indexOf(a.day) - days.indexOf(b.day);
+          ? TIMES.indexOf(a.startTime) - TIMES.indexOf(b.startTime)
+          : DAYS.indexOf(a.day) - DAYS.indexOf(b.day);
       });
     }
     setAvailability(temp);
-    // [12am-3am, 7am-9am]
-    // Case 1: [6am-8am] (good)
-    // Case 2: [3am-7am] (not done)
-    // Case 3: [7am-10am] (good)
+  }
 
-    //const astIndex = times.indexOf(availability[index].startTime);
-    //const aetIndex = times.indexOf(availability[index].endTime);
-    /*
-    if (sstIndex >= astIndex) {
-        availability[index].endTime = endTime;
-    } else if (etIndex <= aetIndex) {
-        availability[index].startTime = startTime;
-    } else {
-        availability.splice()
-    }
-    */
-  };
-
-  const merge = () => {
-    let stIndex = times.indexOf(startTime);
-    let etIndex = times.indexOf(endTime);
-    let st = startTime;
-    let et = endTime;
-    let mergecount = 0;
-    for (let i = 0; i < availability.length; i++) {
-      if (day === availability[i].day) {
-        const avsIndex = times.indexOf(availability[i].startTime);
-        const aveIndex = times.indexOf(availability[i].endTime);
-        if (stIndex < avsIndex && etIndex < aveIndex) {
-          console.log("Changing start");
-          availability[i].startTime = st;
-          et = availability[i].endTime;
-          if (mergecount > 0) {
-            const temparray = [...availability];
-            temparray.splice(i - 1, 1);
-            setAvailability(temparray);
-          }
-          mergecount++;
-          stIndex = times.indexOf(st);
-          etIndex = times.indexOf(et);
-        } else if (stIndex > avsIndex && etIndex > aveIndex) {
-          console.log("Changing end");
-          availability[i].endTime = et;
-          st = availability[i].startTime;
-          if (mergecount > 0) {
-            const temparray = [...availability];
-            temparray.splice(i, 1);
-            setAvailability(temparray);
-          }
-          mergecount++;
-          stIndex = times.indexOf(st);
-          etIndex = times.indexOf(et);
-        } else if (
-          stIndex <= avsIndex &&
-          etIndex >= aveIndex &&
-          !(stIndex === avsIndex && etIndex === aveIndex)
-        ) {
-          availability[i].startTime = st;
-          availability[i].endTime = et;
-          st = availability[i].startTime;
-          et = availability[i].endTime;
-          if (mergecount > 0) {
-            const temparray = [...availability];
-            temparray.splice(i, 1);
-            setAvailability(temparray);
-          }
-          mergecount++;
-          stIndex = times.indexOf(st);
-          etIndex = times.indexOf(et);
-        }
-      }
-    }
-    return mergecount > 0;
-  };
-
-  const addTimeOld = (event) => {
-    event.preventDefault();
-    console.log(day + ", " + startTime + "-" + endTime);
-    if (!day || !startTime || !endTime) {
-      console.log("Invalid time");
-      alert("Incomplete entry made");
-    } else if (
-      times.indexOf(startTime) < times.indexOf(endTime) &&
-      checkTimeValidity()
-    ) {
-      console.log("Valid time");
-      const newday = { day: day, startTime: startTime, endTime: endTime };
-      setAvailability((availability) => {
-        return [...availability, newday].sort((a, b) => {
-          return a.day === b.day
-            ? times.indexOf(a.startTime) - times.indexOf(b.startTime)
-            : days.indexOf(a.day) - days.indexOf(b.day);
-        });
-      });
-      setDay("");
-      setStartTime("");
-      setEndTime("");
-    } else {
-      if (!merge()) {
-        console.log("Invalid time");
-        alert("Invalid time chosen");
-      } else {
-        setDay("");
-        setStartTime("");
-        setEndTime("");
-      }
-    }
-  };
-
-  const removeTime = (event, index) => {
+  function removeTime(event, index) {
     event.preventDefault();
     const temparray = [...availability];
     temparray.splice(index, 1);
     setAvailability(temparray);
-  };
-
-  function showAvailability(availabil) {
-    let availcards = [];
-    console.log("Availability", availabil);
-    if (availabil.length != 0) {
-      for (let i = 0; i < availabil.length; i++) {
-        availcards.push(
-          <Stack
-            direction="row"
-            key={i}
-            component="form"
-            onSubmit={(e) => removeTime(e, i)}
-          >
-            <Card>
-              <CardContent>
-                {availabil[i].day}: {availabil[i].startTime} -{" "}
-                {availabil[i].endTime}
-              </CardContent>
-            </Card>
-            <Button
-              aria-label="DeleteIcon"
-              variant="contained"
-              color="error"
-              type="submit"
-              title="removebutton"
-            >
-              <DeleteIcon />
-            </Button>
-          </Stack>
-        );
-      }
-      return availcards;
-    } else {
-      return <div>No availability given</div>;
-    }
   }
 
   if (profile === null) {
-    return (
-      <div className="loadingContainer">
-        <ThreeDots type="ThreeDots" color="#00b22d" height={100} width={100} />
-      </div>
-    );
+    return <LoadingContainer />;
   } else {
     return (
       <div>
@@ -377,14 +221,14 @@ export default function ProfilePage({ profile }) {
               onChange={(event, newValue) => {
                 setDay(newValue);
               }}
-              options={days}
+              options={DAYS}
               sx={{ width: { xs: 100, md: 300 } }}
               renderInput={(params) => <TextField {...params} label="Day" />}
             />
             <Autocomplete
               disablePortal
               id="StartTimeSelector"
-              options={times}
+              options={TIMES}
               value={startTime}
               onChange={(event, newValue) => {
                 setStartTime(newValue);
@@ -401,7 +245,7 @@ export default function ProfilePage({ profile }) {
               onChange={(event, newValue) => {
                 setEndTime(newValue);
               }}
-              options={times}
+              options={TIMES}
               sx={{ width: { xs: 100, md: 300 } }}
               renderInput={(params) => (
                 <TextField {...params} label="End Time" />
@@ -425,7 +269,37 @@ export default function ProfilePage({ profile }) {
           justifyContent="center"
           sx={{ mt: 2 }}
         >
-          <Stack>{showAvailability(availability)}</Stack>
+          <Stack>
+            {availability.length === 0 ? (
+              <div>No availability given</div>
+            ) : (
+              availability.map((a, i) => {
+                return (
+                  <Stack
+                    direction="row"
+                    key={a.day + " " + a.startTime}
+                    component="form"
+                    onSubmit={(e) => removeTime(e, i)}
+                  >
+                    <Card>
+                      <CardContent>
+                        {a.day + ": " + a.startTime + " - " + a.endTime}
+                      </CardContent>
+                    </Card>
+                    <Button
+                      aria-label="DeleteIcon"
+                      variant="contained"
+                      color="error"
+                      type="submit"
+                      title="removebutton"
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  </Stack>
+                );
+              })
+            )}
+          </Stack>
         </Box>
       </div>
     );

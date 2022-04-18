@@ -1,4 +1,4 @@
-export const days = [
+export const DAYS = [
   "Sunday",
   "Monday",
   "Tuesday",
@@ -8,7 +8,7 @@ export const days = [
   "Saturday",
 ];
 
-export const times = [
+export const TIMES = [
   "12:00 AM",
   "12:15 AM",
   "12:30 AM",
