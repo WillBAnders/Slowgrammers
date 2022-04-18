@@ -16,7 +16,7 @@ import Utils from "../Utils";
 
 const theme = createTheme();
 
-export default function SignupPage() {
+export default function SignupPage({ setProfile }) {
   const navigate = useNavigate();
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -35,6 +35,7 @@ export default function SignupPage() {
       })
         .then((r) => {
           navigate("/");
+          setProfile(undefined);
         })
         .catch((error) => {
           if (error.status === 401) {

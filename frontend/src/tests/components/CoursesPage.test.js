@@ -13,7 +13,7 @@ beforeAll(() => {
   function mockResponseValue(value) {
     return {
       headers: {
-        get: jest.fn().mockImplementation(name => {
+        get: jest.fn().mockImplementation((name) => {
           return name === "Content-Type" ? "application/json" : "";
         }),
       },

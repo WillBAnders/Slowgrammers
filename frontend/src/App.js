@@ -14,21 +14,22 @@ import "./styles/Footer.css";
 import Utils from "./Utils";
 
 function App() {
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(undefined);
 
   useEffect(() => {
-    Utils.fetchJson("/profile")
-      .then((r) => {
-        setProfile(r.body.profile);
-      })
-      .catch((error) => {
-        if (error.status !== 401) {
-          alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
-        }
-      });
-  }, []);
-
-  //console.log("Re-render App.js, name = " + name)
+    if (profile === undefined) {
+      Utils.fetchJson("/profile")
+        .then((r) => {
+          setProfile(r.body.profile);
+        })
+        .catch((error) => {
+          if (error.status !== 401) {
+            alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
+          }
+          setProfile(null);
+        });
+    }
+  }, [profile]);
 
   return (
     <div className="flex-wrapper">
@@ -39,11 +40,20 @@ function App() {
           <Route path="/courses" element={<CoursesPage />} />
           <Route
             path="/courses/:code"
-            element={<CoursePage profile={profile} />}
+            element={<CoursePage profile={profile} setProfile={setProfile} />}
           />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/signin" element={<SigninPage />} />
-          <Route path="/profile" element={<ProfilePage profile={profile} />} />
+          <Route
+            path="/signup"
+            element={<SignupPage setProfile={setProfile} />}
+          />
+          <Route
+            path="/signin"
+            element={<SigninPage setProfile={setProfile} />}
+          />
+          <Route
+            path="/profile"
+            element={<ProfilePage profile={profile} setProfile={setProfile} />}
+          />
           <Route path="/tutors/:username" element={<TutorPage />} />
           <Route
             path="*"

@@ -5,7 +5,6 @@ import AsyncWrapper from "./AsyncWrapper";
 import Utils from "../Utils";
 
 export default function CoursesPage() {
-
   async function loadData() {
     const response = await Utils.fetchJson("/courses");
     return response.body;

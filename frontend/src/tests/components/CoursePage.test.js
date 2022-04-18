@@ -13,7 +13,7 @@ beforeAll(() => {
   function mockResponseValue(value) {
     return {
       headers: {
-        get: jest.fn().mockImplementation(name => {
+        get: jest.fn().mockImplementation((name) => {
           return name === "Content-Type" ? "application/json" : "";
         }),
       },
@@ -30,8 +30,6 @@ beforeAll(() => {
   global.fetch.mockResponseValueOnce = function (value) {
     this.mockResolvedValueOnce(mockResponseValue(value));
   };
-  delete window.location; //TODO: https://remarkablemark.org/blog/2018/11/17/mock-window-location/
-  window.location = { reload: jest.fn() };
 });
 
 describe("CoursePage", () => {
@@ -113,7 +111,6 @@ describe("CoursePage", () => {
           body: JSON.stringify({ tutoring: [{ code: "code", action: add }] }),
         })
       );
-      expect(window.location.reload).toHaveBeenCalled();
     });
   });
 });

@@ -18,7 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Utils from "../Utils";
 import AsyncWrapper from "./AsyncWrapper";
 
-export default function CoursePage({ profile }) {
+export default function CoursePage({ profile, setProfile }) {
   const params = useParams();
 
   async function loadData() {
@@ -35,7 +35,7 @@ export default function CoursePage({ profile }) {
       }),
     })
       .then((r) => {
-        window.location.reload(false);
+        setProfile(undefined);
       })
       .catch((error) => {
         alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
@@ -219,5 +219,7 @@ export default function CoursePage({ profile }) {
     );
   }
 
-  return <AsyncWrapper handler={loadData} component={Component} />;
+  return (
+    <AsyncWrapper handler={loadData} deps={[profile]} component={Component} />
+  );
 }

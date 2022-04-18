@@ -14,7 +14,7 @@ import LoadingContainer from "./LoadingContainer";
 import { DAYS, TIMES } from "../styles/TableData";
 import Utils from "../Utils";
 
-export default function ProfilePage({ profile }) {
+export default function ProfilePage({ profile, setProfile }) {
   const [updated, setUpdated] = React.useState({});
   const [day, setDay] = React.useState("");
   const [startTime, setStartTime] = React.useState("");
@@ -28,7 +28,7 @@ export default function ProfilePage({ profile }) {
       body: JSON.stringify(updated),
     })
       .then((r) => {
-        //TODO: Refresh/confirm?
+        setProfile(undefined);
       })
       .catch((error) => {
         alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
@@ -112,7 +112,7 @@ export default function ProfilePage({ profile }) {
     setAvailability(temparray);
   }
 
-  if (profile === null) {
+  if (!profile) {
     return <LoadingContainer />;
   } else {
     return (
