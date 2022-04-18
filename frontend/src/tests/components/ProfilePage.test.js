@@ -35,7 +35,9 @@ beforeAll(() => {
 describe("ProfilePage", () => {
   test("loading", async () => {
     const component = await waitFor(async () => {
-      return render(<ProfilePage profile={null} />, { wrapper: MemoryRouter });
+      return render(<ProfilePage profile={null} setProfile={jest.fn()} />, {
+        wrapper: MemoryRouter,
+      });
     });
     const loadingContainer =
       component.container.querySelector(".loadingContainer");
@@ -46,7 +48,10 @@ describe("ProfilePage", () => {
     fetch.mockResponseValue({});
     const component = await waitFor(async () => {
       return render(
-        <ProfilePage profile={createUser({ username: "Username" })} />,
+        <ProfilePage
+          profile={createUser({ username: "Username" })}
+          setProfile={jest.fn()}
+        />,
         { wrapper: MemoryRouter }
       );
     });
@@ -62,16 +67,19 @@ describe("ProfilePage", () => {
       ${"phone"}     | ${"Phone Number"}  | ${"123-456-7890"}
     `("$name", async ({ name, label, value }) => {
       fetch.mockResponseValue({});
+      const setProfile = jest.fn();
 
       const component = await waitFor(async () => {
         return render(
-          <ProfilePage profile={createUser({ username: "Username" })} />,
+          <ProfilePage
+            profile={createUser({ username: "Username" })}
+            setProfile={setProfile}
+          />,
           { wrapper: MemoryRouter }
         );
       });
 
       await waitFor(async () => {
-        const field = component.getByLabelText(label, { exact: false });
         fireEvent.change(component.getByLabelText(label, { exact: false }), {
           target: { value },
         });
@@ -88,14 +96,19 @@ describe("ProfilePage", () => {
           body: JSON.stringify({ [name]: value }),
         })
       );
+      expect(setProfile).toHaveBeenCalledWith(undefined);
     });
 
     test("multiple", async () => {
       fetch.mockResponseValue({});
+      const setProfile = jest.fn();
 
       const component = await waitFor(async () => {
         return render(
-          <ProfilePage profile={createUser({ username: "Username" })} />,
+          <ProfilePage
+            profile={createUser({ username: "Username" })}
+            setProfile={setProfile}
+          />,
           { wrapper: MemoryRouter }
         );
       });
@@ -122,15 +135,18 @@ describe("ProfilePage", () => {
           body: JSON.stringify({ firstname: "First", lastname: "Last" }),
         })
       );
+      expect(setProfile).toHaveBeenCalledWith(undefined);
     });
 
     test("clear", async () => {
       fetch.mockResponseValue({});
+      const setProfile = jest.fn();
 
       const component = await waitFor(async () => {
         return render(
           <ProfilePage
             profile={createUser({ username: "Username", firstname: "First" })}
+            setProfile={setProfile}
           />,
           { wrapper: MemoryRouter }
         );
@@ -155,6 +171,7 @@ describe("ProfilePage", () => {
           body: JSON.stringify({ firstname: "" }),
         })
       );
+      expect(setProfile).toHaveBeenCalledWith(undefined);
     });
   });
 });
