@@ -51,7 +51,7 @@ export default function SigninPage({ setProfile }) {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: "url(/images/signin.png)",
+            backgroundImage: "url(./images/signin.png)",
             backgroundRepeat: "no-repeat",
             backgroundSize: "60%",
             backgroundPosition: "center",

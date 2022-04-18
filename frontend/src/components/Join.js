@@ -32,7 +32,7 @@ export default function Join() {
       >
         <Grid item xs={12} md={7} container justify="center" alignItems="left">
           <img
-            src="/images/join.png"
+            src="./images/join.png"
             height="100%"
             width="100%"
             className="main-img"

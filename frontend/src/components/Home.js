@@ -54,7 +54,7 @@ const Home = () => {
           </Typography>
         </Grid>
         <Grid item xs={12} md={7} container justify="center" alignItems="left">
-          <img src="/images/Main.jpg" className="main-img" alt="home" />
+          <img src="./images/Main.jpg" className="main-img" alt="home" />
         </Grid>
       </Grid>
     </div>

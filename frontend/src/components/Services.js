@@ -44,7 +44,7 @@ const Services = () => {
             <CardMedia
               component="img"
               className="service-photo"
-              src="/images/courses.jpg"
+              src="./images/courses.jpg"
               title="Tutors"
               sx={{ maxHeight: "308px" }}
             />
