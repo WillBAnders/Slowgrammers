@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import CoursesPage from "./components/CoursesPage";
 import LandingPage from "./components/LandingPage";
 import CoursePage from "./components/CoursePage";
@@ -33,7 +33,7 @@ function App() {
 
   return (
     <div className="flex-wrapper">
-      <BrowserRouter>
+      <HashRouter>
         <Navbar profile={profile} setProfile={setProfile} />
         <Routes>
           <Route path="/" exact element={<LandingPage />} />
@@ -61,7 +61,7 @@ function App() {
           />
         </Routes>
         <Footer />
-      </BrowserRouter>
+      </HashRouter>
     </div>
   );
 }
