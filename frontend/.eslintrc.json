@@ -22,6 +22,10 @@
     "react/react-in-jsx-scope": "off",
     //"no-console": "warn",
     "no-eval": "error",
-    "linebreak-style": ["error", "unix"]
+    "linebreak-style": ["error", "unix"],
+    "react/prop-types": "warn",
+    "no-unused-vars": "warn",
+    "no-prototype-builtins": "warn",
+    "react/no-unescaped-entities": "warn"
   }
 }
