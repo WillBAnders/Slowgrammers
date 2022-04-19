@@ -13,7 +13,7 @@ beforeAll(() => {
   function mockResponseValue(value) {
     return {
       headers: {
-        get: jest.fn().mockImplementation(name => {
+        get: jest.fn().mockImplementation((name) => {
           return name === "Content-Type" ? "application/json" : "";
         }),
       },
@@ -30,8 +30,6 @@ beforeAll(() => {
   global.fetch.mockResponseValueOnce = function (value) {
     this.mockResolvedValueOnce(mockResponseValue(value));
   };
-  delete window.location; //TODO: https://remarkablemark.org/blog/2018/11/17/mock-window-location/
-  window.location = { reload: jest.fn() };
 });
 
 describe("CoursePage", () => {
@@ -41,9 +39,10 @@ describe("CoursePage", () => {
       tutors: [],
     });
     await waitFor(async () => {
-      const component = render(<CoursePage profile={null} />, {
-        wrapper: MemoryRouter,
-      });
+      const component = render(
+        <CoursePage profile={null} setProfile={jest.fn()} />,
+        { wrapper: MemoryRouter }
+      );
       const loadingContainer =
         component.container.querySelector(".loadingContainer");
       expect(loadingContainer).not.toBe(null);
@@ -62,7 +61,9 @@ describe("CoursePage", () => {
         tutors: tutors.map((t) => createTutor(t)),
       });
       const component = await waitFor(async () => {
-        return render(<CoursePage profile={null} />, { wrapper: MemoryRouter });
+        return render(<CoursePage profile={null} setProfile={jest.fn()} />, {
+          wrapper: MemoryRouter,
+        });
       });
       const tutorlist = component.queryByTitle("tutorlist");
       if (tutors.length === 0) {
@@ -86,6 +87,7 @@ describe("CoursePage", () => {
         tutors: tutors.map((t) => createTutor(t)),
       });
       fetch.mockResponseValue({});
+      const setProfile = jest.fn();
       const component = await waitFor(async () => {
         return render(
           <MemoryRouter initialEntries={["/courses/code"]}>
@@ -93,7 +95,10 @@ describe("CoursePage", () => {
               <Route
                 path={"/courses/:code"}
                 element={
-                  <CoursePage profile={createTutor({ username: "Username" })} />
+                  <CoursePage
+                    profile={createTutor({ username: "Username" })}
+                    setProfile={setProfile}
+                  />
                 }
               />
             </Routes>
@@ -113,7 +118,7 @@ describe("CoursePage", () => {
           body: JSON.stringify({ tutoring: [{ code: "code", action: add }] }),
         })
       );
-      expect(window.location.reload).toHaveBeenCalled();
+      expect(setProfile).toHaveBeenCalled();
     });
   });
 });

@@ -13,7 +13,7 @@ beforeAll(() => {
   function mockResponseValue(value) {
     return {
       headers: {
-        get: jest.fn().mockImplementation(name => {
+        get: jest.fn().mockImplementation((name) => {
           return name === "Content-Type" ? "application/json" : "";
         }),
       },
@@ -35,9 +35,12 @@ beforeAll(() => {
 describe("SignupPage", () => {
   test("fetch arguments", async () => {
     fetch.mockResponseValue({});
+    const setProfile = jest.fn();
 
     const component = await waitFor(async () => {
-      return render(<SignupPage />, { wrapper: MemoryRouter });
+      return render(<SignupPage setProfile={setProfile} />, {
+        wrapper: MemoryRouter,
+      });
     });
 
     await waitFor(async () => {
@@ -60,13 +63,25 @@ describe("SignupPage", () => {
         body: JSON.stringify({ username: "Username", password: "Password" }),
       })
     );
+    expect(setProfile).toHaveBeenCalledWith(undefined);
   });
 
   test("fetch resolved", async () => {
     fetch.mockResponseValue({});
 
     const component = await waitFor(async () => {
-      return render(<SignupPage />, { wrapper: MemoryRouter });
+      return render(<SignupPage setProfile={jest.fn()} />, {
+        wrapper: MemoryRouter,
+      });
+    });
+
+    await waitFor(async () => {
+      fireEvent.change(component.getByLabelText("Username", { exact: false }), {
+        target: { value: "Username" },
+      });
+      fireEvent.change(component.getByLabelText("Password", { exact: false }), {
+        target: { value: "Password" },
+      });
     });
 
     await waitFor(async () => {
@@ -78,18 +93,31 @@ describe("SignupPage", () => {
   });
 
   test("fetch rejected", async () => {
-    console.error = jest.fn(); //TODO: State management
+    global.alert = jest.fn(); //TODO: State management
     fetch.mockRejectedValue(new Error("expected"));
+    const setProfile = jest.fn();
 
     const component = await waitFor(async () => {
-      return render(<SignupPage />, { wrapper: MemoryRouter });
+      return render(<SignupPage setProfile={jest.fn()} />, {
+        wrapper: MemoryRouter,
+      });
+    });
+
+    await waitFor(async () => {
+      fireEvent.change(component.getByLabelText("Username", { exact: false }), {
+        target: { value: "Username" },
+      });
+      fireEvent.change(component.getByLabelText("Password", { exact: false }), {
+        target: { value: "Password" },
+      });
     });
 
     await waitFor(async () => {
       fireEvent.submit(component.getByTitle("submit"));
     });
 
-    // expect(console.error).toHaveBeenCalledWith("expected");
+    expect(alert).toHaveBeenCalledWith("Error (Unexpected): expected");
     //expect(window.location.pathname).toBe("/signin");
+    expect(setProfile).not.toHaveBeenCalled();
   });
 });

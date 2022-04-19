@@ -7,7 +7,9 @@ async function fetchJson(path, options = {}) {
     ...options,
   });
   //TODO: Better method to ensure intermediate errors (ex. offline server) are handled
-  const body = response.headers.get("Content-Type")?.includes("application/json")
+  const body = response.headers
+    .get("Content-Type")
+    ?.includes("application/json")
     ? await response.json()
     : await response.text();
   if (response.ok) {

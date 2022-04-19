@@ -13,7 +13,7 @@ beforeAll(() => {
   function mockResponseValue(value) {
     return {
       headers: {
-        get: jest.fn().mockImplementation(name => {
+        get: jest.fn().mockImplementation((name) => {
           return name === "Content-Type" ? "application/json" : "";
         }),
       },
@@ -35,9 +35,12 @@ beforeAll(() => {
 describe("SigninPage", () => {
   test("fetch arguments", async () => {
     fetch.mockResponseValue({});
+    const setProfile = jest.fn();
 
     const component = await waitFor(async () => {
-      return render(<SigninPage />, { wrapper: MemoryRouter });
+      return render(<SigninPage setProfile={setProfile} />, {
+        wrapper: MemoryRouter,
+      });
     });
 
     await waitFor(async () => {
@@ -60,13 +63,16 @@ describe("SigninPage", () => {
         body: JSON.stringify({ username: "Username", password: "Password" }),
       })
     );
+    expect(setProfile).toHaveBeenCalledWith(undefined);
   });
 
   test("fetch resolved", async () => {
     fetch.mockResponseValue({});
 
     const component = await waitFor(async () => {
-      return render(<SigninPage />, { wrapper: MemoryRouter });
+      return render(<SigninPage setProfile={jest.fn()} />, {
+        wrapper: MemoryRouter,
+      });
     });
 
     await waitFor(async () => {
@@ -80,9 +86,12 @@ describe("SigninPage", () => {
   test("fetch rejected", async () => {
     global.alert = jest.fn(); //TODO: State management
     fetch.mockRejectedValue(new Error("expected"));
+    const setProfile = jest.fn();
 
     const component = await waitFor(async () => {
-      return render(<SigninPage />, { wrapper: MemoryRouter });
+      return render(<SigninPage setProfile={setProfile} />, {
+        wrapper: MemoryRouter,
+      });
     });
 
     await waitFor(async () => {
@@ -91,5 +100,6 @@ describe("SigninPage", () => {
 
     expect(alert).toHaveBeenCalledWith("Error (Unexpected): expected");
     //expect(window.location.pathname).toBe("/signin");
+    expect(setProfile).not.toHaveBeenCalled();
   });
 });
