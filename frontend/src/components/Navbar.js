@@ -12,15 +12,32 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { Link as ScrollLink } from "react-scroll";
+import { useLocation } from "react-router-dom";
 import Utils from "../Utils";
 
-const pages = ["About Us", "Service", "Contact Us"];
+const pages = new Map([
+  ["about", "About Us"],
+  ["services", "Services"],
+  ["courses", "Courses"],
+]);
+
 //const settings = ['Profile', 'Finance', 'Logout'];
 
 const Navbar = ({ profile, setProfile }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const location = useLocation();
+
+  React.useEffect(() => {
+    if (location.hash) {
+      let elem = document.getElementById(location.hash.slice(1));
+      if (elem) {
+        elem.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [location]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -41,7 +58,7 @@ const Navbar = ({ profile, setProfile }) => {
     Utils.fetchJson("/signout", {
       method: "POST",
     })
-      .then((r) => {
+      .then(() => {
         setProfile(null);
         handleCloseUserMenu();
       })
@@ -170,19 +187,17 @@ const Navbar = ({ profile, setProfile }) => {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <ScrollLink
-                      activeClass="active"
-                      to={page}
-                      spy={true}
-                      smooth={true}
-                      duration={500}
+                {Array.from(pages.entries()).map(([key, value]) =>
+                  <MenuItem key={key}>
+                    <Link
+                      to={(key === "courses" ? "/" : "/#") + key}
+                      onClick={handleCloseNavMenu}
+                      style={{ textDecoration: "none", color: "black" }}
                     >
-                      <Typography textAlign="right">{page}</Typography>
-                    </ScrollLink>
+                      <Typography textAlign="right">{value}</Typography>
+                    </Link>
                   </MenuItem>
-                ))}
+                )}
               </Menu>
             </Box>
             <Typography
@@ -196,24 +211,20 @@ const Navbar = ({ profile, setProfile }) => {
               </Link>
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {pages.map((page) => (
-                <ScrollLink
-                  key={page}
-                  activeClass="active"
-                  to={page}
-                  spy={true}
-                  smooth={true}
-                  duration={500}
+              {Array.from(pages.entries()).map(([key, value]) =>
+                <Link
+                  key={key}
+                  to={(key === "courses" ? "/" : "/#") + key}
+                  style={{ textDecoration: "none", color: "white" }}
                 >
                   <Button
-                    key={page}
                     onClick={handleCloseNavMenu}
                     sx={{ my: 2, color: "white", display: "block" }}
                   >
-                    {page}
+                    {value}
                   </Button>
-                </ScrollLink>
-              ))}
+                </Link>
+              )}
             </Box>
             {buttons}
           </Toolbar>

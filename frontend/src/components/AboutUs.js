@@ -8,7 +8,7 @@ import { Box } from "@mui/system";
 
 const AboutUs = () => {
   return (
-    <div id="About Us" className="About Us">
+    <div id="about" className="About Us">
       <Typography
         className="main-text"
         sx={{

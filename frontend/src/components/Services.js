@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 
 const Services = () => {
   return (
-    <div id="Service">
+    <div id="services">
       <Typography
         className="main-text"
         sx={{
@@ -30,7 +30,7 @@ const Services = () => {
         }}
         variant="h2"
       >
-        Our Service
+        Our Services
       </Typography>
       <Grid
         container
