@@ -10,6 +10,8 @@ import "regenerator-runtime/runtime";
 import ProfilePage from "../../components/ProfilePage.js";
 import MockUtils from "../utils/MockUtils";
 
+MockUtils.Alert.enable("error");
+MockUtils.Console.enable({ log: "silent", error: "error" });
 MockUtils.Fetch.enable();
 
 describe("ProfilePage", () => {

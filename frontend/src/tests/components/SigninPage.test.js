@@ -10,6 +10,8 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import SigninPage from "../../components/SigninPage.js";
 import MockUtils from "../utils/MockUtils";
 
+MockUtils.Alert.enable("error");
+MockUtils.Console.enable({ log: "silent", error: "error" });
 MockUtils.Fetch.enable();
 
 describe("SigninPage", () => {
@@ -63,23 +65,24 @@ describe("SigninPage", () => {
     //expect(window.location.pathname).toBe("/");
   });
 
-  test("fetch rejected", async () => {
-    global.alert = jest.fn(); //TODO: State management
-    fetch.mockRejectedValue(new Error("expected"));
-    const setProfile = jest.fn();
+  describe("error", () => {
+    MockUtils.Alert.enable("silent");
 
-    const component = await waitFor(async () => {
-      return render(<SigninPage setProfile={setProfile} />, {
-        wrapper: MemoryRouter,
+    test("fetch rejected", async () => {
+      fetch.mockRejectedValue(new Error("expected"));
+      const setProfile = jest.fn();
+      const component = await waitFor(async () => {
+        return render(<SigninPage setProfile={setProfile} />, {
+          wrapper: MemoryRouter,
+        });
       });
-    });
+      await waitFor(async () => {
+        fireEvent.submit(component.getByTitle("submit"));
+      });
 
-    await waitFor(async () => {
-      fireEvent.submit(component.getByTitle("submit"));
+      expect(alert).toHaveBeenCalledWith("Error (Unexpected): expected");
+      //expect(window.location.pathname).toBe("/signin");
+      expect(setProfile).not.toHaveBeenCalled();
     });
-
-    expect(alert).toHaveBeenCalledWith("Error (Unexpected): expected");
-    //expect(window.location.pathname).toBe("/signin");
-    expect(setProfile).not.toHaveBeenCalled();
   });
 });

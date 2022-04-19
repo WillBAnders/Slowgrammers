@@ -10,6 +10,8 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import CoursesPage from "../../components/CoursesPage.js";
 import MockUtils from "../utils/MockUtils";
 
+MockUtils.Alert.enable("error");
+MockUtils.Console.enable({ log: "silent", error: "error" });
 MockUtils.Fetch.enable();
 
 describe("CoursesPage", () => {
@@ -71,7 +73,6 @@ describe("CoursesPage", () => {
   });
 
   test("fetch rejected", async () => {
-    console.error = jest.fn(); //TODO: State management
     fetch.mockRejectedValue(new Error("expected"));
     const component = await waitFor(async () => {
       return render(<CoursesPage />, { wrapper: MemoryRouter });

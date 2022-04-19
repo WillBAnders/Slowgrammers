@@ -10,6 +10,8 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import SignupPage from "../../components/SignupPage.js";
 import MockUtils from "../utils/MockUtils";
 
+MockUtils.Alert.enable("error");
+MockUtils.Console.enable({ log: "silent", error: "error" });
 MockUtils.Fetch.enable();
 
 describe("SignupPage", () => {
@@ -72,32 +74,41 @@ describe("SignupPage", () => {
     //expect(window.location.pathname).toBe("/");
   });
 
-  test("fetch rejected", async () => {
-    global.alert = jest.fn(); //TODO: State management
-    fetch.mockRejectedValue(new Error("expected"));
-    const setProfile = jest.fn();
+  describe("error", () => {
+    MockUtils.Alert.enable("silent");
 
-    const component = await waitFor(async () => {
-      return render(<SignupPage setProfile={jest.fn()} />, {
-        wrapper: MemoryRouter,
+    test("fetch rejected", async () => {
+      fetch.mockRejectedValue(new Error("expected"));
+      const setProfile = jest.fn();
+
+      const component = await waitFor(async () => {
+        return render(<SignupPage setProfile={jest.fn()} />, {
+          wrapper: MemoryRouter,
+        });
       });
-    });
 
-    await waitFor(async () => {
-      fireEvent.change(component.getByLabelText("Username", { exact: false }), {
-        target: { value: "Username" },
+      await waitFor(async () => {
+        fireEvent.change(
+          component.getByLabelText("Username", { exact: false }),
+          {
+            target: { value: "Username" },
+          }
+        );
+        fireEvent.change(
+          component.getByLabelText("Password", { exact: false }),
+          {
+            target: { value: "Password" },
+          }
+        );
       });
-      fireEvent.change(component.getByLabelText("Password", { exact: false }), {
-        target: { value: "Password" },
+
+      await waitFor(async () => {
+        fireEvent.submit(component.getByTitle("submit"));
       });
-    });
 
-    await waitFor(async () => {
-      fireEvent.submit(component.getByTitle("submit"));
+      expect(alert).toHaveBeenCalledWith("Error (Unexpected): expected");
+      //expect(window.location.pathname).toBe("/signup");
+      expect(setProfile).not.toHaveBeenCalled();
     });
-
-    expect(alert).toHaveBeenCalledWith("Error (Unexpected): expected");
-    //expect(window.location.pathname).toBe("/signin");
-    expect(setProfile).not.toHaveBeenCalled();
   });
 });

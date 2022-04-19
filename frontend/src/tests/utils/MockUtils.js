@@ -1,3 +1,33 @@
+function mockDisableFunction(object, name, mode) {
+  const wrapper = { original: undefined, mock: undefined };
+  beforeEach(() => {
+    wrapper.original = object[name];
+    wrapper.mock = object[name] = jest
+      .fn(mode !== "silent" ? wrapper.original : undefined)
+      .mockName(name);
+  });
+  afterEach(() => {
+    if (mode === "error") {
+      expect(wrapper.mock).not.toHaveBeenCalled();
+    }
+    object[name] = wrapper.original;
+  });
+}
+
+const Console = {
+  enable: function (functions) {
+    Object.entries(functions).forEach(([name, mode]) => {
+      mockDisableFunction(console, name, mode);
+    });
+  },
+};
+
+const Alert = {
+  enable: function (mode) {
+    mockDisableFunction(global, "alert", mode);
+  },
+};
+
 const Fetch = {
   enable: function () {
     function mockResponseValue(arg1, arg2) {
@@ -15,8 +45,8 @@ const Fetch = {
       };
     }
 
-    function fnPolyfill(/*arguments*/) {
-      const fn = jest.fn(...arguments);
+    function fnPolyfill(impl) {
+      const fn = jest.fn(impl);
       fn.mockResponseValue = function (arg1, arg2) {
         this.mockReturnValue(mockResponseValue(arg1, arg2));
       };
@@ -32,10 +62,13 @@ const Fetch = {
         return (
           fetch[path]?.(options) ?? mockResponseValue(404, "Page not found.")
         );
-      });
+      }).mockName("fetch");
       global.fetch = new Proxy(fn, {
         get(target, p, receiver) {
-          return Reflect.get(...arguments) ?? (target[p] = fnPolyfill(fn));
+          return (
+            Reflect.get(...arguments) ??
+            (target[p] = fnPolyfill(fn).mockName("fetch " + p))
+          );
         },
       });
     });
@@ -46,5 +79,7 @@ const Fetch = {
 };
 
 export default {
+  Alert,
+  Console,
   Fetch,
 };
