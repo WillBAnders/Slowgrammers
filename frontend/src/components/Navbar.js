@@ -15,11 +15,10 @@ import MenuItem from "@mui/material/MenuItem";
 import { useLocation } from "react-router-dom";
 import Utils from "../Utils";
 
-const pages = ["About Us", "Service", "Courses"];
-const pagesMap = new Map([
-  ["About Us", "about"],
-  ["Service", "service"],
-  ["Courses", "courses"],
+const pages = new Map([
+  ["about", "About Us"],
+  ["services", "Services"],
+  ["courses", "Courses"],
 ]);
 
 //const settings = ['Profile', 'Finance', 'Logout'];
@@ -188,30 +187,16 @@ const Navbar = ({ profile, setProfile }) => {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                {pages.map((page) =>
-                  page !== "Courses" ? (
-                    <MenuItem key={pagesMap.get(page)}>
-                      <Link
-                        activeClass="active"
-                        to={"/#" + pagesMap.get(page)}
-                        onClick={handleCloseNavMenu}
-                        style={{ textDecoration: "none", color: "black" }}
-                      >
-                        <Typography textAlign="right">{page}</Typography>
-                      </Link>
-                    </MenuItem>
-                  ) : (
-                    <MenuItem key={pagesMap.get(page)}>
-                      <Link
-                        key={pagesMap.get(page)}
-                        to={"/" + pagesMap.get(page)}
-                        style={{ textDecoration: "none", color: "black" }}
-                        onClick={handleCloseNavMenu}
-                      >
-                        <Typography textAlign="right">{page}</Typography>
-                      </Link>
-                    </MenuItem>
-                  )
+                {Array.from(pages.entries()).map(([key, value]) =>
+                  <MenuItem key={key}>
+                    <Link
+                      to={(key === "courses" ? "/" : "/#") + key}
+                      onClick={handleCloseNavMenu}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      <Typography textAlign="right">{value}</Typography>
+                    </Link>
+                  </MenuItem>
                 )}
               </Menu>
             </Box>
@@ -226,37 +211,19 @@ const Navbar = ({ profile, setProfile }) => {
               </Link>
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {pages.map((page) =>
-                page !== "Courses" ? (
-                  <Link
-                    key={pagesMap.get(page)}
-                    activeClass="active"
-                    to={"/#" + pagesMap.get(page)}
-                    style={{ textDecoration: "none", color: "white" }}
+              {Array.from(pages.entries()).map(([key, value]) =>
+                <Link
+                  key={key}
+                  to={(key === "courses" ? "/" : "/#") + key}
+                  style={{ textDecoration: "none", color: "white" }}
+                >
+                  <Button
+                    onClick={handleCloseNavMenu}
+                    sx={{ my: 2, color: "white", display: "block" }}
                   >
-                    <Button
-                      key={pagesMap.get(page)}
-                      onClick={handleCloseNavMenu}
-                      sx={{ my: 2, color: "white", display: "block" }}
-                    >
-                      {page}
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link
-                    to={"/" + pagesMap.get(page)}
-                    key={pagesMap.get(page)}
-                    style={{ textDecoration: "none", color: "white" }}
-                  >
-                    <Button
-                      key={pagesMap.get(page)}
-                      onClick={handleCloseNavMenu}
-                      sx={{ my: 2, color: "white", display: "block" }}
-                    >
-                      {page}
-                    </Button>
-                  </Link>
-                )
+                    {value}
+                  </Button>
+                </Link>
               )}
             </Box>
             {buttons}
