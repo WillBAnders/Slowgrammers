@@ -140,6 +140,9 @@ export default function ProfilePage({ profile, setProfile }) {
           component="form" 
           noValidate 
           onSubmit={onSubmit}
+          sx={{
+            ml:"50px"
+          }}
         >
           <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 1 }}>
             <Grid container>
@@ -303,7 +306,7 @@ export default function ProfilePage({ profile, setProfile }) {
               })
             )}
           </Stack>
-        </Box>
+          </Box>
       </div>
     );
   }
