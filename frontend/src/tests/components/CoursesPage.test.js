@@ -8,29 +8,11 @@ import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import CoursesPage from "../../components/CoursesPage.js";
+import MockUtils from "../utils/MockUtils";
 
-beforeAll(() => {
-  function mockResponseValue(value) {
-    return {
-      headers: {
-        get: jest.fn().mockImplementation((name) => {
-          return name === "Content-Type" ? "application/json" : "";
-        }),
-      },
-      ok: true,
-      status: 200,
-      json: jest.fn().mockResolvedValue(value),
-    };
-  }
-
-  global.fetch = jest.fn();
-  global.fetch.mockResponseValue = function (value) {
-    this.mockResolvedValue(mockResponseValue(value));
-  };
-  global.fetch.mockResponseValueOnce = function (value) {
-    this.mockResolvedValueOnce(mockResponseValue(value));
-  };
-});
+MockUtils.Alert.enable("error");
+MockUtils.Console.enable({ log: "silent", error: "error" });
+MockUtils.Fetch.enable();
 
 describe("CoursesPage", () => {
   test("loading", async () => {
@@ -91,7 +73,6 @@ describe("CoursesPage", () => {
   });
 
   test("fetch rejected", async () => {
-    console.error = jest.fn(); //TODO: State management
     fetch.mockRejectedValue(new Error("expected"));
     const component = await waitFor(async () => {
       return render(<CoursesPage />, { wrapper: MemoryRouter });

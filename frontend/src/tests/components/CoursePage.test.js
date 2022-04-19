@@ -8,28 +8,15 @@ import React from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import "regenerator-runtime/runtime";
 import CoursePage from "../../components/CoursePage.js";
+import MockUtils from "../utils/MockUtils";
+
+MockUtils.Alert.enable("error");
+MockUtils.Console.enable({ log: "silent", error: "error" });
+MockUtils.Fetch.enable();
 
 beforeAll(() => {
-  function mockResponseValue(value) {
-    return {
-      headers: {
-        get: jest.fn().mockImplementation((name) => {
-          return name === "Content-Type" ? "application/json" : "";
-        }),
-      },
-      ok: true,
-      status: 200,
-      json: jest.fn().mockResolvedValue(value),
-    };
-  }
-
-  global.fetch = jest.fn();
-  global.fetch.mockResponseValue = function (value) {
-    this.mockResolvedValue(mockResponseValue(value));
-  };
-  global.fetch.mockResponseValueOnce = function (value) {
-    this.mockResolvedValueOnce(mockResponseValue(value));
-  };
+  delete window.location; //TODO: https://remarkablemark.org/blog/2018/11/17/mock-window-location/
+  window.location = { reload: jest.fn() };
 });
 
 describe("CoursePage", () => {
