@@ -16,6 +16,12 @@ import { useLocation } from "react-router-dom";
 import Utils from "../Utils";
 
 const pages = ["About Us", "Service", "Courses"];
+const pagesMap = new Map([
+  ["About Us", "about"],
+  ["Service", "service"],
+  ["Courses", "courses"],
+]);
+
 //const settings = ['Profile', 'Finance', 'Logout'];
 
 const Navbar = ({ profile, setProfile }) => {
@@ -53,7 +59,7 @@ const Navbar = ({ profile, setProfile }) => {
     Utils.fetchJson("/signout", {
       method: "POST",
     })
-      .then((r) => {
+      .then(() => {
         setProfile(null);
         handleCloseUserMenu();
       })
@@ -184,10 +190,10 @@ const Navbar = ({ profile, setProfile }) => {
               >
                 {pages.map((page) =>
                   page !== "Courses" ? (
-                    <MenuItem key={page}>
+                    <MenuItem key={pagesMap.get(page)}>
                       <Link
                         activeClass="active"
-                        to={"/#" + page}
+                        to={"/#" + pagesMap.get(page)}
                         onClick={handleCloseNavMenu}
                         style={{ textDecoration: "none", color: "black" }}
                       >
@@ -195,10 +201,10 @@ const Navbar = ({ profile, setProfile }) => {
                       </Link>
                     </MenuItem>
                   ) : (
-                    <MenuItem key={page}>
+                    <MenuItem key={pagesMap.get(page)}>
                       <Link
-                        key={page}
-                        to={"/courses"}
+                        key={pagesMap.get(page)}
+                        to={"/" + pagesMap.get(page)}
                         style={{ textDecoration: "none", color: "black" }}
                         onClick={handleCloseNavMenu}
                       >
@@ -223,13 +229,13 @@ const Navbar = ({ profile, setProfile }) => {
               {pages.map((page) =>
                 page !== "Courses" ? (
                   <Link
-                    key={page}
+                    key={pagesMap.get(page)}
                     activeClass="active"
-                    to={"/#" + page}
+                    to={"/#" + pagesMap.get(page)}
                     style={{ textDecoration: "none", color: "white" }}
                   >
                     <Button
-                      key={page}
+                      key={pagesMap.get(page)}
                       onClick={handleCloseNavMenu}
                       sx={{ my: 2, color: "white", display: "block" }}
                     >
@@ -238,16 +244,16 @@ const Navbar = ({ profile, setProfile }) => {
                   </Link>
                 ) : (
                   <Link
-                    to="/courses"
-                    key={"courses"}
+                    to={"/" + pagesMap.get(page)}
+                    key={pagesMap.get(page)}
                     style={{ textDecoration: "none", color: "white" }}
                   >
                     <Button
-                      key="courses"
+                      key={pagesMap.get(page)}
                       onClick={handleCloseNavMenu}
                       sx={{ my: 2, color: "white", display: "block" }}
                     >
-                      Courses
+                      {page}
                     </Button>
                   </Link>
                 )
