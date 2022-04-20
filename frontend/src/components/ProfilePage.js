@@ -40,6 +40,20 @@ export default function ProfilePage({ profile, setProfile }) {
       });
   }
 
+  function onUpgrade(event) {
+    event.preventDefault();
+    Utils.fetchJson("/tutors", {
+      method: "POST",
+      body: JSON.stringify({}),
+    })
+      .then((r) => {
+        setProfile(undefined);
+      })
+      .catch((error) => {
+        alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
+      });
+  }
+
   function update(field, value) {
     setUpdated((fields) => ({ ...fields, [field]: value }));
   }
@@ -123,44 +137,83 @@ export default function ProfilePage({ profile, setProfile }) {
           justifyContent="center"
           sx={{
             fontWeight: 525,
-            paddingTop: {
-              xs: "30px",
-              md: "0px",
-            },
+            m: 2,
           }}
           variant="h2"
         >
           Edit Profile
         </Typography>
         <Box
+          align="center"
           alignItems="center"
           justifyContent="center"
           display="flex"
           width="100%"
         >
-          <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 1 }}>
-            <Grid container>
-              <Grid item xs={5}>
-                <TextField
-                  fullWidth
-                  required
-                  title="firstname"
-                  id="firstname"
-                  label="First Name"
-                  defaultValue={profile.firstname ?? ""}
-                  onChange={(e) => update("firstname", e.target.value)}
-                  sx={{ m: 1 }}
-                />
-                <TextField
-                  fullWidth
-                  required
-                  title="email"
-                  id="email"
-                  label="Email Address"
-                  defaultValue={profile.email ?? ""}
-                  onChange={(e) => update("email", e.target.value)}
-                  sx={{ m: 1 }}
-                />
+          <Stack>
+            <Box
+              align="center"
+              alignItems="center"
+              justifyContent="center"
+              component="form"
+              onSubmit={onSubmit}
+            >
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    title="firstname"
+                    id="firstname"
+                    label="First Name"
+                    defaultValue={profile.firstname ?? ""}
+                    onChange={(e) => update("firstname", e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    title="email"
+                    id="email"
+                    label="Email Address"
+                    defaultValue={profile.email ?? ""}
+                    onChange={(e) => update("email", e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    title="lastname"
+                    id="lastname"
+                    label="Last Name"
+                    defaultValue={profile.lastname ?? ""}
+                    onChange={(e) => update("lastname", e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    title="phone"
+                    id="phone"
+                    label="Phone Number"
+                    defaultValue={profile.phone ?? ""}
+                    onChange={(e) => update("phone", e.target.value)}
+                  />
+                </Grid>
+                {profile.bio !== undefined && (
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      title="bio"
+                      id="bio"
+                      label="Biography"
+                      defaultValue={profile.bio ?? ""}
+                      onChange={(e) => update("bio", e.target.value)}
+                      multiline
+                      minRows={5}
+                      maxRows={8}
+                    />
+                  </Grid>
+                )}
               </Grid>
               {profile.bio !== undefined && (
                 <Box>
@@ -173,7 +226,6 @@ export default function ProfilePage({ profile, setProfile }) {
                     <Stack direction="row" spacing={1}>
                       <Autocomplete
                         disablePortal
-                        title="DaySelector"
                         id="DaySelector"
                         value={day}
                         onChange={(event, newValue) => {
@@ -182,12 +234,11 @@ export default function ProfilePage({ profile, setProfile }) {
                         options={DAYS}
                         sx={{ width: { xs: 100, md: 300 } }}
                         renderInput={(params) => (
-                          <TextField {...params} label="Day" title="DaySelectorText" />
+                          <TextField {...params} label="Day" />
                         )}
                       />
                       <Autocomplete
                         disablePortal
-                        title="StartTimeSelector"
                         id="StartTimeSelector"
                         options={TIMES}
                         value={startTime}
@@ -196,12 +247,11 @@ export default function ProfilePage({ profile, setProfile }) {
                         }}
                         sx={{ width: { xs: 100, md: 300 } }}
                         renderInput={(params) => (
-                          <TextField {...params} label="Start Time" title="StartTimeText" />
+                          <TextField {...params} label="Start Time" />
                         )}
                       />
                       <Autocomplete
                         disablePortal
-                        title="EndTimeSelector"
                         id="EndTimeSelector"
                         value={endTime}
                         onChange={(event, newValue) => {
@@ -210,7 +260,7 @@ export default function ProfilePage({ profile, setProfile }) {
                         options={TIMES}
                         sx={{ width: { xs: 100, md: 300 } }}
                         renderInput={(params) => (
-                          <TextField {...params} label="End Time" title="EndTimeText" />
+                          <TextField {...params} label="End Time" />
                         )}
                       />
                       <Button
@@ -230,7 +280,7 @@ export default function ProfilePage({ profile, setProfile }) {
                     justifyContent="center"
                     sx={{ mt: 2 }}
                   >
-                    <Stack spacing={1} title="AllAvailability">
+                    <Stack spacing={1}>
                       {availability.length === 0 ? (
                         <Typography>No availability given</Typography>
                       ) : (
@@ -261,68 +311,28 @@ export default function ProfilePage({ profile, setProfile }) {
                   </Box>
                 </Box>
               )}
-            />
-            <Autocomplete
-              disablePortal
-              id="EndTimeSelector"
-              value={endTime}
-              onChange={(event, newValue) => {
-                setEndTime(newValue);
-              }}
-              options={TIMES}
-              sx={{ width: { xs: 100, md: 300 } }}
-              renderInput={(params) => (
-                <TextField {...params} label="End Time" />
-              )}
-            />
-
-            <Button
-              type="submit"
-              aria-label="AddIcon"
-              variant="contained"
-              color="success"
-              title="addbutton"
-            >
-              <AddIcon />
-            </Button>
-          </Stack>
-        </Box>
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{ mt: 2 }}
-        >
-          <Stack>
-            {availability.length === 0 ? (
-              <div>No availability given</div>
-            ) : (
-              availability.map((a, i) => {
-                return (
-                  <Stack
-                    direction="row"
-                    key={a.day + " " + a.startTime}
-                    component="form"
-                    onSubmit={(e) => removeTime(e, i)}
-                  >
-                    <Card>
-                      <CardContent>
-                        {a.day + ": " + a.startTime + " - " + a.endTime}
-                      </CardContent>
-                    </Card>
+              <Box
+                align="center"
+                alignItems="center"
+                justifyContent="center"
+                display="flex"
+              >
+                <Stack spacing={1} sx={{ m: 2 }}>
+                  <Button type="submit" title="submit" variant="contained">
+                    Update
+                  </Button>
+                  {profile.bio === undefined && (
                     <Button
-                      aria-label="DeleteIcon"
+                      title="upgradeToTutor"
                       variant="contained"
-                      color="error"
-                      type="submit"
-                      title="removebutton"
+                      onClick={onUpgrade}
                     >
-                      <DeleteIcon />
+                      Upgrade to Tutor
                     </Button>
-                  </Stack>
-                );
-              })
-            )}
+                  )}
+                </Stack>
+              </Box>
+            </Box>
           </Stack>
         </Box>
       </div>
