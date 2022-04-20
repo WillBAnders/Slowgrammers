@@ -11,14 +11,11 @@ import (
 
 var Router *gin.Engine
 
-//"Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With"
 func InitRouter() {
 	Router = gin.Default()
 	Router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowCredentials: true,
-		AllowMethods:     []string{"PATCH", "POST", "GET", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin", "Cache-Control", "X-Requested-With"}}))
+		AllowCredentials: true}))
 	Router.GET("/courses", getCourses)
 	Router.GET("/courses/:code", getCoursesCode)
 	Router.GET("/tutors", getTutors)
