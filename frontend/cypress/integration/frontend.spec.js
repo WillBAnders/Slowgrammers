@@ -150,7 +150,24 @@ describe("general testing", () => {
     cy.findByTitle("upgradeToTutor").click();
     cy.reload();
     cy.findByTitle("bio").should('exist');
-  })
+  });
+
+  it("Change Eve's bio", () => {
+    cy.visit("localhost:3000/signin");
+    cy.findByTitle("username").type("Eve");
+    cy.findByTitle("password").type("password");
+    cy.findByTitle("submit").click();
+    cy.url().should('include', "localhost:3000").then( ($divMain) => {
+      cy.wait(2000) });
+    cy.reload();
+    cy.visit("localhost:3000/profile");
+    cy.url().should('include', "profile");
+    cy.reload();
+    cy.findByTitle("bio").type("This is a test bio");
+    cy.findByTitle("submit").click();
+    cy.visit("localhost:3000/tutors/Eve");
+    cy.findByTitle("Bio").should('contain', "This is a test bio");
+  });
 
   /*it('Sign up, sign in, check for one cookie', () => {
     cy.visit('localhost:3000/SignUp')
