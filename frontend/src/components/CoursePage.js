@@ -43,22 +43,18 @@ export default function CoursePage({ profile, setProfile }) {
   }
 
   function Component({ data }) {
-    const [filter, setFilter] = React.useState("");
+    const [filter, setFilter] = React.useState({ original: "", uppercase: "" });
 
     return (
       <div>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography
-            className="main-text"
-            variant="h2"
-            justifyContent="center"
-            sx={{
-              marginTop: "10px",
-            }}
-          >
-            Tutors
+        <Stack direction="column" alignItems="center" justifyContent="center">
+          <Typography className="main-text" variant="h2">
+            {data.course.code.toUpperCase()}
           </Typography>
-        </Box>
+          <Typography className="main-text" variant="h4">
+            {data.course.name}
+          </Typography>
+        </Stack>
         <Box
           display="flex"
           width="100%"
@@ -75,13 +71,18 @@ export default function CoursePage({ profile, setProfile }) {
           >
             <Stack direction="row">
               <TextField
-                value={filter}
+                value={filter.original}
                 fullWidth
                 title="SearchBar"
                 id="tutor-search"
-                label="Search Here"
+                label="Search Tutors"
                 variant="outlined"
-                onChange={(e) => setFilter(e.target.value.toUpperCase())}
+                onChange={(e) =>
+                  setFilter({
+                    original: e.target.value,
+                    uppercase: e.target.value.toUpperCase(),
+                  })
+                }
                 inputProps={{
                   "data-testid": "SearchBarin",
                   title: "SearchBarInput",
@@ -114,7 +115,6 @@ export default function CoursePage({ profile, setProfile }) {
         </Box>
         <Grid
           container
-          spacing={0}
           alignItems="center"
           justifyContent="center"
           direction="column"
@@ -154,10 +154,14 @@ export default function CoursePage({ profile, setProfile }) {
               </Box>
             ) : (
               data.tutors
-                .filter((t) =>
-                  (t.firstname + " " + t.lastname)
-                    .toUpperCase()
-                    .includes(filter)
+                .filter(
+                  (t) =>
+                    (t.firstname + " " + t.lastname)
+                      .toUpperCase()
+                      .includes(filter.uppercase) ||
+                    t.availability.some((a) =>
+                      a.day.toUpperCase().includes(filter.uppercase)
+                    )
                 )
                 .map((t) => (
                   <Link
@@ -191,7 +195,7 @@ export default function CoursePage({ profile, setProfile }) {
                             spacing={0}
                             sx={{ width: "100%" }}
                           >
-                            {t.availability.map((a, i) => (
+                            {t.availability.map((a) => (
                               <Card
                                 key={a.day + " " + a.startTime}
                                 direction="row"
@@ -201,7 +205,7 @@ export default function CoursePage({ profile, setProfile }) {
                                   margin: "2px",
                                 }}
                               >
-                                {a.day}
+                                {a.day + " " + a.startTime + " - " + a.endTime}
                               </Card>
                             ))}
                           </Grid>

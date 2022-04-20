@@ -68,7 +68,7 @@ const Navbar = ({ profile, setProfile }) => {
   };
 
   let buttons;
-  if (profile !== null) {
+  if (!profile) {
     buttons = (
       <Box sx={{ flexGrow: 0 }}>
         <Tooltip title="Open settings">
