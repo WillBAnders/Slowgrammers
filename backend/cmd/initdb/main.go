@@ -45,24 +45,25 @@ func main() {
 			Rating: 4.5,
 			Bio:    "Once upon a midnight dreary, while I pondered, weak and weary, Over many a quaint and curious volume of forgotten lore—While I nodded, nearly napping, suddenly there came a tapping, As of some one gently rapping, rapping at my chamber door. `Tis some visitor,` I muttered, `tapping at my chamber door—Only this and nothing more.`",
 			Availability: []src.Availability{
-				{Day: "Monday"},
+				{Day: "Monday", Start: "08:30", End: "17:00"},
 			},
 		}, {
 			User:   users[2],
 			Rating: 2.0,
 			Bio:    "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way--in short, the period was so far like the present period that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only.",
 			Availability: []src.Availability{
-				{Day: "Tuesday"},
-				{Day: "Thursday"},
+				{Day: "Tuesday", Start: "18:00", End: "21:00"},
+				{Day: "Thursday", Start: "18:00", End: "21:00"},
 			},
 		}, {
 			User:   users[3],
 			Rating: 0.0,
 			Bio:    "There once was a ship that put to sea. The name of the ship was the Billy of Tea. The winds blew up, her bow dipped down. O blow, my bully boys, blow. Soon may the Wellerman come. To bring us sugar and tea and rum. One day, when the tonguin' is done. We'll take our leave and go.",
 			Availability: []src.Availability{
-				{Day: "Monday"},
-				{Day: "Wednesday"},
-				{Day: "Friday"},
+				{Day: "Monday", Start: "12:00", End: "13:00"},
+				{Day: "Wednesday", Start: "12:00", End: "13:00"},
+				{Day: "Wednesday", Start: "15:00", End: "16:00"},
+				{Day: "Friday", Start: "12:00", End: "13:00"},
 			},
 		},
 	}

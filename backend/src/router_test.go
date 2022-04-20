@@ -512,6 +512,36 @@ func (suite *RouterSuite) TestPatchProfile() {
 		}`, w.Body.String())
 	}))
 
+	suite.Run("Availability", manualSetupTest(func() {
+		hash, _ := bcrypt.GenerateFromPassword([]byte("Password"), bcrypt.DefaultCost)
+		DB.Create(&Tutor{User: User{Username: "Username", Password: string(hash)}})
+
+		w := POST("/signin", gin.H{
+			"username": "Username",
+			"password": "Password",
+		})
+		suite.Equal(200, w.Code)
+		cookies := w.Result().Cookies()
+
+		w = PATCH("/profile", gin.H{
+			"availability": []gin.H{
+				{"day": "Monday", "start": "08:30", "end": "17:00"},
+			},
+		}, cookies...)
+		suite.Equal(200, w.Code)
+
+		w = GET("/profile", cookies...)
+		suite.Equal(200, w.Code)
+		suite.JSONEq(`{
+			"profile": `+stringify(Tutor{
+			User: User{Username: "Username"},
+			Availability: []Availability{
+				{Day: "Monday", Start: "08:30", End: "17:00"},
+			},
+		})+`
+		}`, w.Body.String())
+	}))
+
 	suite.Run("Unauthenticated", manualSetupTest(func() {
 		//w := GET("/profile")
 		//suite.Equal(401, w.Code)
