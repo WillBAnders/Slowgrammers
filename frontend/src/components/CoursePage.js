@@ -35,7 +35,7 @@ export default function CoursePage({ profile, setProfile }) {
       }),
     })
       .then((r) => {
-        setProfile(undefined);
+        window.location.reload(false);
       })
       .catch((error) => {
         alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
@@ -154,12 +154,10 @@ export default function CoursePage({ profile, setProfile }) {
               </Box>
             ) : (
               data.tutors
-                .filter(
-                  (t) =>
-                    (t.firstname + " " + t.lastname)
-                      .toUpperCase()
-                      .includes(filter) ||
-                    t.availability.some((a) => a.toUpperCase().includes(filter))
+                .filter((t) =>
+                  (t.firstname + " " + t.lastname)
+                    .toUpperCase()
+                    .includes(filter)
                 )
                 .map((t) => (
                   <Link
@@ -193,9 +191,9 @@ export default function CoursePage({ profile, setProfile }) {
                             spacing={0}
                             sx={{ width: "100%" }}
                           >
-                            {t.availability.map((day) => (
+                            {t.availability.map((a, i) => (
                               <Card
-                                key={day}
+                                key={a.day + " " + a.startTime}
                                 direction="row"
                                 spacing={1}
                                 sx={{
@@ -203,7 +201,7 @@ export default function CoursePage({ profile, setProfile }) {
                                   margin: "2px",
                                 }}
                               >
-                                {day}
+                                {a.day}
                               </Card>
                             ))}
                           </Grid>

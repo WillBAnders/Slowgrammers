@@ -207,7 +207,7 @@ export default function ProfilePage({ profile, setProfile }) {
                       defaultValue={profile.bio ?? ""}
                       onChange={(e) => update("bio", e.target.value)}
                       multiline
-                      rows={5}
+                      minRows={5}
                       maxRows={8}
                     />
                   </Grid>
