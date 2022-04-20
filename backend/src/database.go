@@ -53,11 +53,11 @@ func (tutor Tutor) MarshalJSON() ([]byte, error) {
 }
 
 type Availability struct {
-	ID      uint   `gorm:"primaryKey" json:"-"`
-	TutorID uint   `gorm:"not null" json:"-"`
-	Day     string `gorm:"not null" json:"day"`
-	Start   string `gorm:"not null" json:"start"`
-	End     string `gorm:"not null" json:"end"`
+	ID        uint   `gorm:"primaryKey" json:"-"`
+	TutorID   uint   `gorm:"not null" json:"-"`
+	Day       string `gorm:"not null" json:"day"`
+	StartTime string `gorm:"not null" json:"startTime"`
+	EndTime   string `gorm:"not null" json:"endTime"`
 }
 
 type Tutoring struct {

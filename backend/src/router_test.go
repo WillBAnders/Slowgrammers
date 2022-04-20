@@ -525,7 +525,7 @@ func (suite *RouterSuite) TestPatchProfile() {
 
 		w = PATCH("/profile", gin.H{
 			"availability": []gin.H{
-				{"day": "Monday", "start": "08:30", "end": "17:00"},
+				{"day": "Monday", "startTime": "8:30 AM", "endTime": "5:00 PM"},
 			},
 		}, cookies...)
 		suite.Equal(200, w.Code)
@@ -536,7 +536,7 @@ func (suite *RouterSuite) TestPatchProfile() {
 			"profile": `+stringify(Tutor{
 			User: User{Username: "Username"},
 			Availability: []Availability{
-				{Day: "Monday", Start: "08:30", End: "17:00"},
+				{Day: "Monday", StartTime: "8:30 AM", EndTime: "5:00 PM"},
 			},
 		})+`
 		}`, w.Body.String())

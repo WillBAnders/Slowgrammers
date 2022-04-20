@@ -421,9 +421,9 @@ type PatchProfileBody struct {
 	Phone        *string `json:"phone"`
 	Bio          *string `json:"bio"`
 	Availability *[]struct {
-		Day   string `json:"day" binding:"required"`
-		Start string `json:"start" binding:"required"`
-		End   string `json:"end" binding:"required"`
+		Day       string `json:"day" binding:"required"`
+		StartTime string `json:"startTime" binding:"required"`
+		EndTime   string `json:"endTime" binding:"required"`
 	} `json:"availability"`
 	Tutoring *[]struct {
 		Code   string `json:"code" binding:"required"`
@@ -450,8 +450,8 @@ type PatchProfileBody struct {
 //     bio?: String
 //     availability?: []Availability {
 //       day: String (Sunday...Saturday)
-//       start: String (HH:MM)
-//       end: String (HH:MM, >start)
+//       start: String (hh:MM AM/PM)
+//       end: String (hh:MM AM/PM, >start)
 //     }
 //     tutoring?: []PatchTutoring {
 //       code: String
@@ -531,10 +531,10 @@ func patchProfile(c *gin.Context) {
 		DB.Where("tutor_id = ?", tutors[0].UserID).Delete(&Availability{})
 		for _, availability := range *body.Availability {
 			DB.Create(&Availability{
-				TutorID: tutors[0].UserID,
-				Day:     availability.Day,
-				Start:   availability.Start,
-				End:     availability.End,
+				TutorID:   tutors[0].UserID,
+				Day:       availability.Day,
+				StartTime: availability.StartTime,
+				EndTime:   availability.EndTime,
 			})
 		}
 	}
