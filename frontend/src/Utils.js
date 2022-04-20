@@ -4,6 +4,7 @@ async function fetchJson(path, options = {}) {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
+    credentials: "include",
     ...options,
   });
   //TODO: Better method to ensure intermediate errors (ex. offline server) are handled
