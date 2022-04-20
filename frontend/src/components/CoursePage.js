@@ -43,21 +43,15 @@ export default function CoursePage({ profile, setProfile }) {
   }
 
   function Component({ data }) {
-    const [filter, setFilter] = React.useState({original: "", uppercase: ""});
+    const [filter, setFilter] = React.useState({ original: "", uppercase: "" });
 
     return (
       <div>
         <Stack direction="column" alignItems="center" justifyContent="center">
-          <Typography
-            className="main-text"
-            variant="h2"
-          >
+          <Typography className="main-text" variant="h2">
             {data.course.code.toUpperCase()}
           </Typography>
-          <Typography
-            className="main-text"
-            variant="h4"
-          >
+          <Typography className="main-text" variant="h4">
             {data.course.name}
           </Typography>
         </Stack>
@@ -83,10 +77,12 @@ export default function CoursePage({ profile, setProfile }) {
                 id="tutor-search"
                 label="Search Tutors"
                 variant="outlined"
-                onChange={(e) => setFilter({
-                  original: e.target.value,
-                  uppercase: e.target.value.toUpperCase(),
-                })}
+                onChange={(e) =>
+                  setFilter({
+                    original: e.target.value,
+                    uppercase: e.target.value.toUpperCase(),
+                  })
+                }
                 inputProps={{
                   "data-testid": "SearchBarin",
                   title: "SearchBarInput",
@@ -163,7 +159,9 @@ export default function CoursePage({ profile, setProfile }) {
                     (t.firstname + " " + t.lastname)
                       .toUpperCase()
                       .includes(filter.uppercase) ||
-                    t.availability.some((a) => a.day.toUpperCase().includes(filter.uppercase))
+                    t.availability.some((a) =>
+                      a.day.toUpperCase().includes(filter.uppercase)
+                    )
                 )
                 .map((t) => (
                   <Link
@@ -197,7 +195,7 @@ export default function CoursePage({ profile, setProfile }) {
                             spacing={0}
                             sx={{ width: "100%" }}
                           >
-                            {t.availability.map(a => (
+                            {t.availability.map((a) => (
                               <Card
                                 key={a.day + " " + a.startTime}
                                 direction="row"

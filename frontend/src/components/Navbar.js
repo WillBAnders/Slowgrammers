@@ -68,7 +68,7 @@ const Navbar = ({ profile, setProfile }) => {
   };
 
   let buttons;
-  if (profile !== null) {
+  if (profile) {
     buttons = (
       <Box sx={{ flexGrow: 0 }}>
         <Tooltip title="Open settings">
@@ -187,7 +187,7 @@ const Navbar = ({ profile, setProfile }) => {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                {Array.from(pages.entries()).map(([key, value]) =>
+                {Array.from(pages.entries()).map(([key, value]) => (
                   <MenuItem key={key}>
                     <Link
                       to={(key === "courses" ? "/" : "/#") + key}
@@ -197,7 +197,7 @@ const Navbar = ({ profile, setProfile }) => {
                       <Typography textAlign="right">{value}</Typography>
                     </Link>
                   </MenuItem>
-                )}
+                ))}
               </Menu>
             </Box>
             <Typography
@@ -211,7 +211,7 @@ const Navbar = ({ profile, setProfile }) => {
               </Link>
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {Array.from(pages.entries()).map(([key, value]) =>
+              {Array.from(pages.entries()).map(([key, value]) => (
                 <Link
                   key={key}
                   to={(key === "courses" ? "/" : "/#") + key}
@@ -224,7 +224,7 @@ const Navbar = ({ profile, setProfile }) => {
                     {value}
                   </Button>
                 </Link>
-              )}
+              ))}
             </Box>
             {buttons}
           </Toolbar>

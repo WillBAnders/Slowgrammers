@@ -1,5 +1,13 @@
 import React from "react";
-import {Box, Card, CardHeader, Paper, Stack, TextField, Typography} from "@mui/material";
+import {
+  Box,
+  Card,
+  CardHeader,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import AsyncWrapper from "./AsyncWrapper";
 import Utils from "../Utils";
@@ -11,15 +19,12 @@ export default function CoursesPage() {
   }
 
   function Component({ data }) {
-    const [filter, setFilter] = React.useState({original: "", uppercase: ""});
+    const [filter, setFilter] = React.useState({ original: "", uppercase: "" });
 
     return (
       <div className="Courses">
         <Stack direction="column" alignItems="center" justifyContent="center">
-          <Typography
-            className="main-text"
-            variant="h2"
-          >
+          <Typography className="main-text" variant="h2">
             Courses
           </Typography>
         </Stack>
@@ -46,10 +51,12 @@ export default function CoursesPage() {
               label="Search Courses"
               variant="outlined"
               name="SearchBar"
-              onChange={(e) => setFilter({
-                original: e.target.value,
-                uppercase: e.target.value.toUpperCase(),
-              })}
+              onChange={(e) =>
+                setFilter({
+                  original: e.target.value,
+                  uppercase: e.target.value.toUpperCase(),
+                })
+              }
               inputProps={{
                 "data-testid": "SearchBarin",
                 title: "SearchBarInput",
@@ -77,7 +84,9 @@ export default function CoursesPage() {
               title="buttonStack"
             >
               {data.courses
-                .filter((c) => (c.code + c.name).toUpperCase().includes(filter.uppercase))
+                .filter((c) =>
+                  (c.code + c.name).toUpperCase().includes(filter.uppercase)
+                )
                 .map((c) => (
                   <Link
                     key={c.code}
