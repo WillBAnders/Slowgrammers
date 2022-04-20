@@ -11,10 +11,10 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Autocomplete from "@mui/material/Autocomplete";
 import LoadingContainer from "./LoadingContainer";
-import {DAYS, TIMES} from "../styles/TableData";
+import { DAYS, TIMES } from "../styles/TableData";
 import Utils from "../Utils";
 
-export default function ProfilePage({profile, setProfile}) {
+export default function ProfilePage({ profile, setProfile }) {
   const [updated, setUpdated] = React.useState({});
   const [day, setDay] = React.useState("");
   const [startTime, setStartTime] = React.useState("");
@@ -28,7 +28,7 @@ export default function ProfilePage({profile, setProfile}) {
     event.preventDefault();
     Utils.fetchJson("/profile", {
       method: "PATCH",
-      body: JSON.stringify({...updated, availability}),
+      body: JSON.stringify({ ...updated, availability }),
     })
       .then((r) => {
         setProfile(undefined);
@@ -53,7 +53,7 @@ export default function ProfilePage({profile, setProfile}) {
   }
 
   function update(field, value) {
-    setUpdated((fields) => ({...fields, [field]: value}));
+    setUpdated((fields) => ({ ...fields, [field]: value }));
   }
 
   function addTime(event) {
@@ -72,7 +72,7 @@ export default function ProfilePage({profile, setProfile}) {
         (a) =>
           day === a.day &&
           stIndex < TIMES.indexOf(a.endTime) &&
-          etIndex > TIMES.indexOf(a.startTime),
+          etIndex > TIMES.indexOf(a.startTime)
       )
     ) {
       alert("The provided time range overlaps with an existing entry.");
@@ -82,7 +82,7 @@ export default function ProfilePage({profile, setProfile}) {
       (a) =>
         day === a.day &&
         (stIndex === TIMES.indexOf(a.endTime) ||
-          etIndex === TIMES.indexOf(a.startTime)),
+          etIndex === TIMES.indexOf(a.startTime))
     );
     const temp = [...availability];
     if (index !== -1) {
@@ -107,7 +107,7 @@ export default function ProfilePage({profile, setProfile}) {
         };
       }
     } else {
-      temp.push({day, startTime, endTime});
+      temp.push({ day, startTime, endTime });
       temp.sort((a, b) => {
         return a.day === b.day
           ? TIMES.indexOf(a.startTime) - TIMES.indexOf(b.startTime)
@@ -125,7 +125,7 @@ export default function ProfilePage({profile, setProfile}) {
   }
 
   if (!profile) {
-    return <LoadingContainer/>;
+    return <LoadingContainer />;
   } else {
     return (
       <div>
@@ -153,12 +153,13 @@ export default function ProfilePage({profile, setProfile}) {
               align="center"
               alignItems="center"
               justifyContent="center"
+              component="form"
+              onSubmit={onSubmit}
             >
               <Grid container spacing={1}>
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    required
                     title="firstname"
                     id="firstname"
                     label="First Name"
@@ -169,7 +170,6 @@ export default function ProfilePage({profile, setProfile}) {
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    required
                     title="email"
                     id="email"
                     label="Email Address"
@@ -180,7 +180,6 @@ export default function ProfilePage({profile, setProfile}) {
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    required
                     title="lastname"
                     id="lastname"
                     label="Last Name"
@@ -190,7 +189,6 @@ export default function ProfilePage({profile, setProfile}) {
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
-                    required
                     fullWidth
                     title="phone"
                     id="phone"
@@ -202,7 +200,6 @@ export default function ProfilePage({profile, setProfile}) {
                 {profile.bio !== undefined && (
                   <Grid item xs={12}>
                     <TextField
-                      required
                       fullWidth
                       title="bio"
                       id="bio"
@@ -222,7 +219,7 @@ export default function ProfilePage({profile, setProfile}) {
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    sx={{m: 2}}
+                    sx={{ m: 2 }}
                   >
                     <Stack direction="row" spacing={1}>
                       <Autocomplete
@@ -233,9 +230,9 @@ export default function ProfilePage({profile, setProfile}) {
                           setDay(newValue);
                         }}
                         options={DAYS}
-                        sx={{width: {xs: 100, md: 300}}}
+                        sx={{ width: { xs: 100, md: 300 } }}
                         renderInput={(params) => (
-                          <TextField {...params} label="Day"/>
+                          <TextField {...params} label="Day" />
                         )}
                       />
                       <Autocomplete
@@ -246,9 +243,9 @@ export default function ProfilePage({profile, setProfile}) {
                         onChange={(event, newValue) => {
                           setStartTime(newValue);
                         }}
-                        sx={{width: {xs: 100, md: 300}}}
+                        sx={{ width: { xs: 100, md: 300 } }}
                         renderInput={(params) => (
-                          <TextField {...params} label="Start Time"/>
+                          <TextField {...params} label="Start Time" />
                         )}
                       />
                       <Autocomplete
@@ -259,9 +256,9 @@ export default function ProfilePage({profile, setProfile}) {
                           setEndTime(newValue);
                         }}
                         options={TIMES}
-                        sx={{width: {xs: 100, md: 300}}}
+                        sx={{ width: { xs: 100, md: 300 } }}
                         renderInput={(params) => (
-                          <TextField {...params} label="End Time"/>
+                          <TextField {...params} label="End Time" />
                         )}
                       />
                       <Button
@@ -271,7 +268,7 @@ export default function ProfilePage({profile, setProfile}) {
                         variant="contained"
                         color="success"
                       >
-                        <AddIcon/>
+                        <AddIcon />
                       </Button>
                     </Stack>
                   </Box>
@@ -279,7 +276,7 @@ export default function ProfilePage({profile, setProfile}) {
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    sx={{mt: 2}}
+                    sx={{ mt: 2 }}
                   >
                     <Stack spacing={1}>
                       {availability.length === 0 ? (
@@ -291,13 +288,9 @@ export default function ProfilePage({profile, setProfile}) {
                             key={a.day + " " + a.startTime}
                             spacing={1}
                           >
-                            <Card sx={{width: 280}}>
+                            <Card sx={{ width: 280 }}>
                               <CardContent>
-                                {a.day +
-                                  ": " +
-                                  a.startTime +
-                                  " - " +
-                                  a.endTime}
+                                {a.day + ": " + a.startTime + " - " + a.endTime}
                               </CardContent>
                             </Card>
                             <Button
@@ -307,7 +300,7 @@ export default function ProfilePage({profile, setProfile}) {
                               variant="contained"
                               color="error"
                             >
-                              <DeleteIcon/>
+                              <DeleteIcon />
                             </Button>
                           </Stack>
                         ))
@@ -322,15 +315,8 @@ export default function ProfilePage({profile, setProfile}) {
                 justifyContent="center"
                 display="flex"
               >
-                <Stack
-                  spacing={1}
-                  sx={{m: 2}}
-                >
-                  <Button
-                    title="submit"
-                    variant="contained"
-                    onClick={onSubmit}
-                  >
+                <Stack spacing={1} sx={{ m: 2 }}>
+                  <Button type="submit" title="submit" variant="contained">
                     Update
                   </Button>
                   {profile.bio === undefined && (
