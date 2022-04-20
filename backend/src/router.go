@@ -47,8 +47,11 @@ func getCourses(c *gin.Context) {
 }
 
 // Handler for /courses/:code. Returns the course identified by :code along
-// with all tutors ordered by username. If the course :code is not defined,
-// returns a 404 with an error message.
+// with all tutors ordered by username. If there is no authenticated user, all
+// tutor's contact information is hidden. Errors if:
+//
+//  - The course :code does not exist (404)
+//  - A server issue prevents parsing the JWT (500)
 //
 // Response Schema: {
 //   course: Course {
@@ -59,8 +62,8 @@ func getCourses(c *gin.Context) {
 //     username: String
 //     firstname: String
 //     lastname: String
-//     email: String
-//     phone: String
+//     email: String ("" if unauthenticated)
+//     phone: String ("" if unauthenticated)
 //     rating: Float
 //     bio: String
 //     availability: []String
@@ -88,6 +91,20 @@ func getCoursesCode(c *gin.Context) {
 	for i, tutoring := range tutorings {
 		//TODO: Limit the amount of data being returned
 		tutors[i] = tutoring.Tutor
+	}
+
+	if token, err := c.Cookie("jwt"); err == nil {
+		if _, err := ParseJWT(token); err != nil {
+			c.JSON(500, gin.H{
+				"error": "Unable to parse JWT: " + err.Error() + ".",
+			})
+			return
+		}
+	} else {
+		for i := range tutors {
+			tutors[i].User.Email = ""
+			tutors[i].User.Phone = ""
+		}
 	}
 
 	c.JSON(200, gin.H{
@@ -166,16 +183,19 @@ func postTutors(c *gin.Context) {
 }
 
 // Handler for /tutors/:username. Returns the tutor identified by :username
-// along with all courses tutored ordered by code. If the tutor :username is
-// not defined, returns a 404 with an error message.
+// along with all courses tutored ordered by code. If there is no authenticated
+// user, the tutor's contact information is hidden. Errors if:
+//
+//  - The tutor :username does not exist (404)
+//  - A server issue prevents parsing the JWT (500)
 //
 // Response Schema: {
 //   tutor: Tutor {
 //     username: String
 //     firstname: String
 //     lastname: String
-//     email: String
-//     phone: String
+//     email: String ("" if unauthenticated)
+//     phone: String ("" if unauthenticated)
 //     rating: Float
 //     bio: String
 //     availability: []String
@@ -207,6 +227,18 @@ func getTutorsUsername(c *gin.Context) {
 	courses := make([]Course, len(tutorings))
 	for i, tutoring := range tutorings {
 		courses[i] = tutoring.Course
+	}
+
+	if token, err := c.Cookie("jwt"); err == nil {
+		if _, err := ParseJWT(token); err != nil {
+			c.JSON(500, gin.H{
+				"error": "Unable to parse JWT: " + err.Error() + ".",
+			})
+			return
+		}
+	} else {
+		tutors[0].User.Email = ""
+		tutors[0].User.Phone = ""
 	}
 
 	c.JSON(200, gin.H{
