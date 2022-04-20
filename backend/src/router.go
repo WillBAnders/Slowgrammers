@@ -556,7 +556,7 @@ func patchProfile(c *gin.Context) {
 	DB.Save(&users[0])
 
 	if body.Bio != nil {
-		DB.Model(&Tutor{}).Update("bio", *body.Bio)
+		DB.Model(&tutors[0]).Update("bio", *body.Bio)
 	}
 	if body.Availability != nil {
 		//TODO: Patch behavior (delete all and set to body.Availability)
