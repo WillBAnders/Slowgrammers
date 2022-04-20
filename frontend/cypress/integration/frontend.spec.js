@@ -43,13 +43,13 @@ describe("general testing", () => {
   it("Go to sign in page", () => {
     cy.visit("localhost:3000");
     cy.contains("Sign In").click();
-    cy.url().should("eq", "http://localhost:3000/SignIn");
+    cy.url().should("eq", "http://localhost:3000/signin");
   });
 
   it("Go to sign up page", () => {
     cy.visit("localhost:3000");
     cy.contains("Sign Up").click();
-    cy.url().should("eq", "http://localhost:3000/SignUp");
+    cy.url().should("eq", "http://localhost:3000/signup");
   });
 
   it("Go to sign up page from sign in", () => {
@@ -104,12 +104,14 @@ describe("general testing", () => {
     cy.findByTitle("username").type("Alice");
     cy.findByTitle("password").type("password");
     cy.findByTitle("submit").click();
+    cy.url().should('include', "localhost:3000").then( ($divMain) => {
+      cy.wait(2000) });
+    cy.reload();
     cy.contains("See Courses").click();
     cy.contains("COP-3502").click();
-    let before;
-    let after;
+    cy.reload();
     cy.findByTitle("removebutton").click();
-    cy.findByTitle("tutorlist").children().should("have.length", 1);
+    cy.findByTitle("addbutton").should('exist');
   });
 
   it("Log in as tutor, add self to class, click on profile", () => {
@@ -117,12 +119,14 @@ describe("general testing", () => {
     cy.findByTitle("username").type("Alice");
     cy.findByTitle("password").type("password");
     cy.findByTitle("submit").click();
+    cy.url().should('include', "localhost:3000").then( ($divMain) => {
+      cy.wait(2000) });
+    cy.reload();
     cy.contains("See Courses").click();
     cy.contains("COP-3502").click();
-    let before;
-    let after;
+    cy.reload();
     cy.findByTitle("addbutton").click();
-    cy.findByTitle("tutorlist").children().should("have.length", 2);
+    cy.findByTitle("removebutton").should('exist');
     cy.contains("Bob").click();
     cy.url().should("eq", "http://localhost:3000/tutors/Bob");
   });
@@ -131,6 +135,22 @@ describe("general testing", () => {
     cy.visit("localhost:3000/gotoerror");
     cy.contains("Error");
   });
+
+  it("Upgrade Eve to tutor", () => {
+    cy.visit("localhost:3000/signin");
+    cy.findByTitle("username").type("Eve");
+    cy.findByTitle("password").type("password");
+    cy.findByTitle("submit").click();
+    cy.url().should('include', "localhost:3000").then( ($divMain) => {
+      cy.wait(2000) });
+    cy.reload();
+    cy.visit("localhost:3000/profile");
+    cy.url().should('include', "profile");
+    cy.reload();
+    cy.findByTitle("upgradeToTutor").click();
+    cy.reload();
+    cy.findByTitle("bio").should('exist');
+  })
 
   /*it('Sign up, sign in, check for one cookie', () => {
     cy.visit('localhost:3000/SignUp')
