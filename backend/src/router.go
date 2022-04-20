@@ -83,7 +83,7 @@ func getCoursesCode(c *gin.Context) {
 
 	//TODO: Native Gorm handling with Pluck (Preload/Join extract?)
 	var tutorings []Tutoring
-	DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
+	DB.Joins("Tutor").Joins("LEFT JOIN users User ON id = Tutor__user_id").Preload("Tutor.Availability").Preload("Tutor.User").Order("User.username").Find(&tutorings, "course_id = ?", courses[0].ID)
 	tutors := make([]Tutor, len(tutorings))
 	for i, tutoring := range tutorings {
 		//TODO: Limit the amount of data being returned
@@ -192,7 +192,7 @@ func getTutorsUsername(c *gin.Context) {
 	username := c.Params.ByName("username")
 
 	var tutors []Tutor
-	DB.Joins("User").Limit(1).Find(&tutors, "User__username = ?", username)
+	DB.Limit(1).Joins("User").Preload("Availability").Find(&tutors, "User__username = ?", username)
 	if len(tutors) != 1 {
 		c.JSON(404, gin.H{
 			"error": "Tutor " + username + " not found.",
@@ -400,7 +400,7 @@ func getProfile(c *gin.Context) {
 	}
 
 	var tutors []Tutor
-	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
+	DB.Limit(1).Preload("Availability").Find(&tutors, "user_id = ?", users[0].ID)
 	if len(tutors) != 1 {
 		c.JSON(200, gin.H{
 			"profile": users[0],
@@ -414,53 +414,55 @@ func getProfile(c *gin.Context) {
 	})
 }
 
-// JSON Schema for updating the profile
-// None or all of these attributes (accept for ID) can be used when send to PATCH /profile
-// for updating of the profile
-// Submit as { "attr": "val", "attr": "val" }
-type ClassItem struct {
-	Code   string `json:"code"`
-	Action bool   `json:"action"`
+type PatchProfileBody struct {
+	FirstName    *string `json:"firstname"`
+	LastName     *string `json:"lastname"`
+	Email        *string `json:"email"`
+	Phone        *string `json:"phone"`
+	Bio          *string `json:"bio"`
+	Availability *[]struct {
+		Day       string `json:"day" binding:"required"`
+		StartTime string `json:"startTime" binding:"required"`
+		EndTime   string `json:"endTime" binding:"required"`
+	} `json:"availability"`
+	Tutoring *[]struct {
+		Code   string `json:"code" binding:"required"`
+		Action bool   `json:"action" binding:"required"`
+	} `json:"tutoring"`
 }
 
-type ProfileUpdateData struct {
-	ID           uint        `json:"-"`
-	FirstName    string      `json:"firstname"`
-	LastName     string      `json:"lastname"`
-	Email        string      `json:"email"`
-	Phone        string      `json:"phone"`
-	Bio          string      `json:"bio"`
-	Availability string      `json:"availability"`
-	Tutoring     []ClassItem `json:"tutoring"`
-}
-
-// Handler for PATCH /profile. Returns a success string if update operation is complete.
-// Errors if:
+// Handler for PATCH /profile. Takes any number of profile fields and updates
+// the profile of the authenticated user. Returns an empty object. Errors if:
 //
+//  - The request body is invalid (400)
 //  - There is no authenticated user (401)
 //  - A server issue prevents parsing the JWT (500)
-//  - The changed data does not fit the json schema detailed in ProfileUpdateData (400)
+//  - The user does not exist in the database (500)
 //
-// Response Schema: {
-//   200
+// Additionally, note that including availability will update the entire tutor's
+// availability while including tutoring will only update the courses specified.
+//
+// Body Schema: {
+//     firstname?: String
+//     lastname?: String
+//     email?: String
+//     phone?: String
+//     bio?: String
+//     availability?: []Availability {
+//       day: String (Sunday...Saturday)
+//       start: String (hh:MM AM/PM)
+//       end: String (hh:MM AM/PM, >start)
+//     }
+//     tutoring?: []PatchTutoring {
+//       code: String
+//       action: Boolean
+//     }
 // }
+// Response Schema: {}
 // Error Schema: {
 //   error: String
 // }
-//Source Note: https://blog.logrocket.com/how-to-build-a-rest-api-with-golang-using-gin-and-gorm/
-
-/*
-Need to add:
-Error to check if user exists in DB (500 error)
-Prevent changes to ID
-Add edit of classes
-Add as a tutor if editing tutor portion (assuming it is left as blank on the profile until edited by user)
-Check for sending extra json data that is not used (ie tutor stuff for nontutor). Currently assumes proper stuff sent
-Currently assumes class actions are correct and frontend is telling the truth
-*/
-
 func patchProfile(c *gin.Context) {
-
 	token, err := c.Cookie("jwt")
 	if err != nil {
 		c.JSON(401, gin.H{
@@ -477,60 +479,76 @@ func patchProfile(c *gin.Context) {
 		return
 	}
 
-	var edits ProfileUpdateData
-	if err := c.ShouldBindJSON(&edits); err != nil {
+	var body PatchProfileBody
+	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(400, gin.H{
-			"error": err.Error(),
+			"error": "Invalid request: " + err.Error() + ".",
+		})
+		return
+	}
+
+	var users []User
+	DB.Limit(1).Find(&users, "username = ?", claims.Username)
+	if len(users) != 1 {
+		c.JSON(500, gin.H{
+			"error": "User " + claims.Username + " is authenticated but does not exist in the database.",
 		})
 		return
 	}
 
 	var tutors []Tutor
-	DB.Joins("User").Find(&tutors, "User__username = ?", claims.Username)
-
-	if len(tutors) > 0 {
-		if edits.Bio != "" {
-			tutors[0].Bio = edits.Bio
+	DB.Limit(1).Find(&tutors, "user_id = ?", users[0].ID)
+	if len(tutors) != 1 {
+		if body.Bio != nil || body.Availability != nil || body.Tutoring != nil {
+			c.JSON(400, gin.H{
+				"error": "Invalid request: User is not a tutor.",
+			})
+			return
 		}
-		if edits.Availability != "" {
-			tutors[0].Availability = edits.Availability
-		}
-		DB.Save(&tutors)
+	} else {
+		//TODO: Validate Availability/Tutoring data (use binding tags?)
 	}
 
-	if len(tutors) > 0 && len(edits.Tutoring) > 0 {
-		for i := 0; i < len(edits.Tutoring); i++ {
+	if body.FirstName != nil {
+		users[0].FirstName = *body.FirstName
+	}
+	if body.LastName != nil {
+		users[0].LastName = *body.LastName
+	}
+	if body.Email != nil {
+		users[0].Email = *body.Email
+	}
+	if body.Phone != nil {
+		users[0].Phone = *body.Phone
+	}
+	DB.Save(&users[0])
+
+	if body.Bio != nil {
+		DB.Model(&Tutor{}).Update("bio", *body.Bio)
+	}
+	if body.Availability != nil {
+		//TODO: Patch behavior (delete all and set to body.Availability)
+		DB.Where("tutor_id = ?", tutors[0].UserID).Delete(&Availability{})
+		for _, availability := range *body.Availability {
+			DB.Create(&Availability{
+				TutorID:   tutors[0].UserID,
+				Day:       availability.Day,
+				StartTime: availability.StartTime,
+				EndTime:   availability.EndTime,
+			})
+		}
+	}
+	if body.Tutoring != nil {
+		for _, tutoring := range *body.Tutoring {
 			var courses []Course
-			DB.Find(&courses, "code = ?", edits.Tutoring[i].Code)
-			if edits.Tutoring[i].Action {
-				//add class
-				newClass := Tutoring{Tutor: tutors[0], Course: courses[0]}
-				DB.Create(&newClass)
+			DB.Limit(1).Find(&courses, "code = ?", tutoring.Code)
+			if tutoring.Action {
+				DB.Create(&Tutoring{TutorID: tutors[0].UserID, CourseID: courses[0].ID})
 			} else {
-				//remove class
-				DB.Where("tutor_id = ? AND course_id = ?", tutors[0].UserID, courses[0].ID).Delete(&Tutoring{})
+				DB.Delete(&Tutoring{TutorID: tutors[0].UserID, CourseID: courses[0].ID})
 			}
 		}
 	}
-
-	//It's angry at me, so I'm doing it this less pretty way, even though the nice way used to work. Tutor class stuff put it to flames
-	//So long, old way. Rest in reeses pieces. You will be missed.
-	var users []User
-	DB.Find(&users, "username = ?", claims.Username)
-	if edits.FirstName != "" {
-		users[0].FirstName = edits.FirstName
-	}
-	if edits.LastName != "" {
-		users[0].LastName = edits.LastName
-	}
-	if edits.Email != "" {
-		users[0].Email = edits.Email
-	}
-	if edits.Phone != "" {
-		users[0].Phone = edits.Phone
-	}
-	DB.Save(&users)
-	//DB.Model(&users[0]).Updates(edits)
 
 	c.JSON(200, gin.H{})
 }

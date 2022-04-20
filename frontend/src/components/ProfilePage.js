@@ -20,12 +20,15 @@ export default function ProfilePage({ profile, setProfile }) {
   const [startTime, setStartTime] = React.useState("");
   const [endTime, setEndTime] = React.useState("");
   const [availability, setAvailability] = React.useState([]);
+  React.useEffect(() => {
+    setAvailability(profile?.availability ?? []);
+  }, [profile]);
 
   function onSubmit(event) {
     event.preventDefault();
     Utils.fetchJson("/profile", {
       method: "PATCH",
-      body: JSON.stringify(updated),
+      body: JSON.stringify({ ...updated, availability }),
     })
       .then((r) => {
         setProfile(undefined);
@@ -47,7 +50,7 @@ export default function ProfilePage({ profile, setProfile }) {
     }
     const stIndex = TIMES.indexOf(startTime);
     const etIndex = TIMES.indexOf(endTime);
-    if (stIndex >= endTime) {
+    if (stIndex >= etIndex) {
       alert("The provided time range is invalid.");
       return;
     } else if (
@@ -85,13 +88,8 @@ export default function ProfilePage({ profile, setProfile }) {
         temp[index] = {
           day,
           startTime:
-            TIMES[
-              Math.min(stIndex, TIMES.indexOf(temp[index].startTime))
-            ],
-          endTime:
-            TIMES[
-              Math.max(etIndex, TIMES.indexOf(temp[index].endTime))
-            ],
+            TIMES[Math.min(stIndex, TIMES.indexOf(temp[index].startTime))],
+          endTime: TIMES[Math.max(etIndex, TIMES.indexOf(temp[index].endTime))],
         };
       }
     } else {
