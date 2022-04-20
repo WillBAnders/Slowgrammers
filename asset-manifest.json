@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/TutorsVILLE/static/css/main.712fcb55.css",
-    "main.js": "/TutorsVILLE/static/js/main.580a8b80.js",
+    "main.js": "/TutorsVILLE/static/js/main.b2ff2957.js",
     "static/js/787.9750ae9a.chunk.js": "/TutorsVILLE/static/js/787.9750ae9a.chunk.js",
     "index.html": "/TutorsVILLE/index.html",
     "main.712fcb55.css.map": "/TutorsVILLE/static/css/main.712fcb55.css.map",
-    "main.580a8b80.js.map": "/TutorsVILLE/static/js/main.580a8b80.js.map",
+    "main.b2ff2957.js.map": "/TutorsVILLE/static/js/main.b2ff2957.js.map",
     "787.9750ae9a.chunk.js.map": "/TutorsVILLE/static/js/787.9750ae9a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.712fcb55.css",
-    "static/js/main.580a8b80.js"
+    "static/js/main.b2ff2957.js"
   ]
 }
