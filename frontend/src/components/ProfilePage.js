@@ -28,7 +28,9 @@ export default function ProfilePage({ profile, setProfile }) {
     event.preventDefault();
     Utils.fetchJson("/profile", {
       method: "PATCH",
-      body: JSON.stringify({ ...updated, availability }),
+      body: JSON.stringify(
+        profile?.bio === undefined ? updated : { ...updated, availability }
+      ),
     })
       .then((r) => {
         setProfile(undefined);
