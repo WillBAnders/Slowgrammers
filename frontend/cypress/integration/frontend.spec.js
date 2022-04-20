@@ -6,8 +6,7 @@ describe("general testing", () => {
   });
 
   beforeEach(() => {});
-  //Cypress.config("waitAfterEachCommand", 2000)
-
+  //Cypress.config("waitAfterEachCommand", 1000)
   //Courses
   it("goes to courses page and confirm number of courses", () => {
     cy.visit("localhost:3000");
@@ -79,25 +78,6 @@ describe("general testing", () => {
     cy.findByTitle("submit").click();
     cy.url().should("eq", "http://localhost:3000/");
   });
-  /*
-  it('Create an account, edit profile, check new profile', () => {
-    cy.visit('localhost:3000/SignUp')
-    cy.findByTitle('username').type('COP')
-    cy.findByTitle('password').type('12!Abe')
-    cy.findByTitle('submit').click()
-    cy.visit('localhost:3000/profile')
-    cy.findByTitle('firstname').type('Jon')
-    cy.findByTitle('lastname').type('Arbuckle')
-    cy.findByTitle('email').type('jon.arbuckle@gmail.com')
-    cy.findByTitle('phone').type('352-352-3523')
-    cy.contains('update').click();
-    cy.reload();
-    cy.findByTitle('firstname').should('eq', 'Jon')
-    cy.findByTitle('lastname').should('eq', 'Arbuckle')
-    cy.findByTitle('email').should('eq', 'jon.arbuckle@gmail.com')
-    cy.findByTitle('phone').should('eq', '352-352-3523')
-  })
-*/
 
   it("Log in as tutor, remove self to class", () => {
     cy.visit("localhost:3000/SignIn");
@@ -105,7 +85,7 @@ describe("general testing", () => {
     cy.findByTitle("password").type("password");
     cy.findByTitle("submit").click();
     cy.url().should('include', "localhost:3000").then( ($divMain) => {
-      cy.wait(2000) });
+      cy.wait(1000) });
     cy.reload();
     cy.contains("See Courses").click();
     cy.contains("COP-3502").click();
@@ -120,7 +100,7 @@ describe("general testing", () => {
     cy.findByTitle("password").type("password");
     cy.findByTitle("submit").click();
     cy.url().should('include', "localhost:3000").then( ($divMain) => {
-      cy.wait(2000) });
+      cy.wait(1000) });
     cy.reload();
     cy.contains("See Courses").click();
     cy.contains("COP-3502").click();
@@ -142,7 +122,7 @@ describe("general testing", () => {
     cy.findByTitle("password").type("password");
     cy.findByTitle("submit").click();
     cy.url().should('include', "localhost:3000").then( ($divMain) => {
-      cy.wait(2000) });
+      cy.wait(1000) });
     cy.reload();
     cy.visit("localhost:3000/profile");
     cy.url().should('include', "profile");
@@ -158,7 +138,7 @@ describe("general testing", () => {
     cy.findByTitle("password").type("password");
     cy.findByTitle("submit").click();
     cy.url().should('include', "localhost:3000").then( ($divMain) => {
-      cy.wait(2000) });
+      cy.wait(1000) });
     cy.reload();
     cy.visit("localhost:3000/profile");
     cy.url().should('include', "profile");
@@ -168,6 +148,73 @@ describe("general testing", () => {
     cy.visit("localhost:3000/tutors/Eve");
     cy.findByTitle("Bio").should('contain', "This is a test bio");
   });
+
+  it("Add availability", () => {
+    cy.visit("localhost:3000/signin");
+    cy.findByTitle("username").type("Alice");
+    cy.findByTitle("password").type("password");
+    cy.findByTitle("submit").click();
+    cy.url().should('include', "localhost:3000").then( ($divMain) => {
+      cy.wait(1000) });
+    cy.reload();
+    cy.visit("localhost:3000/profile");
+    cy.url().should('include', "profile");
+    cy.reload();
+    cy.get("#DaySelector").type("Sunday").get('li[data-option-index="0"]').click();
+    cy.get("#StartTimeSelector").type("6").get('li[data-option-index="0"]').click();
+    cy.get("#EndTimeSelector").type("9").get('li[data-option-index="0"]').click();
+    cy.findByTitle("addbutton").click();
+    cy.get("#DaySelector").type("Tuesday").get('li[data-option-index="0"]').click();
+    cy.get("#StartTimeSelector").type("6").get('li[data-option-index="0"]').click();
+    cy.get("#EndTimeSelector").type("9").get('li[data-option-index="0"]').click();
+    cy.findByTitle("addbutton").click();
+    cy.findByTitle("submit").click();
+    cy.findByTitle("AllAvailability").children().should('have.length', 2);
+  })
+
+  it("Merge availabilities", () => {
+    cy.visit("localhost:3000/signin");
+    cy.findByTitle("username").type("Bob");
+    cy.findByTitle("password").type("password");
+    cy.findByTitle("submit").click();
+    cy.url().should('include', "localhost:3000").then( ($divMain) => {
+      cy.wait(1000) });
+    cy.reload();
+    cy.visit("localhost:3000/profile");
+    cy.url().should('include', "profile");
+    cy.reload();
+    cy.get("#DaySelector").type("Sunday").get('li[data-option-index="0"]').click();
+    cy.get("#StartTimeSelector").type("6").get('li[data-option-index="0"]').click();
+    cy.get("#EndTimeSelector").type("9").get('li[data-option-index="0"]').click();
+    cy.findByTitle("addbutton").click();
+    cy.get("#DaySelector").type("Sunday").get('li[data-option-index="0"]').click();
+    cy.get("#StartTimeSelector").type("10:00").get('li[data-option-index="0"]').click();
+    cy.get("#EndTimeSelector").type("11:00").get('li[data-option-index="0"]').click();
+    cy.findByTitle("addbutton").click();
+    cy.get("#DaySelector").type("Sunday").get('li[data-option-index="0"]').click();
+    cy.get("#StartTimeSelector").type("9:00").get('li[data-option-index="0"]').click();
+    cy.get("#EndTimeSelector").type("10:00").get('li[data-option-index="0"]').click();
+    cy.findByTitle("addbutton").click();
+    cy.findByTitle("submit").click();
+    cy.findByTitle("AllAvailability").children().should('have.length', 1);
+  })
+
+  it("Remove availability", () => {
+    cy.visit("localhost:3000/signin");
+    cy.findByTitle("username").type("Alice");
+    cy.findByTitle("password").type("password");
+    cy.findByTitle("submit").click();
+    cy.url().should('include', "localhost:3000").then( ($divMain) => {
+      cy.wait(1000) });
+    cy.reload();
+    cy.visit("localhost:3000/profile");
+    cy.url().should('include', "profile");
+    cy.reload();
+    cy.findByTitle("AllAvailability").children().first().findByTitle("removebutton");
+    cy.findByTitle("submit").click();
+    cy.findByTitle("AllAvailability").children().should('have.length', 1);
+  })
+
 
   /*it('Sign up, sign in, check for one cookie', () => {
     cy.visit('localhost:3000/SignUp')

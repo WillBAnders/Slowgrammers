@@ -162,80 +162,104 @@ export default function ProfilePage({ profile, setProfile }) {
                   sx={{ m: 1 }}
                 />
               </Grid>
-              <Grid item xs={5}>
-                <TextField
-                  fullWidth
-                  required
-                  title="lastname"
-                  id="lastname"
-                  label="Last Name"
-                  defaultValue={profile.lastname ?? ""}
-                  onChange={(e) => update("lastname", e.target.value)}
-                  sx={{ m: 1, pl: 1 }}
-                />
-
-                <TextField
-                  required
-                  fullWidth
-                  title="phone"
-                  id="phone"
-                  label="Phone Number"
-                  defaultValue={profile.phone ?? ""}
-                  onChange={(e) => update("phone", e.target.value)}
-                  sx={{ m: 1, pl: 1 }}
-                />
-              </Grid>
-            </Grid>
-            <TextField
-              required
-              fullWidth
-              title="bio"
-              id="bio"
-              label="Biography"
-              defaultValue={profile.bio ?? ""}
-              onChange={(e) => update("bio", e.target.value)}
-              multiline
-              minRows={5}
-              maxRows={8}
-              sx={{ m: 1, pl: 1 }}
-            />
-            <Button type="submit" title="submit" variant="contained">
-              Update
-            </Button>
-          </Box>
-        </Box>
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{ mt: 2 }}
-          component="form"
-          onSubmit={addTime}
-          noValidate
-        >
-          <Stack direction="row">
-            <Autocomplete
-              disablePortal
-              id="DaySelector"
-              value={day}
-              onChange={(event, newValue) => {
-                setDay(newValue);
-              }}
-              options={DAYS}
-              sx={{ width: { xs: 100, md: 300 } }}
-              renderInput={(params) => <TextField {...params} label="Day" />}
-            />
-            <Autocomplete
-              disablePortal
-              id="StartTimeSelector"
-              options={TIMES}
-              value={startTime}
-              onChange={(event, newValue) => {
-                setStartTime(newValue);
-              }}
-              sx={{ width: { xs: 100, md: 300 } }}
-              renderInput={(params) => (
-                <TextField {...params} label="Start Time" />
+              {profile.bio !== undefined && (
+                <Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    sx={{ m: 2 }}
+                  >
+                    <Stack direction="row" spacing={1}>
+                      <Autocomplete
+                        disablePortal
+                        title="DaySelector"
+                        id="DaySelector"
+                        value={day}
+                        onChange={(event, newValue) => {
+                          setDay(newValue);
+                        }}
+                        options={DAYS}
+                        sx={{ width: { xs: 100, md: 300 } }}
+                        renderInput={(params) => (
+                          <TextField {...params} label="Day" title="DaySelectorText" />
+                        )}
+                      />
+                      <Autocomplete
+                        disablePortal
+                        title="StartTimeSelector"
+                        id="StartTimeSelector"
+                        options={TIMES}
+                        value={startTime}
+                        onChange={(event, newValue) => {
+                          setStartTime(newValue);
+                        }}
+                        sx={{ width: { xs: 100, md: 300 } }}
+                        renderInput={(params) => (
+                          <TextField {...params} label="Start Time" title="StartTimeText" />
+                        )}
+                      />
+                      <Autocomplete
+                        disablePortal
+                        title="EndTimeSelector"
+                        id="EndTimeSelector"
+                        value={endTime}
+                        onChange={(event, newValue) => {
+                          setEndTime(newValue);
+                        }}
+                        options={TIMES}
+                        sx={{ width: { xs: 100, md: 300 } }}
+                        renderInput={(params) => (
+                          <TextField {...params} label="End Time" title="EndTimeText" />
+                        )}
+                      />
+                      <Button
+                        title="addbutton"
+                        onClick={addTime}
+                        aria-label="AddIcon"
+                        variant="contained"
+                        color="success"
+                      >
+                        <AddIcon />
+                      </Button>
+                    </Stack>
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    sx={{ mt: 2 }}
+                  >
+                    <Stack spacing={1} title="AllAvailability">
+                      {availability.length === 0 ? (
+                        <Typography>No availability given</Typography>
+                      ) : (
+                        availability.map((a, i) => (
+                          <Stack
+                            direction="row"
+                            key={a.day + " " + a.startTime}
+                            spacing={1}
+                          >
+                            <Card sx={{ width: 280 }}>
+                              <CardContent>
+                                {a.day + ": " + a.startTime + " - " + a.endTime}
+                              </CardContent>
+                            </Card>
+                            <Button
+                              title="removebutton"
+                              onClick={(e) => removeTime(e, i)}
+                              aria-label="DeleteIcon"
+                              variant="contained"
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </Button>
+                          </Stack>
+                        ))
+                      )}
+                    </Stack>
+                  </Box>
+                </Box>
               )}
             />
             <Autocomplete
