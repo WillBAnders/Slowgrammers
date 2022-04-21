@@ -75,7 +75,7 @@ describe("ProfilePage", () => {
         "/profile",
         expect.objectContaining({
           method: "PATCH",
-          body: JSON.stringify({ [name]: value, availability: [] }),
+          body: JSON.stringify({ [name]: value }),
         })
       );
       expect(setProfile).toHaveBeenCalledWith(undefined);
@@ -117,7 +117,6 @@ describe("ProfilePage", () => {
           body: JSON.stringify({
             firstname: "First",
             lastname: "Last",
-            availability: [],
           }),
         })
       );
@@ -154,7 +153,7 @@ describe("ProfilePage", () => {
         "/profile",
         expect.objectContaining({
           method: "PATCH",
-          body: JSON.stringify({ firstname: "", availability: [] }),
+          body: JSON.stringify({ firstname: "" }),
         })
       );
       expect(setProfile).toHaveBeenCalledWith(undefined);
