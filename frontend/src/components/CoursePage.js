@@ -35,7 +35,7 @@ export default function CoursePage({ profile, setProfile }) {
       }),
     })
       .then((r) => {
-        setProfile(undefined);
+        window.location.reload(false);
       })
       .catch((error) => {
         alert(`Error ${error.status ?? "(Unexpected)"}: ${error.message}`);
